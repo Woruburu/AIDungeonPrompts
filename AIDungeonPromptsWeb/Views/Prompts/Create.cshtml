@@ -51,7 +51,7 @@
 		<div class="card">
 			<div class="card-body">
 				@Html.EditorFor(m => m.WorldInfos)
-				<button asp-controller="Prompts" asp-action="Create" asp-route-addWi="@true" asp-fragment="world-infos" class="btn btn-secondary">Add Another</button>
+				<button asp-controller="Prompts" asp-action="Create" asp-route-addWi="@true" asp-fragment="world-infos" class="btn btn-secondary" onclick="wiAddClick()">Add Another</button>
 			</div>
 		</div>
 	</div>
@@ -63,4 +63,10 @@
 
 @section Scripts {
 	<partial name="_ValidationScriptsPartial.cshtml" />
+<script>
+	function wiAddClick() {
+		var settngs = $.data($('form')[0], 'validator').settings;
+		settngs.ignore = "*";
+	}
+</script>
 }

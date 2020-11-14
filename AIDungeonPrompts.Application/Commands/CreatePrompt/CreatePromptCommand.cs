@@ -21,7 +21,7 @@ namespace AIDungeonPrompts.Application.Commands.CreatePrompt
 		[Display(Name = "NSFW?")]
 		public bool Nsfw { get; set; }
 
-		[Display(Name = "Prompt")]
+		[Display(Name = "Prompt"), Required(ErrorMessage = "Please supply a Prompt")]
 		public string PromptContent { get; set; } = string.Empty;
 
 		[Display(Name = "Tags (comma delimited)"), Required(ErrorMessage = "Please supply at least a single tag")]
@@ -29,6 +29,7 @@ namespace AIDungeonPrompts.Application.Commands.CreatePrompt
 
 		public string? Quests { get; set; }
 
+		[Required(ErrorMessage = "Please supply a Title")]
 		public string Title { get; set; } = string.Empty;
 
 		[Display(Name = "World Info's")]

@@ -92,7 +92,7 @@
 		}
 		<li class="page-item disabled">
 			<span class="page-link">
-				@Model.Page
+				@(Model.Page ?? 1)
 			</span>
 		</li>
 		@if(page+1 <= Model.SearchResult.TotalPages)
