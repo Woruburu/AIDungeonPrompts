@@ -1,0 +1,25 @@
+@model AIDungeonPrompts.Application.Queries.SearchPrompts.SearchPromptsResultViewModel
+<div class="col-sm-6 mb-4">
+	<div class="card">
+		<div class="card-body">
+			<a asp-controller="Prompts" asp-action="View" asp-route-id="@Model.Id">
+				<h5 class="card-title">@Model.Title</h5>
+			</a>
+			<p class="card-text">@(!string.IsNullOrWhiteSpace(Model.Description) ? Model.Description : Model.PromptContent)</p>
+		</div>
+		<div class="card-footer bg-transparent" style="border:0">
+			<p>
+				@Html.DisplayNameFor(_ => Model.SearchPromptsTagViewModel):
+				@if (Model.Nsfw)
+				{
+					<a asp-controller="Search" asp-action="Index" asp-route-NsfwSetting="2"><span class="badge badge-danger">NSFW</span></a>
+				}
+				@foreach (var tag in Model.SearchPromptsTagViewModel)
+				{
+					<a asp-controller="Search" asp-action="Index" asp-route-Tags="@tag.Name"><span class="badge badge-primary">@tag.Name</span></a>
+				}
+			</p>
+			<a asp-controller="Prompts" asp-action="View" asp-route-id="@Model.Id" class="btn btn-primary">View Prompt</a>
+		</div>
+	</div>
+</div>

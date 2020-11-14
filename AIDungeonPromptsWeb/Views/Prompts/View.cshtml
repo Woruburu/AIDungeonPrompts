@@ -1,0 +1,85 @@
+@model AIDungeonPrompts.Application.Queries.GetPrompt.GetPromptViewModel
+@{ ViewData["Title"] = Model.Title; }
+<h3>@Model.Title</h3>
+<p>Uploaded on @Model.DateCreated.ToShortDateString()</p>
+<p>
+	Tags:
+	@if (Model.Nsfw)
+	{
+		<span class="badge badge-danger">NSFW</span>
+	}
+	@foreach (var tag in Model.PromptTags)
+	{
+		<span class="badge badge-primary">@tag.Name</span>
+	}
+</p>
+
+@if (!string.IsNullOrWhiteSpace(Model.Description))
+{
+	
+	<h5>@Html.DisplayNameFor(m => m.Description)</h5>
+	<div class="card mb-4">
+		<div class="card-body">
+			@Html.DisplayFor(m => m.Description)
+		</div>
+	</div>
+}
+
+<h5>@Html.DisplayNameFor(m => m.PromptContent)</h5>
+<div class="card mb-4">
+	<div class="card-body">
+		@Html.DisplayFor(m => m.PromptContent)
+	</div>
+</div>
+
+
+@if (!string.IsNullOrWhiteSpace(Model.Memory))
+{
+	<h5>@Html.DisplayNameFor(m => m.Memory)</h5>
+	<div class="card mb-4">
+		<div class="card-body">
+			@Html.DisplayFor(m => m.Memory)
+		</div>
+	</div>
+}
+
+@if (!string.IsNullOrWhiteSpace(Model.AuthorsNote))
+{
+	<h5>@Html.DisplayNameFor(m => m.AuthorsNote)</h5>
+	<div class="card mb-4">
+		<div class="card-body">
+			@Html.DisplayFor(m => m.AuthorsNote)
+		</div>
+	</div>
+}
+
+@if (!string.IsNullOrWhiteSpace(Model.Quests))
+{
+	<h5>@Html.DisplayNameFor(m => m.Quests)</h5>
+	<div class="card mb-4">
+		<div class="card-body">
+			@Html.DisplayFor(m => m.Quests)
+		</div>
+	</div>
+}
+
+@if (Model.WorldInfos.Any())
+{
+	<h5 class="card-title">@Html.DisplayNameFor(m => m.WorldInfos)</h5>
+	<div class="row">
+		@foreach (var worldInfo in Model.WorldInfos)
+		{
+			<div class="col-sm-6 mb-4">
+				<div class="card">
+					<div class="card-body">
+						<h5>@Html.DisplayNameFor(_ => worldInfo.Keys)</h5>
+						@Html.DisplayFor(_ => worldInfo.Keys)
+						<hr />
+						<h5>@Html.DisplayNameFor(_ => worldInfo.Entry)</h5>
+						@Html.DisplayFor(_ => worldInfo.Entry)
+					</div>
+				</div>
+			</div>
+		}
+	</div>
+}

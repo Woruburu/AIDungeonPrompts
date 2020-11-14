@@ -1,0 +1,8 @@
+@model AIDungeonPrompts.Application.Queries.SearchPrompts.SearchPromptsViewModel
+@{ ViewData["Title"] = "Home"; }
+
+<h2>Latest Prompts</h2>
+<br/>
+<div class="row">
+	@Html.DisplayFor(m => m.Results)
+</div>

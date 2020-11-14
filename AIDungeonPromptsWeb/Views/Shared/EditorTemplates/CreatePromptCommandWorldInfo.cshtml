@@ -1,0 +1,12 @@
+@model AIDungeonPrompts.Application.Commands.CreatePrompt.CreatePromptCommandWorldInfo
+
+<div class="form-group">
+	@Html.LabelFor(m => m.Keys)
+	<input asp-for="Keys" class="form-control" />
+	<span asp-validation-for="Keys"></span>
+</div>
+<div class="form-group">
+	@Html.LabelFor(m => m.Entry)
+	<textarea asp-for="Entry" class="form-control"></textarea>
+	<span asp-validation-for="Entry"></span>
+</div>

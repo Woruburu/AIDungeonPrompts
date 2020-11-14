@@ -1,0 +1,66 @@
+@model AIDungeonPrompts.Application.Commands.CreatePrompt.CreatePromptCommand
+@{ ViewData["Title"] = "Create"; }
+
+<h2>Create Prompt</h2>
+<br />
+<form asp-controller="Prompts" asp-action="Create" method="post">
+	<input class="honey" name="Honey" />
+
+	<div class="form-group">
+		@Html.LabelFor(m => m.Title)
+		<input asp-for="Title" class="form-control" />
+		<span class="invalid-feedback" asp-validation-for="Title"></span>
+	</div>
+	<div class="form-group">
+		@Html.LabelFor(m => m.Description)
+		<textarea asp-for="Description" class="form-control"></textarea>
+		<span class="invalid-feedback" asp-validation-for="Description"></span>
+	</div>
+	<div class="form-group">
+		@Html.LabelFor(m => m.PromptContent)
+		<textarea asp-for="PromptContent" class="form-control"></textarea>
+		<span class="invalid-feedback" asp-validation-for="PromptContent"></span>
+	</div>
+	<div class="form-group">
+		@Html.LabelFor(m => m.Memory)
+		<textarea asp-for="Memory" class="form-control"></textarea>
+		<span class="invalid-feedback" asp-validation-for="Memory"></span>
+	</div>
+	<div class="form-group">
+		@Html.LabelFor(m => m.Quests)
+		<textarea asp-for="Quests" class="form-control"></textarea>
+		<span class="invalid-feedback" asp-validation-for="Quests"></span>
+	</div>
+	<div class="form-group">
+		@Html.LabelFor(m => m.AuthorsNote)
+		<textarea asp-for="AuthorsNote" class="form-control"></textarea>
+		<span class="invalid-feedback" asp-validation-for="AuthorsNote"></span>
+	</div>
+	<div class="form-group">
+		@Html.LabelFor(m => m.PromptTags)
+		<input asp-for="PromptTags" class="form-control" />
+		<span class="invalid-feedback" asp-validation-for="PromptTags"></span>
+	</div>
+	<div class="form-check">
+		<input asp-for="Nsfw" class="form-check-input">
+		@Html.LabelFor(m => m.Nsfw, new { @class = "form-check-label" })
+	</div>
+	<br />
+	<div id="world-infos">
+		@Html.LabelFor(m => m.WorldInfos)
+		<div class="card">
+			<div class="card-body">
+				@Html.EditorFor(m => m.WorldInfos)
+				<button asp-controller="Prompts" asp-action="Create" asp-route-addWi="@true" asp-fragment="world-infos" class="btn btn-secondary">Add Another</button>
+			</div>
+		</div>
+	</div>
+	<br />
+	<div class="d-flex flex-row-reverse">
+		<button type="submit" class="btn btn-lg btn-primary">Submit</button>
+	</div>
+</form>
+
+@section Scripts {
+	<partial name="_ValidationScriptsPartial.cshtml" />
+}

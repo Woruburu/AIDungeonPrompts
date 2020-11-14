@@ -1,0 +1,34 @@
+﻿{
+	"Serilog": {
+		"Using": [
+			"Serilog.Sinks.Console"
+		],
+		"MinimumLevel": {
+			"Default": "Information",
+			"Override": {
+				"Microsoft.AspNetCore": "Warning",
+				"CorrelationId": "Warning"
+			}
+		},
+		"WriteTo": [
+			{
+				"Name": "Console"
+			},
+			{
+				"Name": "PostgreSql",
+				"Args": {
+					"connectionString": "",
+					"tableName": "ApplicationLogs",
+					"needAutoCreateTable": true
+				}
+			}
+		],
+		"Enrich": [
+			"FromLogContext",
+			"WithMachineName",
+			"WithThreadId",
+			"WithProcessId",
+			"WithCorrelationId"
+		]
+	}
+}
