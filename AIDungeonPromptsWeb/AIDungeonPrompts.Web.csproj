@@ -6,6 +6,8 @@
 		<AssemblyName>AIDungeonPrompts.Web</AssemblyName>
 		<RootNamespace>AIDungeonPrompts.Web</RootNamespace>
 		<Nullable>enable</Nullable>
+		<UserSecretsId>3b5f46d9-e109-493d-b722-00961ef01293</UserSecretsId>
+		<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -24,6 +26,7 @@
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
+		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.9" />
 		<PackageReference Include="Roslynator.Analyzers" Version="3.0.0">
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
