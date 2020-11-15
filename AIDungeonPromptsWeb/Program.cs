@@ -1,7 +1,5 @@
 using System;
-using AIDungeonPrompts.Persistence.DbContexts;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Serilog;
@@ -21,12 +19,7 @@ namespace AIDungeonPrompts.Web
 			try
 			{
 				Log.Information("Starting web host");
-				var host = CreateHostBuilder(args).Build();
-
-				var db = (AIDungeonPromptsDbContext)host.Services.GetService(typeof(AIDungeonPromptsDbContext))!;
-				db.Database.Migrate();
-
-				host.Run();
+				CreateHostBuilder(args).Build().Run();
 				return 0;
 			}
 			catch (Exception ex)
