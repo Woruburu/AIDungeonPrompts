@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace AIDungeonPrompts.Application.Queries.SearchPrompts
 {
 	public class SearchPromptsResultViewModel
 	{
+		public DateTime DateCreated { get; set; }
 		public string? Description { get; set; }
 		public int Id { get; set; }
 

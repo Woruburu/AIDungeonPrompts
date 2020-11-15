@@ -1,16 +1,20 @@
 @model AIDungeonPrompts.Application.Queries.GetPrompt.GetPromptViewModel
 @{ ViewData["Title"] = Model.Title; }
 <h3>@Model.Title</h3>
-<p>Uploaded on @Model.DateCreated.ToShortDateString()</p>
+<p>Created on @Model.DateCreated.ToShortDateString()</p>
 <p>
 	Tags:
 	@if (Model.Nsfw)
 	{
-		<span class="badge badge-danger">NSFW</span>
+		<a asp-controller="Search" asp-action="Index" asp-route-NsfwSetting="2">
+			<span class="badge badge-danger">NSFW</span>
+		</a>
 	}
 	@foreach (var tag in Model.PromptTags)
 	{
-		<span class="badge badge-primary">@tag.Name</span>
+		<a asp-controller="Search" asp-action="Index" asp-route-Tags="@tag.Name">
+			<span class="badge badge-primary">@tag.Name</span>
+		</a>
 	}
 </p>
 

@@ -12,14 +12,22 @@
 				@Html.DisplayNameFor(_ => Model.SearchPromptsTagViewModel):
 				@if (Model.Nsfw)
 				{
-					<a asp-controller="Search" asp-action="Index" asp-route-NsfwSetting="2"><span class="badge badge-danger">NSFW</span></a>
+					<a asp-controller="Search" asp-action="Index" asp-route-NsfwSetting="2">
+						<span class="badge badge-danger">NSFW</span>
+					</a>
 				}
 				@foreach (var tag in Model.SearchPromptsTagViewModel)
 				{
-					<a asp-controller="Search" asp-action="Index" asp-route-Tags="@tag.Name"><span class="badge badge-primary">@tag.Name</span></a>
+					<a asp-controller="Search" asp-action="Index" asp-route-Tags="@tag.Name">
+						<span class="badge badge-primary">@tag.Name</span>
+					</a>
 				}
+			
 			</p>
-			<a asp-controller="Prompts" asp-action="View" asp-route-id="@Model.Id" class="btn btn-primary">View Prompt</a>
+			<div class="d-flex">
+				<a asp-controller="Prompts" asp-action="View" asp-route-id="@Model.Id" class="btn btn-primary ">View Prompt</a>
+				<span class="align-self-end ml-auto font-small" style="font-size:0.9rem">Created: @Model.DateCreated.ToShortDateString()</span>
+			</div>
 		</div>
 	</div>
 </div>

@@ -78,6 +78,7 @@ namespace AIDungeonPrompts.Application.Queries.SearchPrompts
 					PromptContent = prompt.PromptContent,
 					Nsfw = prompt.Nsfw,
 					Description = prompt.Description,
+					DateCreated = prompt.DateCreated,
 					SearchPromptsTagViewModel = prompt.PromptTags
 						.Select(promptTag => new SearchPromptsTagViewModel
 						{
