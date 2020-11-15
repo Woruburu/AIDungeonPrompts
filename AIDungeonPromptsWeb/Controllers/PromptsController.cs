@@ -53,9 +53,13 @@ namespace AIDungeonPrompts.Web.Controllers
 			return View(new CreateReportCommand { PromptId = id });
 		}
 
-		[HttpPost("{id}/report")]
-		public async Task<ActionResult> Report(int id, CreateReportCommand command)
+		[HttpPost("{id}/report"), ValidateAntiForgeryToken]
+		public async Task<ActionResult> Report(int id, string? honey, CreateReportCommand command)
 		{
+			if (!string.IsNullOrWhiteSpace(honey))
+			{
+				return View(command);
+			}
 			command.PromptId = id;
 			await _mediator.Send(command);
 			return RedirectToAction("View", new { id, reported = true });
