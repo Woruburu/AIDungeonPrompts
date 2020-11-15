@@ -8,6 +8,7 @@ using CorrelationId.DependencyInjection;
 using MediatR;
 using MediatR.Extensions.FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -77,6 +78,8 @@ namespace AIDungeonPrompts.Web
 				.AddFluentValidation(new[] { typeof(ApplicationLayer) }.Select(t => t.Assembly).ToArray())
 				.AddRouting(builder => builder.LowercaseUrls = true)
 				.AddControllersWithViews();
+			services.AddDataProtection()
+				.PersistKeysToDbContext<AIDungeonPromptsDbContext>();
 		}
 	}
 }

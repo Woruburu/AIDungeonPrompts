@@ -3,15 +3,17 @@ using System;
 using AIDungeonPrompts.Persistence.DbContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace AIDungeonPrompts.Persistence.Migrations
 {
     [DbContext(typeof(AIDungeonPromptsDbContext))]
-    partial class AIDungeonPromptsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20201115215301_add_data_protection_keys")]
+    partial class add_data_protection_keys
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -120,7 +122,7 @@ namespace AIDungeonPrompts.Persistence.Migrations
 
                     b.HasIndex("PromptId");
 
-                    b.ToTable("Reports");
+                    b.ToTable("Report");
                 });
 
             modelBuilder.Entity("AIDungeonPrompts.Domain.Entities.Tag", b =>

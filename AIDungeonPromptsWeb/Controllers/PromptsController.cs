@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using AIDungeonPrompts.Application.Commands.CreatePrompt;
+using AIDungeonPrompts.Application.Commands.CreateReport;
 using AIDungeonPrompts.Application.Queries.GetPrompt;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -45,11 +46,33 @@ namespace AIDungeonPrompts.Web.Controllers
 			return RedirectToAction("View", new { id });
 		}
 
-		[HttpGet("[controller]/{id}")]
-		public async Task<ActionResult> View(int id)
+		[HttpGet("{id}/report")]
+		public async Task<ActionResult> Report(int id)
 		{
+			ViewData["prompt"] = await _mediator.Send(new GetPromptQuery { Id = id });
+			return View(new CreateReportCommand { PromptId = id });
+		}
+
+		[HttpPost("{id}/report")]
+		public async Task<ActionResult> Report(int id, CreateReportCommand command)
+		{
+			command.PromptId = id;
+			await _mediator.Send(command);
+			return RedirectToAction("View", new { id, reported = true });
+		}
+
+		[HttpGet("/{id}")]
+		public async Task<ActionResult> View(int id, bool? reported)
+		{
+			ViewData["reported"] = reported ?? false;
 			var prompt = await _mediator.Send(new GetPromptQuery { Id = id });
 			return View(prompt);
+		}
+
+		[HttpGet("[controller]/{id}")]
+		public ActionResult ViewOld(int id)
+		{
+			return RedirectToActionPermanent("View", new { id });
 		}
 	}
 }

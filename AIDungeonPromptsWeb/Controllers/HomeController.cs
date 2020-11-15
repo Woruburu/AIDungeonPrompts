@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using AIDungeonPrompts.Application.Queries.SearchPrompts;
 using AIDungeonPrompts.Web.Models;
@@ -22,10 +24,44 @@ namespace AIDungeonPrompts.Web.Controllers
 			return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
 		}
 
-		public async Task<ActionResult<SearchPromptsViewModel>> Index()
+		public async Task<ActionResult> Index(SearchRequestParameters request)
 		{
-			var results = await _mediator.Send(new SearchPromptsQuery { Nsfw = SearchNsfw.Both });
-			return View(results);
+			var tags = new List<string>();
+			if (!string.IsNullOrWhiteSpace(request.Tags))
+			{
+				tags = request.Tags.Split(',').Select(t => t.Trim()).ToList();
+			}
+			var nsfwIndex = tags.FindIndex(t => string.Equals("nsfw", t, System.StringComparison.OrdinalIgnoreCase));
+			if (nsfwIndex > -1)
+			{
+				request.NsfwSetting = SearchNsfw.NsfwOnly;
+				tags.RemoveAt(nsfwIndex);
+			}
+
+			var result = await _mediator.Send(new SearchPromptsQuery
+			{
+				Page = request.Page ?? 1,
+				Reverse = request.Reverse,
+				Search = request.Query ?? string.Empty,
+				Tags = tags,
+				Nsfw = request.NsfwSetting
+			});
+
+			return View(new SearchViewModel
+			{
+				Page = request.Page,
+				Query = request.Query,
+				Reverse = request.Reverse,
+				Tags = request.Tags,
+				NsfwSetting = request.NsfwSetting,
+				SearchResult = result
+			});
+		}
+
+		[HttpGet("[controller]/whats-new")]
+		public IActionResult WhatsNew()
+		{
+			return View();
 		}
 	}
 }

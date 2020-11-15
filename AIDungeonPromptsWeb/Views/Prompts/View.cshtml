@@ -1,19 +1,38 @@
 @model AIDungeonPrompts.Application.Queries.GetPrompt.GetPromptViewModel
-@{ ViewData["Title"] = Model.Title; }
-<h3>@Model.Title</h3>
-<p>Created on @Model.DateCreated.ToShortDateString()</p>
+@{
+	ViewData["Title"] = Model.Title;
+	var reported = (bool)ViewData["reported"];
+}
+@if(reported)
+{
+	<div class="alert alert-danger alert-dismissible fade show" role="alert">
+		You have successfully reported this prompt.
+		<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+			<span aria-hidden="true">&times;</span>
+		</button>
+	</div>
+}
+<div class="d-flex">
+	<div>
+		<h3>@Model.Title</h3>
+		<p>Created on @Model.DateCreated.ToShortDateString()</p>
+	</div>
+	<div class="ml-auto">
+		<a asp-action="Report" asp-route-id="@Model.Id" class="btn btn-danger">Report</a>
+	</div>
+</div>
 <p>
 	Tags:
 	@if (Model.Nsfw)
 	{
 		<a asp-controller="Search" asp-action="Index" asp-route-NsfwSetting="2">
-			<span class="badge badge-danger">NSFW</span>
+			<code class="badge badge-danger">NSFW</code>
 		</a>
 	}
 	@foreach (var tag in Model.PromptTags)
 	{
 		<a asp-controller="Search" asp-action="Index" asp-route-Tags="@tag.Name">
-			<span class="badge badge-primary">@tag.Name</span>
+			<code class="badge badge-primary">@tag.Name</code>
 		</a>
 	}
 </p>
@@ -24,7 +43,7 @@
 	<h5>@Html.DisplayNameFor(m => m.Description)</h5>
 	<div class="card mb-4">
 		<div class="card-body">
-			<div class="card-text pre-line">@Html.DisplayFor(m => m.Description)</div>
+			<code class="card-text pre-line">@Html.DisplayFor(m => m.Description)</code>
 		</div>
 	</div>
 }
@@ -32,7 +51,7 @@
 <h5>@Html.DisplayNameFor(m => m.PromptContent)</h5>
 <div class="card mb-4">
 	<div class="card-body">
-		<div class="card-text pre-line">@Html.DisplayFor(m => m.PromptContent)</div>
+		<code class="card-text pre-line">@Html.DisplayFor(m => m.PromptContent)</code>
 	</div>
 </div>
 
@@ -42,7 +61,7 @@
 	<h5>@Html.DisplayNameFor(m => m.Memory)</h5>
 	<div class="card mb-4">
 		<div class="card-body">
-			<div class="card-text pre-line">@Html.DisplayFor(m => m.Memory)</div>
+			<code class="card-text pre-line">@Html.DisplayFor(m => m.Memory)</code>
 		</div>
 	</div>
 }
@@ -77,10 +96,10 @@
 				<div class="card">
 					<div class="card-body">
 						<h5>@Html.DisplayNameFor(_ => worldInfo.Keys)</h5>
-						@Html.DisplayFor(_ => worldInfo.Keys)
+						<code class="card-text pre-line">@Html.DisplayFor(_ => worldInfo.Keys)</code>
 						<hr />
 						<h5>@Html.DisplayNameFor(_ => worldInfo.Entry)</h5>
-						<div class="card-text pre-line">@Html.DisplayFor(_ => worldInfo.Entry)</div>
+						<code class="card-text pre-line">@Html.DisplayFor(_ => worldInfo.Entry)</code>
 					</div>
 				</div>
 			</div>
