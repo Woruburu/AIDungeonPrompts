@@ -84,6 +84,10 @@ namespace AIDungeonPrompts.Application.Commands.CreatePrompt
 			var promptTags = request.PromptTags.Split(',').Select(p => p.Trim().ToLower()).Distinct();
 			foreach (var promptTag in promptTags)
 			{
+				if (string.IsNullOrWhiteSpace(promptTag))
+				{
+					continue;
+				}
 				if (string.Equals(promptTag, "nsfw", StringComparison.OrdinalIgnoreCase))
 				{
 					prompt.Nsfw = true;
