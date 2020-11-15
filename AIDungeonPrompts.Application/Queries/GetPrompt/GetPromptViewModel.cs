@@ -12,7 +12,7 @@ namespace AIDungeonPrompts.Application.Queries.GetPrompt
 
 	public class GetPromptViewModel
 	{
-		[Display(Name = "Authors Note")]
+		[Display(Name = "Author's Note")]
 		public string? AuthorsNote { get; set; }
 
 		public DateTime DateCreated { get; set; }
@@ -32,7 +32,7 @@ namespace AIDungeonPrompts.Application.Queries.GetPrompt
 		public string? Quests { get; set; }
 		public string Title { get; set; } = string.Empty;
 
-		[Display(Name = "World Info's")]
+		[Display(Name = "World Info")]
 		public IEnumerable<GetPromptWorldInfoViewModel> WorldInfos { get; set; } = new List<GetPromptWorldInfoViewModel>();
 	}
 

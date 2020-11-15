@@ -13,7 +13,7 @@ namespace AIDungeonPrompts.Application.Commands.CreatePrompt
 {
 	public class CreatePromptCommand : IRequest<int>
 	{
-		[Display(Name = "Authors Note")]
+		[Display(Name = "Author's Note")]
 		public string? AuthorsNote { get; set; }
 
 		public string? Description { get; set; }
@@ -33,7 +33,7 @@ namespace AIDungeonPrompts.Application.Commands.CreatePrompt
 		[Required(ErrorMessage = "Please supply a Title")]
 		public string Title { get; set; } = string.Empty;
 
-		[Display(Name = "World Info's")]
+		[Display(Name = "World Info")]
 		public List<CreatePromptCommandWorldInfo> WorldInfos { get; set; } = new List<CreatePromptCommandWorldInfo>()
 		{
 			new CreatePromptCommandWorldInfo(),
@@ -84,7 +84,7 @@ namespace AIDungeonPrompts.Application.Commands.CreatePrompt
 			var promptTags = request.PromptTags.Split(',').Select(p => p.Trim().ToLower()).Distinct();
 			foreach (var promptTag in promptTags)
 			{
-				if(string.Equals(promptTag, "nsfw", StringComparison.OrdinalIgnoreCase))
+				if (string.Equals(promptTag, "nsfw", StringComparison.OrdinalIgnoreCase))
 				{
 					prompt.Nsfw = true;
 					continue;
