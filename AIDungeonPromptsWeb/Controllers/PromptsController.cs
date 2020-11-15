@@ -22,7 +22,7 @@ namespace AIDungeonPrompts.Web.Controllers
 		}
 
 		[HttpPost, ValidateAntiForgeryToken]
-		public async Task<ActionResult> Create(bool addWi, string honey, CreatePromptCommand command)
+		public async Task<ActionResult> Create(bool addWi, string? honey, CreatePromptCommand command)
 		{
 			if (!string.IsNullOrWhiteSpace(honey))
 			{
