@@ -5,7 +5,7 @@
 			<a asp-controller="Prompts" asp-action="View" asp-route-id="@Model.Id">
 				<h5 class="card-title">@Model.Title</h5>
 			</a>
-			<p class="card-text">@(!string.IsNullOrWhiteSpace(Model.Description) ? Model.Description : Model.PromptContent)</p>
+			<p class="card-text truncated">@(!string.IsNullOrWhiteSpace(Model.Description) ? Model.Description : Model.PromptContent)</p>
 		</div>
 		<div class="card-footer bg-transparent" style="border:0">
 			<p>

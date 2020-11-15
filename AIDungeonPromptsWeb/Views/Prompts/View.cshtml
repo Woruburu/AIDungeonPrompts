@@ -20,7 +20,7 @@
 	<h5>@Html.DisplayNameFor(m => m.Description)</h5>
 	<div class="card mb-4">
 		<div class="card-body">
-			@Html.DisplayFor(m => m.Description)
+			<div class="card-text pre-line">@Html.DisplayFor(m => m.Description)</div>
 		</div>
 	</div>
 }
@@ -28,7 +28,7 @@
 <h5>@Html.DisplayNameFor(m => m.PromptContent)</h5>
 <div class="card mb-4">
 	<div class="card-body">
-		@Html.DisplayFor(m => m.PromptContent)
+		<div class="card-text pre-line">@Html.DisplayFor(m => m.PromptContent)</div>
 	</div>
 </div>
 
@@ -38,7 +38,7 @@
 	<h5>@Html.DisplayNameFor(m => m.Memory)</h5>
 	<div class="card mb-4">
 		<div class="card-body">
-			@Html.DisplayFor(m => m.Memory)
+			<div class="card-text pre-line">@Html.DisplayFor(m => m.Memory)</div>
 		</div>
 	</div>
 }
@@ -48,7 +48,7 @@
 	<h5>@Html.DisplayNameFor(m => m.AuthorsNote)</h5>
 	<div class="card mb-4">
 		<div class="card-body">
-			@Html.DisplayFor(m => m.AuthorsNote)
+			<div class="card-text pre-line">@Html.DisplayFor(m => m.AuthorsNote)</div>
 		</div>
 	</div>
 }
@@ -58,7 +58,7 @@
 	<h5>@Html.DisplayNameFor(m => m.Quests)</h5>
 	<div class="card mb-4">
 		<div class="card-body">
-			@Html.DisplayFor(m => m.Quests)
+			<div class="card-text pre-line">@Html.DisplayFor(m => m.Quests)</div>
 		</div>
 	</div>
 }
@@ -76,7 +76,7 @@
 						@Html.DisplayFor(_ => worldInfo.Keys)
 						<hr />
 						<h5>@Html.DisplayNameFor(_ => worldInfo.Entry)</h5>
-						@Html.DisplayFor(_ => worldInfo.Entry)
+						<div class="card-text pre-line">@Html.DisplayFor(_ => worldInfo.Entry)</div>
 					</div>
 				</div>
 			</div>

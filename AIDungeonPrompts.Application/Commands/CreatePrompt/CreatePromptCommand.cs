@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AIDungeonPrompts.Application.Abstractions.DbContexts;
@@ -80,10 +81,15 @@ namespace AIDungeonPrompts.Application.Commands.CreatePrompt
 				});
 			}
 
-			foreach (var promptTagValue in request.PromptTags.Split(','))
+			var promptTags = request.PromptTags.Split(',').Select(p => p.Trim().ToLower()).Distinct();
+			foreach (var promptTag in promptTags)
 			{
-				var promptTag = promptTagValue.Trim();
-				var tag = await _dbContext.Tags.FirstOrDefaultAsync(e => e.Name == promptTag);
+				if(string.Equals(promptTag, "nsfw", StringComparison.OrdinalIgnoreCase))
+				{
+					prompt.Nsfw = true;
+					continue;
+				}
+				var tag = await _dbContext.Tags.FirstOrDefaultAsync(e => EF.Functions.ILike(e.Name, promptTag));
 				if (tag == null)
 				{
 					prompt.PromptTags.Add(new PromptTag { Prompt = prompt, Tag = new Tag { Name = promptTag } });

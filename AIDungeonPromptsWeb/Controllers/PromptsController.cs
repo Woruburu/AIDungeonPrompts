@@ -35,10 +35,12 @@ namespace AIDungeonPrompts.Web.Controllers
 				command.WorldInfos.Add(new CreatePromptCommandWorldInfo());
 				return View(command);
 			}
+
 			if (!ModelState.IsValid)
 			{
 				return View(command);
 			}
+
 			var id = await _mediator.Send(command);
 			return RedirectToAction("View", new { id });
 		}
