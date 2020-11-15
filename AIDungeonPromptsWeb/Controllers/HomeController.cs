@@ -58,7 +58,7 @@ namespace AIDungeonPrompts.Web.Controllers
 			});
 		}
 
-		[HttpGet("[controller]/whats-new")]
+		[HttpGet("/whats-new")]
 		public IActionResult WhatsNew()
 		{
 			return View();
