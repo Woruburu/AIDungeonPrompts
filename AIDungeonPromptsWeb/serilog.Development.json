@@ -1,15 +1,5 @@
 {
 	"Serilog": {
-		"Using": [
-			"Serilog.Sinks.Console"
-		],
-		"MinimumLevel": {
-			"Default": "Information",
-			"Override": {
-				"Microsoft.AspNetCore": "Warning",
-				"CorrelationId": "Warning"
-			}
-		},
 		"WriteTo": [
 			{
 				"Name": "Console"
@@ -19,16 +9,14 @@
 				"Args": {
 					"connectionString": "Server=127.0.0.1;Port=5432;Database=aidungeonprompts;User Id=postgres;Password=postgres;",
 					"tableName": "ApplicationLogs",
-					"needAutoCreateTable": true
+					"needAutoCreateTable": true,
+					"loggerColumnOptions": {
+						"Id": "IdAutoIncrement",
+						"TimeStamp": "Timestamp",
+						"LogEvent": "Properties"
+					}
 				}
 			}
-		],
-		"Enrich": [
-			"FromLogContext",
-			"WithMachineName",
-			"WithThreadId",
-			"WithProcessId",
-			"WithCorrelationId"
 		]
 	}
 }

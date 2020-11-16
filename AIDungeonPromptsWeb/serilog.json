@@ -1,4 +1,4 @@
-﻿{
+{
 	"Serilog": {
 		"Using": [
 			"Serilog.Sinks.Console"
@@ -6,6 +6,8 @@
 		"MinimumLevel": {
 			"Default": "Information",
 			"Override": {
+				"Microsoft.EntityFrameworkCore": "Warning",
+				"Microsoft.EntityFrameworkCore.Migrations": "Information",
 				"Microsoft.AspNetCore": "Warning",
 				"CorrelationId": "Warning"
 			}
@@ -19,15 +21,23 @@
 				"Args": {
 					"connectionString": "",
 					"tableName": "ApplicationLogs",
-					"needAutoCreateTable": true
+					"needAutoCreateTable": true,
+					"loggerColumnOptions": {
+						"Id": "IdAutoIncrement",
+						"Level": "LevelAsText",
+						"TimeStamp": "Timestamp",
+						"Properties": "Properties",
+						"LogEvent": "LogEvent",
+						"Message": "Message",
+						"RenderedMessage": "RenderedMessage",
+						"Exception": "Exception"
+					}
 				}
 			}
 		],
 		"Enrich": [
 			"FromLogContext",
-			"WithMachineName",
 			"WithThreadId",
-			"WithProcessId",
 			"WithCorrelationId"
 		]
 	}

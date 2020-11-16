@@ -11,7 +11,11 @@ namespace AIDungeonPrompts.Persistence
 			string databaseConnection)
 		{
 			services
-				.AddDbContext<AIDungeonPromptsDbContext>(options => options.UseNpgsql(databaseConnection))
+				.AddDbContext<AIDungeonPromptsDbContext>(options => options.UseNpgsql(databaseConnection, builder =>
+				{
+					// See: https://docs.microsoft.com/en-us/ef/core/querying/single-split-queries
+					builder.UseQuerySplittingBehavior(QuerySplittingBehavior.SingleQuery);
+				}))
 				.AddScoped<IAIDungeonPromptsDbContext>(provider => provider.GetService<AIDungeonPromptsDbContext>()!);
 
 			return services;
