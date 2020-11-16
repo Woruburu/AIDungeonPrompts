@@ -1,21 +1,20 @@
-@model AIDungeonPrompts.Application.Commands.CreateReport.CreateReportCommand
+@model CreateReportViewModel
 @using AIDungeonPrompts.Domain.Enums
 @{
 	ViewData["Title"] = "Report";
-	var prompt = (AIDungeonPrompts.Application.Queries.GetPrompt.GetPromptViewModel)ViewData["prompt"];
 }
-<h2>Report @prompt.Title</h2>
+<h2>Report @Model.Prompt.Title</h2>
 <br />
 <form asp-controller="Prompts" asp-action="Report" method="post">
 	<input class="honey" name="Honey" />
 	<div class="form-group required">
-		@Html.LabelFor(m => m.ReportReason)
-		<select class="form-control" asp-for="ReportReason" asp-items="Html.GetEnumSelectList<ReportReason>()"></select>
+		@Html.LabelFor(m => m.Command.ReportReason)
+		<select class="form-control" asp-for="Command.ReportReason" asp-items="Html.GetEnumSelectList<ReportReason>()"></select>
 	</div>
 	<div class="form-group">
-		@Html.LabelFor(m => m.ExtraDetails)
-		<textarea asp-for="ExtraDetails" class="form-control"></textarea>
-		<span class="invalid-feedback" asp-validation-for="ExtraDetails"></span>
+		@Html.LabelFor(m => m.Command.ExtraDetails)
+		<textarea asp-for="Command.ExtraDetails" class="form-control"></textarea>
+		<span class="invalid-feedback" asp-validation-for="Command.ExtraDetails"></span>
 	</div>
 	<div class="d-flex flex-row-reverse">
 		<button type="submit" class="btn btn-lg btn-primary">Submit</button>

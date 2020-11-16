@@ -24,7 +24,7 @@ namespace AIDungeonPrompts.Web.Controllers
 			return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
 		}
 
-		public async Task<ActionResult> Index(SearchRequestParameters request)
+		public async Task<IActionResult> Index(SearchRequestParameters request)
 		{
 			var tags = new List<string>();
 			if (!string.IsNullOrWhiteSpace(request.Tags))

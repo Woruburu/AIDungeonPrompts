@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using AIDungeonPrompts.Application.Commands.CreatePrompt;
-using AIDungeonPrompts.Application.Commands.CreateReport;
 using AIDungeonPrompts.Application.Queries.GetPrompt;
+using AIDungeonPrompts.Web.Models;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,7 +23,7 @@ namespace AIDungeonPrompts.Web.Controllers
 		}
 
 		[HttpPost, ValidateAntiForgeryToken]
-		public async Task<ActionResult> Create(bool addWi, string? honey, CreatePromptCommand command)
+		public async Task<IActionResult> Create(bool addWi, string? honey, CreatePromptCommand command)
 		{
 			if (!string.IsNullOrWhiteSpace(honey))
 			{
@@ -47,34 +47,34 @@ namespace AIDungeonPrompts.Web.Controllers
 		}
 
 		[HttpGet("{id}/report")]
-		public async Task<ActionResult> Report(int id)
+		public async Task<IActionResult> Report(int id)
 		{
-			ViewData["prompt"] = await _mediator.Send(new GetPromptQuery { Id = id });
-			return View(new CreateReportCommand { PromptId = id });
+			var prompt = await _mediator.Send(new GetPromptQuery { Id = id });
+			return View(new CreateReportViewModel { Prompt = prompt });
 		}
 
 		[HttpPost("{id}/report"), ValidateAntiForgeryToken]
-		public async Task<ActionResult> Report(int id, string? honey, CreateReportCommand command)
+		public async Task<IActionResult> Report(int id, string? honey, CreateReportViewModel viewModel)
 		{
-			if (!string.IsNullOrWhiteSpace(honey))
+			if (!string.IsNullOrWhiteSpace(honey) || !ModelState.IsValid)
 			{
-				return View(command);
+				viewModel.Prompt = await _mediator.Send(new GetPromptQuery { Id = id });
+				return View(viewModel);
 			}
-			command.PromptId = id;
-			await _mediator.Send(command);
+			viewModel.Command.PromptId = id;
+			await _mediator.Send(viewModel.Command);
 			return RedirectToAction("View", new { id, reported = true });
 		}
 
 		[HttpGet("/{id}")]
-		public async Task<ActionResult> View(int id, bool? reported)
+		public async Task<IActionResult> View(int id, bool? reported)
 		{
-			ViewData["reported"] = reported ?? false;
 			var prompt = await _mediator.Send(new GetPromptQuery { Id = id });
-			return View(prompt);
+			return View(new ViewPromptViewModel { Prompt = prompt, Reported = reported });
 		}
 
 		[HttpGet("[controller]/{id}")]
-		public ActionResult ViewOld(int id)
+		public IActionResult ViewOld(int id)
 		{
 			return RedirectToActionPermanent("View", new { id });
 		}

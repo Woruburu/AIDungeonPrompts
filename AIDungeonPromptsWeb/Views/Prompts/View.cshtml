@@ -1,9 +1,8 @@
-@model AIDungeonPrompts.Application.Queries.GetPrompt.GetPromptViewModel
+@model ViewPromptViewModel
 @{
-	ViewData["Title"] = Model.Title;
-	var reported = (bool)ViewData["reported"];
+	ViewData["Title"] = Model.Prompt.Title;
 }
-@if(reported)
+@if(Model.Reported ?? false)
 {
 	<div class="alert alert-danger alert-dismissible fade show" role="alert">
 		You have successfully reported this prompt.
@@ -14,22 +13,22 @@
 }
 <div class="d-flex">
 	<div>
-		<h3>@Model.Title</h3>
-		<p>Created on @Model.DateCreated.ToShortDateString()</p>
+		<h3>@Model.Prompt.Title</h3>
+		<p>Created on @Model.Prompt.DateCreated.ToShortDateString()</p>
 	</div>
 	<div class="ml-auto">
-		<a asp-action="Report" asp-route-id="@Model.Id" class="btn btn-danger">Report</a>
+		<a asp-action="Report" asp-route-id="@Model.Prompt.Id" class="btn btn-danger">Report</a>
 	</div>
 </div>
 <p>
 	Tags:
-	@if (Model.Nsfw)
+	@if (Model.Prompt.Nsfw)
 	{
 		<a asp-controller="Search" asp-action="Index" asp-route-NsfwSetting="2">
 			<code class="badge badge-danger">NSFW</code>
 		</a>
 	}
-	@foreach (var tag in Model.PromptTags)
+	@foreach (var tag in Model.Prompt.PromptTags)
 	{
 		<a asp-controller="Search" asp-action="Index" asp-route-Tags="@tag.Name">
 			<code class="badge badge-primary">@tag.Name</code>
@@ -37,60 +36,60 @@
 	}
 </p>
 
-@if (!string.IsNullOrWhiteSpace(Model.Description))
+@if (!string.IsNullOrWhiteSpace(Model.Prompt.Description))
 {
 	
-	<h5>@Html.DisplayNameFor(m => m.Description)</h5>
+	<h5>@Html.DisplayNameFor(m => m.Prompt.Description)</h5>
 	<div class="card mb-4">
 		<div class="card-body">
-			<code class="card-text pre-line">@Html.DisplayFor(m => m.Description)</code>
+			<code class="card-text pre-line">@Html.DisplayFor(m => m.Prompt.Description)</code>
 		</div>
 	</div>
 }
 
-<h5>@Html.DisplayNameFor(m => m.PromptContent)</h5>
+<h5>@Html.DisplayNameFor(m => m.Prompt.PromptContent)</h5>
 <div class="card mb-4">
 	<div class="card-body">
-		<code class="card-text pre-line">@Html.DisplayFor(m => m.PromptContent)</code>
+		<code class="card-text pre-line">@Html.DisplayFor(m => m.Prompt.PromptContent)</code>
 	</div>
 </div>
 
 
-@if (!string.IsNullOrWhiteSpace(Model.Memory))
+@if (!string.IsNullOrWhiteSpace(Model.Prompt.Memory))
 {
-	<h5>@Html.DisplayNameFor(m => m.Memory)</h5>
+	<h5>@Html.DisplayNameFor(m => m.Prompt.Memory)</h5>
 	<div class="card mb-4">
 		<div class="card-body">
-			<code class="card-text pre-line">@Html.DisplayFor(m => m.Memory)</code>
+			<code class="card-text pre-line">@Html.DisplayFor(m => m.Prompt.Memory)</code>
 		</div>
 	</div>
 }
 
-@if (!string.IsNullOrWhiteSpace(Model.AuthorsNote))
+@if (!string.IsNullOrWhiteSpace(Model.Prompt.AuthorsNote))
 {
-	<h5>@Html.DisplayNameFor(m => m.AuthorsNote)</h5>
+	<h5>@Html.DisplayNameFor(m => m.Prompt.AuthorsNote)</h5>
 	<div class="card mb-4">
 		<div class="card-body">
-			<code class="card-text pre-line">@Html.DisplayFor(m => m.AuthorsNote)</code>
+			<code class="card-text pre-line">@Html.DisplayFor(m => m.Prompt.AuthorsNote)</code>
 		</div>
 	</div>
 }
 
-@if (!string.IsNullOrWhiteSpace(Model.Quests))
+@if (!string.IsNullOrWhiteSpace(Model.Prompt.Quests))
 {
-	<h5>@Html.DisplayNameFor(m => m.Quests)</h5>
+	<h5>@Html.DisplayNameFor(m => m.Prompt.Quests)</h5>
 	<div class="card mb-4">
 		<div class="card-body">
-			<code class="card-text pre-line">@Html.DisplayFor(m => m.Quests)</code>
+			<code class="card-text pre-line">@Html.DisplayFor(m => m.Prompt.Quests)</code>
 		</div>
 	</div>
 }
 
-@if (Model.WorldInfos.Any())
+@if (Model.Prompt.WorldInfos.Any())
 {
-	<h5 class="card-title">@Html.DisplayNameFor(m => m.WorldInfos)</h5>
+	<h5 class="card-title">@Html.DisplayNameFor(m => m.Prompt.WorldInfos)</h5>
 	<div class="row">
-		@foreach (var worldInfo in Model.WorldInfos)
+		@foreach (var worldInfo in Model.Prompt.WorldInfos)
 		{
 			<div class="col-sm-6 mb-4">
 				<div class="card">

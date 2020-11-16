@@ -76,7 +76,10 @@ namespace AIDungeonPrompts.Web
 				.AddDistributedMemoryCache()
 				.AddMediatR(new[] { typeof(DomainLayer), typeof(ApplicationLayer) }.Select(t => t.Assembly).ToArray())
 				.AddFluentValidation(new[] { typeof(ApplicationLayer) }.Select(t => t.Assembly).ToArray())
-				.AddRouting(builder => builder.LowercaseUrls = true)
+				.AddRouting(builder => {
+					builder.LowercaseUrls = true;
+					builder.LowercaseQueryStrings = true;
+				})
 				.AddControllersWithViews();
 			// See: https://docs.microsoft.com/en-us/aspnet/core/security/data-protection/implementation/key-storage-providers?view=aspnetcore-5.0&tabs=visual-studio#entity-framework-core
 			services.AddDataProtection()
