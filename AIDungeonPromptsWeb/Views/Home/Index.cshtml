@@ -1,24 +1,30 @@
 @model SearchViewModel
 @using AIDungeonPrompts.Application.Queries.SearchPrompts
-
-<h2>Search</h2>
-<br/>
 <form asp-action="Index" method="get">
 	<div class="row mb-4">
 		<div class="col-sm-9 col-md-10">
 			<div class="row">
 				<div class="col-sm-6 mb-4">
-					<input class="form-control" name="query" asp-for="Query" placeholder="Search Title" />
+					<input class="form-control" asp-for="Query" placeholder="Search Title" />
 				</div>
 				<div class="col-sm-6 mb-4">
-					<select class="form-control" name="nsfw-setting" asp-for="NsfwSetting" asp-items="Html.GetEnumSelectList<SearchNsfw>()"></select>
+					<select class="form-control" asp-for="NsfwSetting" asp-items="Html.GetEnumSelectList<SearchNsfw>()"></select>
 				</div>
 				<div class="col-sm-6 mb-4">
-					<input class="form-control" name="tags" asp-for="Tags" placeholder="Tags (comma delimited)" />
+					<input class="form-control" asp-for="Tags" placeholder="Tags (comma delimited)" />
 				</div>
 				<div class="col-sm-6 mb-4">
 					<div class="form-check">
-						<input class="form-check-input" name="reverse" asp-for="Reverse" />
+						<input class="form-check-input" asp-for="FuzzySearch" />
+						@Html.LabelFor(m => m.FuzzySearch, new { @class = "form-check-label" })
+					</div>
+				</div>
+				<div class="col-sm-6 mb-4">
+					<select class="form-control" asp-for="TagJoin" asp-items="Html.GetEnumSelectList<TagJoin>()"></select>
+				</div>
+				<div class="col-sm-6 mb-4">
+					<div class="form-check">
+						<input class="form-check-input" asp-for="Reverse" />
 						@Html.LabelFor(m => m.Reverse, new { @class = "form-check-label" })
 					</div>
 				</div>

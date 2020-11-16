@@ -74,6 +74,29 @@ body {
 	height: 100%;	
 }
 
+.tags.truncated {
+	display: -webkit-box;
+	overflow: hidden;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+}
+
+.tags.truncated:focus {
+	display: block;
+	overflow: initial;
+	-webkit-line-clamp: initial;
+	-webkit-box-orient: initial;
+}
+
+@media (hover:hover) {
+	.tags.truncated:hover {
+		display: block;
+		overflow: initial;
+		-webkit-line-clamp: initial;
+		-webkit-box-orient: initial;
+	}
+} 
+
 .card-text.truncated {
 	display: -webkit-box;
 	overflow: hidden;
@@ -108,4 +131,8 @@ body {
 
 code.card-text {
 	color:unset;
+}
+
+.nowrap {
+	white-space: nowrap;
 }

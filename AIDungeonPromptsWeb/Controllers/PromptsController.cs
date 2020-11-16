@@ -69,6 +69,10 @@ namespace AIDungeonPrompts.Web.Controllers
 		[HttpGet("/{id}")]
 		public async Task<IActionResult> View(int id, bool? reported)
 		{
+			if (id == default)
+			{
+				return NotFound();
+			}
 			var prompt = await _mediator.Send(new GetPromptQuery { Id = id });
 			return View(new ViewPromptViewModel { Prompt = prompt, Reported = reported });
 		}

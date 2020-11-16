@@ -24,13 +24,13 @@
 	Tags:
 	@if (Model.Prompt.Nsfw)
 	{
-		<a asp-controller="Search" asp-action="Index" asp-route-NsfwSetting="2">
+		<a asp-controller="Home" asp-action="Index" asp-route-NsfwSetting="2">
 			<code class="badge badge-danger">NSFW</code>
 		</a>
 	}
 	@foreach (var tag in Model.Prompt.PromptTags)
 	{
-		<a asp-controller="Search" asp-action="Index" asp-route-Tags="@tag.Name">
+		<a asp-controller="Home" asp-action="Index" asp-route-Tags="@tag.Name">
 			<code class="badge badge-primary">@tag.Name</code>
 		</a>
 	}

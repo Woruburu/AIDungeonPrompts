@@ -1,33 +1,32 @@
 @model AIDungeonPrompts.Application.Queries.SearchPrompts.SearchPromptsResultViewModel
-<div class="col-sm-6 mb-4">
+<div class="col-sm-12 col-md-6 mb-4">
 	<div class="card">
 		<div class="card-body">
 			<a asp-controller="Prompts" asp-action="View" asp-route-id="@Model.Id">
 				<h5 class="card-title">@Model.Title</h5>
 			</a>
-			<p class="card-text truncated">@(!string.IsNullOrWhiteSpace(Model.Description) ? Model.Description : Model.PromptContent)</p>
-		</div>
-		<div class="card-footer bg-transparent" style="border:0">
-			<p>
+			<p tabindex="-1" class="tags truncated">
+				Created: @Model.DateCreated.ToShortDateString()
+				<br/>
 				@Html.DisplayNameFor(_ => Model.SearchPromptsTagViewModel):
 				@if (Model.Nsfw)
 				{
-					<a asp-controller="Search" asp-action="Index" asp-route-NsfwSetting="2">
-						<span class="badge badge-danger">NSFW</span>
+					<a class="badge badge-danger" asp-controller="Home" asp-action="Index" asp-route-NsfwSetting="2">
+						NSFW
 					</a>
 				}
 				@foreach (var tag in Model.SearchPromptsTagViewModel)
 				{
-					<a asp-controller="Search" asp-action="Index" asp-route-Tags="@tag.Name">
-						<span class="badge badge-primary">@tag.Name</span>
+					<a class="badge badge-primary" asp-controller="Home" asp-action="Index" asp-route-Tags="@tag.Name">
+						@tag.Name
 					</a>
 				}
-			
 			</p>
-			<div class="d-flex">
-				<a asp-controller="Prompts" asp-action="View" asp-route-id="@Model.Id" class="btn btn-primary ">View Prompt</a>
-				<span class="align-self-end ml-auto font-small" style="font-size:0.9rem">Created: @Model.DateCreated.ToShortDateString()</span>
-			</div>
+			<p class="card-text truncated">@(!string.IsNullOrWhiteSpace(Model.Description) ? Model.Description : Model.PromptContent)</p>
+		</div>
+		<div class="card-footer bg-transparent d-flex" style="border:0">
+			<a asp-controller="Prompts" asp-action="View" asp-route-id="@Model.Id" class="ml-auto align-self-end btn btn-primary">View Prompt</a>
+			@*<span class="ml-auto font-small nowrap align-self-end" style="font-size:0.9rem">Created: @Model.DateCreated.ToShortDateString()</span>*@
 		</div>
 	</div>
 </div>
