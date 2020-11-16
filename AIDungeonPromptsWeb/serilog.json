@@ -19,7 +19,6 @@
 			{
 				"Name": "PostgreSql",
 				"Args": {
-					"connectionString": "",
 					"tableName": "ApplicationLogs",
 					"needAutoCreateTable": true,
 					"loggerColumnOptions": {
