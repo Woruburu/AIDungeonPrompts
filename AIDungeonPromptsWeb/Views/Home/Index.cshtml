@@ -48,9 +48,9 @@
 	{
 		{ "Query", Model.Query ?? string.Empty },
 		{ "Tags", Model.Tags ?? string.Empty },
-		{ "NsfwSetting", Model.NsfwSetting.ToString() },
+		{ "NsfwSetting", ((int)Model.NsfwSetting).ToString() },
 		{ "Reverse", Model.Reverse.ToString() },
-		{ "TagJoin", Model.TagJoin.ToString() },
+		{ "TagJoin", ((int)Model.TagJoin).ToString() },
 		{ "MatchExact", Model.MatchExact.ToString() }
 	};
 }
