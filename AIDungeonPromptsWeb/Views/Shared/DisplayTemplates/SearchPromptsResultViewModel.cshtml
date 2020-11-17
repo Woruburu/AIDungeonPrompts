@@ -6,7 +6,7 @@
 				<h5 class="card-title">@Model.Title</h5>
 			</a>
 			<p tabindex="-1" class="tags truncated">
-				Created: @Model.DateCreated.ToShortDateString()
+				Created: @Model.DateCreated.ToString("yyyy/MM/dd")
 				<br/>
 				@Html.DisplayNameFor(_ => Model.SearchPromptsTagViewModel):
 				@if (Model.Nsfw)
@@ -26,7 +26,6 @@
 		</div>
 		<div class="card-footer bg-transparent d-flex" style="border:0">
 			<a asp-controller="Prompts" asp-action="View" asp-route-id="@Model.Id" class="ml-auto align-self-end btn btn-primary">View Prompt</a>
-			@*<span class="ml-auto font-small nowrap align-self-end" style="font-size:0.9rem">Created: @Model.DateCreated.ToShortDateString()</span>*@
 		</div>
 	</div>
 </div>

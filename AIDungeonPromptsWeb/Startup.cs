@@ -76,7 +76,8 @@ namespace AIDungeonPrompts.Web
 				.AddDistributedMemoryCache()
 				.AddMediatR(new[] { typeof(DomainLayer), typeof(ApplicationLayer) }.Select(t => t.Assembly).ToArray())
 				.AddFluentValidation(new[] { typeof(ApplicationLayer) }.Select(t => t.Assembly).ToArray())
-				.AddRouting(builder => {
+				.AddRouting(builder =>
+				{
 					builder.LowercaseUrls = true;
 					builder.LowercaseQueryStrings = true;
 				})

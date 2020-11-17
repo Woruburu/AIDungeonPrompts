@@ -14,7 +14,7 @@
 <div class="d-flex">
 	<div>
 		<h3>@Model.Prompt.Title</h3>
-		<p>Created on @Model.Prompt.DateCreated.ToShortDateString()</p>
+		<p>Created on @Model.Prompt.DateCreated.ToString("yyyy/MM/dd")</p>
 	</div>
 	<div class="ml-auto">
 		<a asp-action="Report" asp-route-id="@Model.Prompt.Id" class="btn btn-danger">Report</a>
