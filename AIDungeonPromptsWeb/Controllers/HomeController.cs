@@ -56,7 +56,9 @@ namespace AIDungeonPrompts.Web.Controllers
 				Reverse = request.Reverse,
 				Tags = request.Tags,
 				NsfwSetting = request.NsfwSetting,
-				SearchResult = result
+				SearchResult = result,
+				MatchExact = request.MatchExact,
+				TagJoin = request.TagJoin
 			});
 		}
 
