@@ -46,7 +46,7 @@ namespace AIDungeonPrompts.Web.Controllers
 				Tags = tags,
 				Nsfw = request.NsfwSetting,
 				TagJoin = request.TagJoin,
-				TagsFuzzy = request.FuzzySearch
+				TagsFuzzy = !request.MatchExact
 			});
 
 			return View(new SearchViewModel

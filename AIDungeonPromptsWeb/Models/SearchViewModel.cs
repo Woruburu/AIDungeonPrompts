@@ -5,8 +5,8 @@ namespace AIDungeonPrompts.Web.Models
 {
 	public class SearchRequestParameters
 	{
-		[Display(Name = "Fuzzy Search Tags")]
-		public bool FuzzySearch { get; set; }
+		[Display(Name = "Match Tags Exactly")]
+		public bool MatchExact { get; set; } = true;
 
 		public SearchNsfw NsfwSetting { get; set; }
 		public int? Page { get; set; }
