@@ -44,7 +44,9 @@ namespace AIDungeonPrompts.Web.Controllers
 				Reverse = request.Reverse,
 				Search = request.Query ?? string.Empty,
 				Tags = tags,
-				Nsfw = request.NsfwSetting
+				Nsfw = request.NsfwSetting,
+				TagJoin = request.TagJoin,
+				TagsFuzzy = !request.MatchExact
 			});
 
 			return View(new SearchViewModel

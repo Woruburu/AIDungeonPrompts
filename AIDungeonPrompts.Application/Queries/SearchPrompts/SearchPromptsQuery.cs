@@ -17,7 +17,9 @@ namespace AIDungeonPrompts.Application.Queries.SearchPrompts
 		public int PageSize { get; set; } = 10;
 		public bool Reverse { get; set; }
 		public string Search { get; set; } = string.Empty;
+		public TagJoin TagJoin { get; set; }
 		public List<string> Tags { get; set; } = new List<string>();
+		public bool TagsFuzzy { get; set; }
 	}
 
 	public class SearchPromptsQueryHandler : IRequestHandler<SearchPromptsQuery, SearchPromptsViewModel>
@@ -56,13 +58,31 @@ namespace AIDungeonPrompts.Application.Queries.SearchPrompts
 
 			if (request.Tags.Count > 0)
 			{
-				foreach (var item in request.Tags)
+				if (request.TagsFuzzy)
 				{
-					query = query.Where(
-						prompt => prompt.PromptTags.Any(
-							promptTag => EF.Functions.ILike(promptTag.Tag!.Name, $"{item}")
-						)
-					);
+					request.Tags = request.Tags.Select(t => $"%{t}%").ToList();
+				}
+
+				switch (request.TagJoin)
+				{
+					case TagJoin.And:
+						foreach (var item in request.Tags)
+						{
+							query = query.Where(
+								prompt => prompt.PromptTags.Any(
+									promptTag => EF.Functions.ILike(promptTag.Tag!.Name, $"{item}")
+								)
+							);
+						}
+						break;
+
+					case TagJoin.Or:
+						query = query.Where(
+							prompt => prompt.PromptTags.Any(
+								promptTag => request.Tags.Any(t => EF.Functions.ILike(promptTag.Tag!.Name, t))
+							)
+						);
+						break;
 				}
 			}
 
