@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using AIDungeonPrompts.Application;
 using AIDungeonPrompts.Domain;
@@ -10,10 +11,12 @@ using MediatR.Extensions.FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Net.Http.Headers;
 using Serilog;
 
 namespace AIDungeonPrompts.Web
@@ -46,7 +49,17 @@ namespace AIDungeonPrompts.Web
 			context.Database.Migrate();
 
 			app.UseHttpsRedirection();
-			app.UseStaticFiles();
+			app.UseStaticFiles(new StaticFileOptions()
+			{
+				OnPrepareResponse = (context) =>
+				{
+					var headers = context.Context.Response.GetTypedHeaders();
+					headers.CacheControl = new CacheControlHeaderValue()
+					{
+						MaxAge = TimeSpan.FromDays(1)
+					};
+				}
+			});
 
 			app.UseHttpsRedirection();
 
