@@ -109,8 +109,8 @@ namespace AIDungeonPrompts.Application.Queries.SearchPrompts
 				.ToListAsync();
 
 			var count = await query.CountAsync();
-
-			var totalPages = count < 1 ? 1 : (count / request.PageSize) + 1;
+			var pageAdd = count % request.PageSize == 0 ? 0 : 1;
+			var totalPages = count < 1 ? 1 : (count / request.PageSize) + pageAdd;
 
 			return new SearchPromptsViewModel
 			{
