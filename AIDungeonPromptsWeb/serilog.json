@@ -6,7 +6,7 @@
 		"MinimumLevel": {
 			"Default": "Information",
 			"Override": {
-				//"Microsoft.EntityFrameworkCore": "Warning",
+				"Microsoft.EntityFrameworkCore": "Warning",
 				"Microsoft.EntityFrameworkCore.Migrations": "Information",
 				"Microsoft.AspNetCore": "Warning",
 				"CorrelationId": "Warning"
