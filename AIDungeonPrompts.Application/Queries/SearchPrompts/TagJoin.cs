@@ -4,10 +4,10 @@ namespace AIDungeonPrompts.Application.Queries.SearchPrompts
 {
 	public enum TagJoin
 	{
-		[Display(Name = "Only show posts with ALL selected tags")]
+		[Display(Name = "Results must include all tags")]
 		And,
 
-		[Display(Name = "Show posts with ANY of the selected tags")]
+		[Display(Name = "Results can include any tag")]
 		Or
 	}
 }
