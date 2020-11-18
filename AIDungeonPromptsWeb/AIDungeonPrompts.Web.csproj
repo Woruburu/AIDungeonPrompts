@@ -22,6 +22,7 @@
 		<PackageReference Include="MediatR.Extensions.FluentValidation.AspNetCore" Version="1.1.1" />
 		<PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0" />
 		<PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="5.0.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.Analyzers" Version="2.2.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="5.0.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.0">
 		  <PrivateAssets>all</PrivateAssets>

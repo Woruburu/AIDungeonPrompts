@@ -1,3 +1,11 @@
+@using AIDungeonPrompts.Web.ColorScheme
+@{
+	var colorPrefString = Context.Request.Cookies[CookieValueDefaults.DarkModePreference];
+	if (string.IsNullOrWhiteSpace(colorPrefString) || !Enum.TryParse<ColorSchemePreference>(colorPrefString, out var colorPref))
+	{
+		colorPref = ColorSchemePreference.Light;
+	}
+}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,7 +16,17 @@
 	<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
 	<link rel="manifest" href="/site.webmanifest">
 	<title>@( ViewData["Title"] != null ? $"{ViewData["Title"]} - " : string.Empty)/aidg/ Prompts</title>
-	<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+	@{
+		switch (colorPref)
+		{
+			case ColorSchemePreference.Light:
+				<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+				break;
+			case ColorSchemePreference.Dark:
+				<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.dark.min.css" />
+				break;
+		}
+	}
 	<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 	<noscript>
 		<style>
@@ -19,43 +37,60 @@
 	</noscript>
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container">
-                <a class="navbar-brand" asp-controller="Home" asp-action="Index">/aidg/ Prompts</a>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
+	<header>
+		@{
+			var navbarClass = colorPref == ColorSchemePreference.Light ? "navbar-light" : "navbar-dark";
+		}
+		<nav class="navbar @navbarClass navbar-expand-sm navbar-toggleable-sm border-bottom box-shadow mb-3">
+			<div class="container">
+				<a class="navbar-brand" asp-controller="Home" asp-action="Index">/aidg/ Prompts</a>
+				<button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+						aria-expanded="false" aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
 				<div class="navbar-collapse collapse d-sm-inline-flex">
-					<ul class="navbar-nav flex-grow-1">
+					<ul class="navbar-nav mr-auto">
 						<li class="nav-item">
-							<a class="nav-link text-dark" asp-controller="Prompts" asp-action="Create">Create</a>
+							<a class="nav-link" asp-controller="Prompts" asp-action="Create">Create</a>
 						</li>
-					</ul>
-					<ul class="navbar-nav">
+					</ul>					
+					<ul class="navbar-nav ml-auto">
 						<li class="nav-item">
-							<a class="nav-link text-dark" asp-controller="Home" asp-action="WhatsNew">What's New?</a>
+							<a class="nav-link" asp-controller="Home" asp-action="WhatsNew">What's New?</a>
 						</li>
 					</ul>
 				</div>
-            </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
+			</div>
+		</nav>
+	</header>
+	<div class="container">
+		<main role="main" class="pb-3">
+			@RenderBody()
+		</main>
+	</div>
 
-    @*<footer class="border-top footer text-muted">
-		<div class="container">
-			&copy; 2020 - AI Dungeon Prompts
+	<footer class="border-top footer">
+		<div class="container d-flex">
+			<form class="form-inline ml-auto" asp-action="ColorScheme" asp-controller="Home" asp-route-returnUrl="@Context.Request.Path">
+				<div class="input-group">
+					<select name="preference" class="form-control d-flex m-auto">
+						<option selected="@(colorPref == ColorSchemePreference.Light)" value="@ColorSchemePreference.Light">
+							Light Scheme
+						</option>
+						<option selected="@(colorPref == ColorSchemePreference.Dark)" value="@ColorSchemePreference.Dark">
+							Dark Scheme
+						</option>
+					</select>
+					<div class="input-group-append">
+						<button class="btn btn-outline-success my-2 my-sm-0" type="submit">Apply</button>
+					</div>
+				</div>
+			</form>
 		</div>
-    </footer>*@
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+	</footer>
+	<script src="~/lib/jquery/dist/jquery.min.js"></script>
+	<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="~/js/site.js" asp-append-version="true"></script>
+	@await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

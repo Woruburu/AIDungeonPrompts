@@ -38,6 +38,7 @@ namespace AIDungeonPrompts.Web
 			if (env.IsDevelopment())
 			{
 				app.UseDeveloperExceptionPage();
+				app.UseHttpsRedirection();
 			}
 			else
 			{
@@ -48,7 +49,6 @@ namespace AIDungeonPrompts.Web
 
 			context.Database.Migrate();
 
-			app.UseHttpsRedirection();
 			app.UseStaticFiles(new StaticFileOptions()
 			{
 				OnPrepareResponse = (context) =>

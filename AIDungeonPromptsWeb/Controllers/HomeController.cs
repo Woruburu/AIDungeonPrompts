@@ -1,10 +1,14 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using AIDungeonPrompts.Application.Queries.SearchPrompts;
+using AIDungeonPrompts.Web.ColorScheme;
+using AIDungeonPrompts.Web.Cookies;
 using AIDungeonPrompts.Web.Models;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AIDungeonPrompts.Web.Controllers
@@ -16,6 +20,27 @@ namespace AIDungeonPrompts.Web.Controllers
 		public HomeController(IMediator mediator)
 		{
 			_mediator = mediator;
+		}
+
+		[HttpPost("/color-scheme"), ValidateAntiForgeryToken]
+		public IActionResult ColorScheme(ColorSchemePreference? preference, string? returnUrl)
+		{
+			if (preference != null)
+			{
+				var cookieOptions = new CookieOptions
+				{
+					HttpOnly = true,
+					IsEssential = true,
+					MaxAge = new TimeSpan(365, 0, 0, 0),
+					Secure = true,
+				};
+				Response.Cookies.Append(CookieValueDefaults.DarkModePreference, ((int)preference).ToString(), cookieOptions);
+			}
+			if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
+			{
+				return Redirect(returnUrl);
+			}
+			return RedirectToAction("Index");
 		}
 
 		[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
