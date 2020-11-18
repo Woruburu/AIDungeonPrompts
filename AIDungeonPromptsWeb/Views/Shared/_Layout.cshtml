@@ -3,7 +3,7 @@
 	var colorPrefString = Context.Request.Cookies[CookieValueDefaults.DarkModePreference];
 	if (string.IsNullOrWhiteSpace(colorPrefString) || !Enum.TryParse<ColorSchemePreference>(colorPrefString, out var colorPref))
 	{
-		colorPref = ColorSchemePreference.Light;
+		colorPref = ColorSchemePreference.Dark;
 	}
 }
 <!DOCTYPE html>
