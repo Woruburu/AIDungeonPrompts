@@ -7,11 +7,13 @@ namespace AIDungeonPrompts.Application.Abstractions.DbContexts
 {
 	public interface IAIDungeonPromptsDbContext
 	{
-		public DbSet<Prompt> Prompts { get; set; }
-		public DbSet<PromptTag> PromptTags { get; set; }
-		public DbSet<Report> Reports { get; set; }
-		public DbSet<Tag> Tags { get; set; }
-		public DbSet<WorldInfo> WorldInfos { get; set; }
+		DbSet<AuditPrompt> AuditPrompts { get; set; }
+		DbSet<Prompt> Prompts { get; set; }
+		DbSet<PromptTag> PromptTags { get; set; }
+		DbSet<Report> Reports { get; set; }
+		DbSet<Tag> Tags { get; set; }
+		DbSet<User> Users { get; set; }
+		DbSet<WorldInfo> WorldInfos { get; set; }
 
 		Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 	}

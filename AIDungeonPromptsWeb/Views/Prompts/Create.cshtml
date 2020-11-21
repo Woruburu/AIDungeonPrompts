@@ -47,13 +47,9 @@
 	</div>
 	<br />
 	<div>
-		@Html.LabelFor(m => m.Command.WorldInfos)
-		<div class="card">
-			<div class="card-body">
-				@Html.EditorFor(m => m.Command.WorldInfos)
-				<button asp-route-addWi="@true" asp-fragment="world-infos" class="btn btn-secondary" onclick="wiAddClick()">Add Another</button>
-			</div>
-		</div>
+		@Html.LabelFor(m => m.Command.WorldInfos)		
+		@Html.EditorFor(m => m.Command.WorldInfos)		
+		<button asp-route-addWi="@true" asp-fragment="world-infos" class="btn btn-secondary" onclick="wiAddClick()">Add Another</button>
 	</div>
 	<div id="world-infos"></div>
 	<br />

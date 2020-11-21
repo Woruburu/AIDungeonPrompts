@@ -4,12 +4,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace AIDungeonPrompts.Application.Queries.GetPrompt
 {
-	public class GetPromptPromptTagViewModel
-	{
-		public int Id { get; set; }
-		public string Name { get; set; } = string.Empty;
-	}
-
 	public class GetPromptViewModel
 	{
 		[Display(Name = "Author's Note")]
@@ -23,6 +17,8 @@ namespace AIDungeonPrompts.Application.Queries.GetPrompt
 		[Display(Name = "NSFW?")]
 		public bool Nsfw { get; set; }
 
+		public int? OwnerId { get; set; }
+
 		[Display(Name = "Prompt")]
 		public string PromptContent { get; set; } = string.Empty;
 
@@ -34,11 +30,5 @@ namespace AIDungeonPrompts.Application.Queries.GetPrompt
 
 		[Display(Name = "World Info")]
 		public IEnumerable<GetPromptWorldInfoViewModel> WorldInfos { get; set; } = new List<GetPromptWorldInfoViewModel>();
-	}
-
-	public class GetPromptWorldInfoViewModel
-	{
-		public string Entry { get; set; } = string.Empty;
-		public string Keys { get; set; } = string.Empty;
 	}
 }

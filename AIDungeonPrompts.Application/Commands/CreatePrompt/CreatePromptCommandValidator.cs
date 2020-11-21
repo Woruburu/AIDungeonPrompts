@@ -8,7 +8,7 @@ namespace AIDungeonPrompts.Application.Commands.CreatePrompt
 		{
 			RuleFor(e => e.PromptContent).NotEmpty();
 			RuleFor(e => e.PromptTags).NotEmpty();
-			//RuleFor(e => e.Title).NotEmpty();
+			RuleFor(e => e.Title).NotEmpty();
 		}
 	}
 }

@@ -53,8 +53,27 @@
 						<li class="nav-item">
 							<a class="nav-link" asp-controller="Prompts" asp-action="Create">Create</a>
 						</li>
-					</ul>					
-					<ul class="navbar-nav ml-auto">
+					</ul>
+					@{
+						userService.TryGetCurrentUser(out var user);
+					}
+					@if (user == null || string.IsNullOrWhiteSpace(user!.Password))
+					{
+						<ul class="navbar-nav">
+							<li class="nav-item">
+								<a class="nav-link" asp-route-returnUrl="@Context.Request.Path" asp-controller="User" asp-action="Register">Register</a>
+							</li>
+						</ul>
+					}
+					@if(user == null)
+					{
+						<ul class="navbar-nav">
+							<li class="nav-item">
+								<a class="nav-link" asp-route-returnUrl="@Context.Request.Path" asp-controller="User" asp-action="LogIn">Log In</a>
+							</li>
+						</ul>
+					}
+					<ul class="navbar-nav">
 						<li class="nav-item">
 							<a class="nav-link" asp-controller="Home" asp-action="WhatsNew">What's New?</a>
 						</li>

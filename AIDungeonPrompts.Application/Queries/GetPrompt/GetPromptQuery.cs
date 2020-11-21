@@ -38,8 +38,10 @@ namespace AIDungeonPrompts.Application.Queries.GetPrompt
 					Title = prompt.Title,
 					Description = prompt.Description,
 					DateCreated = prompt.DateCreated,
+					OwnerId = prompt.OwnerId,
 					WorldInfos = prompt.WorldInfos.Select(worldInfo => new GetPromptWorldInfoViewModel
 					{
+						Id = worldInfo.Id,
 						Entry = worldInfo.Entry,
 						Keys = worldInfo.Keys
 					}),

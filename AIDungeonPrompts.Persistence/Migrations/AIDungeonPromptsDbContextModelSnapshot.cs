@@ -19,6 +19,34 @@ namespace AIDungeonPrompts.Persistence.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63)
                 .HasAnnotation("ProductVersion", "5.0.0");
 
+            modelBuilder.Entity("AIDungeonPrompts.Domain.Entities.AuditPrompt", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityByDefaultColumn();
+
+                    b.Property<DateTime>("AuditDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime?>("DateEdited")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("Entry")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<int>("PromptId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AuditPrompts");
+                });
+
             modelBuilder.Entity("AIDungeonPrompts.Domain.Entities.Prompt", b =>
                 {
                     b.Property<int>("Id")
@@ -44,6 +72,9 @@ namespace AIDungeonPrompts.Persistence.Migrations
                     b.Property<bool>("Nsfw")
                         .HasColumnType("boolean");
 
+                    b.Property<int?>("OwnerId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("PromptContent")
                         .IsRequired()
                         .HasColumnType("text");
@@ -62,6 +93,8 @@ namespace AIDungeonPrompts.Persistence.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("OwnerId");
 
                     b.HasIndex("Title");
 
@@ -147,6 +180,34 @@ namespace AIDungeonPrompts.Persistence.Migrations
                     b.ToTable("Tags");
                 });
 
+            modelBuilder.Entity("AIDungeonPrompts.Domain.Entities.User", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityByDefaultColumn();
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime?>("DateEdited")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("Password")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Username")
+                        .IsUnique();
+
+                    b.ToTable("Users");
+                });
+
             modelBuilder.Entity("AIDungeonPrompts.Domain.Entities.WorldInfo", b =>
                 {
                     b.Property<int>("Id")
@@ -199,6 +260,15 @@ namespace AIDungeonPrompts.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("DataProtectionKeys");
+                });
+
+            modelBuilder.Entity("AIDungeonPrompts.Domain.Entities.Prompt", b =>
+                {
+                    b.HasOne("AIDungeonPrompts.Domain.Entities.User", "Owner")
+                        .WithMany("Prompts")
+                        .HasForeignKey("OwnerId");
+
+                    b.Navigation("Owner");
                 });
 
             modelBuilder.Entity("AIDungeonPrompts.Domain.Entities.PromptTag", b =>
@@ -258,6 +328,11 @@ namespace AIDungeonPrompts.Persistence.Migrations
             modelBuilder.Entity("AIDungeonPrompts.Domain.Entities.Tag", b =>
                 {
                     b.Navigation("PromptTags");
+                });
+
+            modelBuilder.Entity("AIDungeonPrompts.Domain.Entities.User", b =>
+                {
+                    b.Navigation("Prompts");
                 });
 #pragma warning restore 612, 618
         }

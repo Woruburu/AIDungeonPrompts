@@ -1,8 +1,18 @@
 @model ViewPromptViewModel
 @{
 	ViewData["Title"] = Model.Prompt.Title;
+	var showEdit = false;
+	var canClaim = false;
+	if (userService.TryGetCurrentUser(out var user) && user!.Id == Model.Prompt.OwnerId)
+	{		
+		showEdit = true;	
+	}
+	if (Model.Prompt.OwnerId == null)
+	{
+		canClaim = true;
+	}
 }
-@if(Model.Reported ?? false)
+@if (Model.Reported ?? false)
 {
 	<div class="alert alert-danger alert-dismissible fade show" role="alert">
 		You have successfully reported this prompt.
@@ -16,8 +26,22 @@
 		<h3>@Model.Prompt.Title</h3>
 		<p>Created on @Model.Prompt.DateCreated.ToString("yyyy/MM/dd")</p>
 	</div>
-	<div class="ml-auto">
-		<a asp-action="Report" asp-route-id="@Model.Prompt.Id" class="btn btn-danger">Report</a>
+	<div class="ml-auto d-flex">
+		@if (canClaim) {
+			<div>
+				<form method="post" asp-action="Claim" asp-route-id="@Model.Prompt.Id">
+					<button class="btn btn-outline-primary mr-2 px-3">Claim</button>
+				</form>
+			</div>
+		}
+		@if (showEdit) {
+			<div>
+				<a asp-action="Edit" asp-route-id="@Model.Prompt.Id" class="btn btn-outline-success mr-2 px-3">Edit</a>
+			</div>
+		}
+		<div>
+			<a asp-action="Report" asp-route-id="@Model.Prompt.Id" class="btn btn-outline-danger">Report</a>
+		</div>
 	</div>
 </div>
 <p>

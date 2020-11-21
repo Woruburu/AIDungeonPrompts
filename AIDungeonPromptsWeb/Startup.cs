@@ -2,13 +2,18 @@ using System;
 using System.Linq;
 using AIDungeonPrompts.Application;
 using AIDungeonPrompts.Domain;
+using AIDungeonPrompts.Infrastructure;
+using AIDungeonPrompts.Infrastructure.Identity;
 using AIDungeonPrompts.Persistence;
 using AIDungeonPrompts.Persistence.DbContexts;
 using CorrelationId;
 using CorrelationId.DependencyInjection;
+using FluentValidation.AspNetCore;
 using MediatR;
 using MediatR.Extensions.FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -18,6 +23,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Net.Http.Headers;
 using Serilog;
+using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
 namespace AIDungeonPrompts.Web
 {
@@ -47,6 +53,15 @@ namespace AIDungeonPrompts.Web
 				app.UseHsts();
 			}
 
+			app.UseStatusCodePages();
+
+			app.UseCookiePolicy(new CookiePolicyOptions
+			{
+				HttpOnly = HttpOnlyPolicy.Always,
+				Secure = CookieSecurePolicy.Always,
+				MinimumSameSitePolicy = SameSiteMode.Strict
+			});
+
 			context.Database.Migrate();
 
 			app.UseStaticFiles(new StaticFileOptions()
@@ -69,7 +84,10 @@ namespace AIDungeonPrompts.Web
 
 			app.UseRouting();
 
+			app.UseAuthentication();
 			app.UseAuthorization();
+
+			app.UseMiddleware<CurrentUserMiddleware>();
 
 			app.UseEndpoints(endpoints =>
 			{
@@ -82,8 +100,15 @@ namespace AIDungeonPrompts.Web
 		// This method gets called by the runtime. Use this method to add services to the container.
 		public void ConfigureServices(IServiceCollection services)
 		{
+			services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+				.AddCookie();
+
+			services.AddDataProtection()
+				.PersistKeysToDbContext<AIDungeonPromptsDbContext>();
+
 			services
 				.AddPersistenceLayer(Configuration.GetConnectionString(DatabaseConnectionName))
+				.AddInfrastructureLayer()
 				.AddHttpContextAccessor()
 				.AddDefaultCorrelationId()
 				.AddDistributedMemoryCache()
@@ -94,10 +119,15 @@ namespace AIDungeonPrompts.Web
 					builder.LowercaseUrls = true;
 					builder.LowercaseQueryStrings = true;
 				})
-				.AddControllersWithViews();
+				.AddControllersWithViews()
+				.AddFluentValidation(fv =>
+					fv.RegisterValidatorsFromAssemblies(new[]
+					{
+						typeof(ApplicationLayer),
+						typeof(Startup)
+					}.Select(t => t.Assembly).ToArray())
+				);
 			// See: https://docs.microsoft.com/en-us/aspnet/core/security/data-protection/implementation/key-storage-providers?view=aspnetcore-5.0&tabs=visual-studio#entity-framework-core
-			services.AddDataProtection()
-				.PersistKeysToDbContext<AIDungeonPromptsDbContext>();
 		}
 	}
 }

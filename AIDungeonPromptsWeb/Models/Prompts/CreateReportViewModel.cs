@@ -1,7 +1,7 @@
 using AIDungeonPrompts.Application.Commands.CreateReport;
 using AIDungeonPrompts.Application.Queries.GetPrompt;
 
-namespace AIDungeonPrompts.Web.Models
+namespace AIDungeonPrompts.Web.Models.Prompts
 {
 	public class CreateReportViewModel
 	{
