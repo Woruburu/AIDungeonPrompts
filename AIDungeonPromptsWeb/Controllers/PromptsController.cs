@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AIDungeonPrompts.Application.Abstractions.Identity;
-using AIDungeonPrompts.Application.Commands.ClaimPrompt;
 using AIDungeonPrompts.Application.Commands.CreatePrompt;
 using AIDungeonPrompts.Application.Commands.CreateTransientUser;
 using AIDungeonPrompts.Application.Commands.UpdatePrompt;
@@ -27,32 +26,33 @@ namespace AIDungeonPrompts.Web.Controllers
 			_currentUserService = currentUserService;
 		}
 
-		[HttpPost("/{id}/claim"), ValidateAntiForgeryToken]
-		public async Task<IActionResult> Claim(int? id, string? honey)
-		{
-			if (id == null)
-			{
-				return NotFound();
-			}
+		// TODO: think about bringing this in
+		//[HttpPost("/{id}/claim"), ValidateAntiForgeryToken]
+		//public async Task<IActionResult> Claim(int? id, string? honey)
+		//{
+		//	if (id == null)
+		//	{
+		//		return NotFound();
+		//	}
 
-			if (!string.IsNullOrWhiteSpace(honey))
-			{
-				return RedirectToAction("View", new { id });
-			}
+		//	if (!string.IsNullOrWhiteSpace(honey))
+		//	{
+		//		return RedirectToAction("View", new { id });
+		//	}
 
-			if (_currentUserService.TryGetCurrentUser(out var user))
-			{
-				await _mediator.Send(new ClaimPromptCommand { PromptId = id.Value, OwnerId = user!.Id });
-			}
-			else
-			{
-				var userId = await _mediator.Send(new CreateTransientUserCommand());
-				await HttpContext.SignInUserAsync(userId);
-				await _mediator.Send(new ClaimPromptCommand { PromptId = id.Value, OwnerId = userId });
-			}
+		//	if (_currentUserService.TryGetCurrentUser(out var user))
+		//	{
+		//		await _mediator.Send(new ClaimPromptCommand { PromptId = id.Value, OwnerId = user!.Id });
+		//	}
+		//	else
+		//	{
+		//		var userId = await _mediator.Send(new CreateTransientUserCommand());
+		//		await HttpContext.SignInUserAsync(userId);
+		//		await _mediator.Send(new ClaimPromptCommand { PromptId = id.Value, OwnerId = userId });
+		//	}
 
-			return RedirectToAction("View", new { id });
-		}
+		//	return RedirectToAction("View", new { id });
+		//}
 
 		[HttpGet("[controller]/create")]
 		public ActionResult Create()

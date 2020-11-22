@@ -27,13 +27,13 @@
 		<p>Created on @Model.Prompt.DateCreated.ToString("yyyy/MM/dd")</p>
 	</div>
 	<div class="ml-auto d-flex">
-		@if (canClaim) {
+		@*@if (canClaim) {
 			<div>
 				<form method="post" asp-action="Claim" asp-route-id="@Model.Prompt.Id">
 					<button class="btn btn-outline-primary mr-2 px-3">Claim</button>
 				</form>
 			</div>
-		}
+		}*@
 		@if (showEdit) {
 			<div>
 				<a asp-action="Edit" asp-route-id="@Model.Prompt.Id" class="btn btn-outline-success mr-2 px-3">Edit</a>
