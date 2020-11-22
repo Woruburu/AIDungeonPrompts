@@ -62,8 +62,7 @@
 				@for (int i = 0; i < Model.SimilarPromptQuery.SimilarPrompts.Count; i++)
 				{
 					var prompt = Model.SimilarPromptQuery.SimilarPrompts[i];
-					<a asp-action="View" asp-controller="Prompts" asp-route-id="@prompt.Id" target="_blank">@prompt.Title</a>@if (i != Model.SimilarPromptQuery.SimilarPrompts.Count - 1)
-					{<span>, </span>}
+					<a asp-action="View" asp-controller="Prompts" asp-route-id="@prompt.Id" target="_blank">@prompt.Title</a>@if (i != Model.SimilarPromptQuery.SimilarPrompts.Count - 1){<span>, </span>}
 				}
 				<br />
 				Please confirm this isn't a duplicate before creating a new prompt.
