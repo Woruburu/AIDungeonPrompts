@@ -46,6 +46,7 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\AIDungeonPrompts.Application\AIDungeonPrompts.Application.csproj" />
+	  <ProjectReference Include="..\AIDungeonPrompts.Infrastructure\AIDungeonPrompts.Infrastructure.csproj" />
 	  <ProjectReference Include="..\AIDungeonPrompts.Persistence\AIDungeonPrompts.Persistence.csproj" />
 	</ItemGroup>
 </Project>

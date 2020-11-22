@@ -22,6 +22,8 @@ namespace AIDungeonPrompts.Application.Commands.CreatePrompt
 		[Display(Name = "NSFW?")]
 		public bool Nsfw { get; set; }
 
+		public int OwnerId { get; set; }
+
 		[Display(Name = "Prompt"), Required(ErrorMessage = "Please supply a Prompt")]
 		public string PromptContent { get; set; } = string.Empty;
 
@@ -54,7 +56,7 @@ namespace AIDungeonPrompts.Application.Commands.CreatePrompt
 			var prompt = new Prompt
 			{
 				AuthorsNote = request.AuthorsNote,
-				DateCreated = DateTime.Now,
+				DateCreated = DateTime.UtcNow,
 				DateEdited = null,
 				Memory = request.Memory,
 				Nsfw = request.Nsfw,
@@ -62,6 +64,7 @@ namespace AIDungeonPrompts.Application.Commands.CreatePrompt
 				Quests = request.Quests,
 				Title = request.Title,
 				Description = request.Description,
+				OwnerId = request.OwnerId,
 				Upvote = 0,
 				Views = 0
 			};
@@ -74,7 +77,7 @@ namespace AIDungeonPrompts.Application.Commands.CreatePrompt
 				}
 				prompt.WorldInfos.Add(new WorldInfo
 				{
-					DateCreated = DateTime.Now,
+					DateCreated = DateTime.UtcNow,
 					Entry = worldInfo.Entry,
 					Keys = worldInfo.Keys,
 					Prompt = prompt

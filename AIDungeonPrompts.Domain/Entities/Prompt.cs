@@ -9,6 +9,8 @@ namespace AIDungeonPrompts.Domain.Entities
 		public string? Description { get; set; }
 		public string? Memory { get; set; }
 		public bool Nsfw { get; set; }
+		public User? Owner { get; set; }
+		public int? OwnerId { get; set; }
 		public string PromptContent { get; set; } = string.Empty;
 		public List<PromptTag> PromptTags { get; set; } = new List<PromptTag>();
 		public string? Quests { get; set; }

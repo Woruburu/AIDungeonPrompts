@@ -12,6 +12,9 @@ namespace AIDungeonPrompts.Persistence.Configurations
 			builder.Property(e => e.Title).IsRequired();
 			builder.Property(e => e.PromptContent).IsRequired();
 			builder.HasIndex(e => e.Title);
+			builder.HasOne(e => e.Owner)
+				.WithMany(e => e.Prompts)
+				.HasForeignKey(e => e.OwnerId);
 		}
 	}
 }

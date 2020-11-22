@@ -1,7 +1,7 @@
 using AIDungeonPrompts.Application.Commands.CreatePrompt;
 using AIDungeonPrompts.Application.Queries.SimilarPrompt;
 
-namespace AIDungeonPrompts.Web.Models
+namespace AIDungeonPrompts.Web.Models.Prompts
 {
 	public class CreatePromptViewModel
 	{

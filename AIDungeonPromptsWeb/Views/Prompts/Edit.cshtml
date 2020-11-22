@@ -1,0 +1,91 @@
+@model UpdatePromptViewModel
+@{ ViewData["Title"] = "Edit"; }
+
+<h2>Edit Prompt</h2>
+<br />
+<form asp-controller="Prompts" asp-action="Edit" method="post">
+	<input class="honey" name="Honey" />
+
+	<div class="form-group required">
+		@Html.LabelFor(m => m.Command.Title)
+		<input asp-for="Command.Title" class="form-control" />
+		<span class="invalid-feedback" asp-validation-for="Command.Title"></span>
+	</div>
+	<div class="form-group">
+		@Html.LabelFor(m => m.Command.Description)
+		<textarea asp-for="Command.Description" class="form-control"></textarea>
+		<span class="invalid-feedback" asp-validation-for="Command.Description"></span>
+	</div>
+	<div class="form-group required">
+		@Html.LabelFor(m => m.Command.PromptContent)
+		<textarea asp-for="Command.PromptContent" class="form-control"></textarea>
+		<span class="invalid-feedback" asp-validation-for="Command.PromptContent"></span>
+	</div>
+	<div class="form-group required">
+		@Html.LabelFor(m => m.Command.PromptTags)
+		<input asp-for="Command.PromptTags" class="form-control" />
+		<span class="invalid-feedback" asp-validation-for="Command.PromptTags"></span>
+	</div>
+	<div class="form-group">
+		@Html.LabelFor(m => m.Command.Memory)
+		<textarea asp-for="Command.Memory" class="form-control"></textarea>
+		<span class="invalid-feedback" asp-validation-for="Command.Memory"></span>
+	</div>
+	<div class="form-group">
+		@Html.LabelFor(m => m.Command.Quests)
+		<textarea asp-for="Command.Quests" class="form-control"></textarea>
+		<span class="invalid-feedback" asp-validation-for="Command.Quests"></span>
+	</div>
+	<div class="form-group">
+		@Html.LabelFor(m => m.Command.AuthorsNote)
+		<textarea asp-for="Command.AuthorsNote" class="form-control"></textarea>
+		<span class="invalid-feedback" asp-validation-for="Command.AuthorsNote"></span>
+	</div>
+	<div class="form-check">
+		<input asp-for="Command.Nsfw" class="form-check-input">
+		@Html.LabelFor(m => m.Command.Nsfw, new { @class = "form-check-label" })
+	</div>
+	<br />
+	<div>
+		@Html.LabelFor(m => m.Command.WorldInfos)
+		@Html.EditorFor(m => m.Command.WorldInfos)
+		<button asp-route-addWi="@true" asp-fragment="world-infos" class="btn btn-secondary" onclick="wiAddClick()">Add Another</button>
+	</div>
+	<div id="world-infos"></div>
+	<br />
+	@if (Model.SimilarPromptQuery.Matched)
+	{
+		<div class="alert alert-warning" role="alert">
+			<p>
+				There already @(Model.SimilarPromptQuery.SimilarPrompts.Count == 1 ? "exists a prompt" : "exist prompts") with the same title:
+				<br />
+				@for (int i = 0; i < Model.SimilarPromptQuery.SimilarPrompts.Count; i++)
+				{
+					var prompt = Model.SimilarPromptQuery.SimilarPrompts[i];
+					<a asp-action="View" asp-controller="Prompts" asp-route-id="@prompt.Id" target="_blank">@prompt.Title</a>@if (i != Model.SimilarPromptQuery.SimilarPrompts.Count - 1){<span>, </span>}
+				}
+				<br />
+				Please confirm this isn't a duplicate before creating a new prompt.
+			</p>
+		</div>
+		<div class="d-flex flex-row-reverse">
+			<button autofocus asp-route-confirm="@true" type="submit" class="btn btn-lg btn-primary">Submit</button>
+		</div>
+	}
+	else
+	{
+		<div class="d-flex flex-row-reverse">
+			<button type="submit" class="btn btn-lg btn-primary">Submit</button>
+		</div>
+	}
+</form>
+
+@section Scripts {
+	<partial name="_ValidationScriptsPartial.cshtml" />
+	<script>
+		function wiAddClick() {
+			var settngs = $.data($('form')[0], 'validator').settings;
+			settngs.ignore = "*";
+		}
+	</script>
+}

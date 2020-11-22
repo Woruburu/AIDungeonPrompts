@@ -13,7 +13,9 @@ namespace AIDungeonPrompts.Application.Commands.CreateReport
 	{
 		[Display(Name = "Additional Details")]
 		public string? ExtraDetails { get; set; }
+
 		public int PromptId { get; set; }
+
 		[Display(Name = "Report Reason")]
 		public ReportReason ReportReason { get; set; }
 	}
@@ -31,7 +33,7 @@ namespace AIDungeonPrompts.Application.Commands.CreateReport
 		{
 			_dbContext.Reports.Add(new Report
 			{
-				DateCreated = DateTime.Now,
+				DateCreated = DateTime.UtcNow,
 				ExtraDetails = request.ExtraDetails,
 				PromptId = request.PromptId,
 				ReportReason = request.ReportReason

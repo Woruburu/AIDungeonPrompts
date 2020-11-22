@@ -20,6 +20,9 @@ namespace AIDungeonPrompts.Domain.Enums
 		Duplicate,
 
 		[Display(Name = "Incorrect Tags")]
-		IncorrectTags
+		IncorrectTags,
+
+		[Display(Name = "Other (please describe below)")]
+		Other
 	}
 }

@@ -9,6 +9,7 @@ namespace AIDungeonPrompts.Application.Queries.SimilarPrompt
 {
 	public class SimilarPromptQuery : IRequest<SimilarPromptViewModel>
 	{
+		public int? CurrentId { get; set; }
 		public string Title { get; set; } = string.Empty;
 	}
 
@@ -23,13 +24,19 @@ namespace AIDungeonPrompts.Application.Queries.SimilarPrompt
 
 		public async Task<SimilarPromptViewModel> Handle(SimilarPromptQuery request, CancellationToken cancellationToken)
 		{
-			var similarPrompts = await _dbContext.Prompts
-				.Where(prompt => EF.Functions.ILike(prompt.Title, $"{request.Title}"))
-				.Select(prompt => new SimilarPromptDetailsViewModel
-				{
-					Id = prompt.Id,
-					Title = prompt.Title
-				})
+			var query = _dbContext.Prompts
+				.Where(prompt => EF.Functions.ILike(prompt.Title, $"{request.Title}"));
+
+			if (request.CurrentId.HasValue)
+			{
+				query = query.Where(e => e.Id != request.CurrentId.Value);
+			}
+
+			var similarPrompts = await query.Select(prompt => new SimilarPromptDetailsViewModel
+			{
+				Id = prompt.Id,
+				Title = prompt.Title
+			})
 				.ToListAsync();
 
 			if (similarPrompts.Count < 1)
