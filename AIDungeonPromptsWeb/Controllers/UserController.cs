@@ -55,12 +55,10 @@ namespace AIDungeonPrompts.Web.Controllers
 
 		public IActionResult Register(string returnUrl)
 		{
-			var model = new RegisterUserModel();
-			if (_currentUserService.TryGetCurrentUser(out var user))
+			var model = new RegisterUserModel
 			{
-				model.Username = user!.Username;
-				model.ReturnUrl = returnUrl;
-			}
+				ReturnUrl = returnUrl
+			};
 			return View(model);
 		}
 
