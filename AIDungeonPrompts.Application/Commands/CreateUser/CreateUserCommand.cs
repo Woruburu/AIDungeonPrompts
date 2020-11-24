@@ -34,8 +34,8 @@ namespace AIDungeonPrompts.Application.Commands.CreateUser
 			var user = new User
 			{
 				DateCreated = DateTime.UtcNow,
-				Password = BCrypt.Net.BCrypt.EnhancedHashPassword(request.Username),
-				Username = request.Password
+				Password = BCrypt.Net.BCrypt.EnhancedHashPassword(request.Password),
+				Username = request.Username
 			};
 
 			_dbContext.Users.Add(user);
