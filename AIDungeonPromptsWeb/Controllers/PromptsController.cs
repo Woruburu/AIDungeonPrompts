@@ -192,7 +192,7 @@ namespace AIDungeonPrompts.Web.Controllers
 		{
 			if (id == null || id == default)
 			{
-				return BadRequest();
+				return NotFound();
 			}
 			var prompt = await _mediator.Send(new GetPromptQuery { Id = id.Value });
 			if (prompt == null)
@@ -207,7 +207,7 @@ namespace AIDungeonPrompts.Web.Controllers
 		{
 			if (id == null || id == default)
 			{
-				return BadRequest();
+				return NotFound();
 			}
 			if (!string.IsNullOrWhiteSpace(honey) || !ModelState.IsValid)
 			{
@@ -224,7 +224,7 @@ namespace AIDungeonPrompts.Web.Controllers
 		{
 			if (id == null || id == default)
 			{
-				return BadRequest();
+				return NotFound();
 			}
 			var prompt = await _mediator.Send(new GetPromptQuery { Id = id.Value });
 			if (prompt == null)
