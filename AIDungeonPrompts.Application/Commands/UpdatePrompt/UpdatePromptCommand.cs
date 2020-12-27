@@ -58,14 +58,14 @@ namespace AIDungeonPrompts.Application.Commands.UpdatePrompt
 				.Include(e => e.WorldInfos)
 				.FirstOrDefaultAsync(e => e.Id == request.Id, cancellationToken);
 
-			prompt.AuthorsNote = request.AuthorsNote;
+			prompt.AuthorsNote = request.AuthorsNote?.Replace("\r\n", "\n");
 			prompt.DateEdited = DateTime.UtcNow;
-			prompt.Memory = request.Memory;
+			prompt.Memory = request.Memory?.Replace("\r\n", "\n");
 			prompt.Nsfw = request.Nsfw;
-			prompt.PromptContent = request.PromptContent;
-			prompt.Quests = request.Quests;
-			prompt.Title = request.Title;
-			prompt.Description = request.Description;
+			prompt.PromptContent = request.PromptContent.Replace("\r\n", "\n");
+			prompt.Quests = request.Quests?.Replace("\r\n", "\n");
+			prompt.Title = request.Title.Replace("\r\n", "\n");
+			prompt.Description = request.Description?.Replace("\r\n", "\n");
 			prompt.PromptTags = new List<PromptTag>();
 			prompt.WorldInfos = new List<WorldInfo>();
 
@@ -78,8 +78,8 @@ namespace AIDungeonPrompts.Application.Commands.UpdatePrompt
 				prompt.WorldInfos.Add(new WorldInfo
 				{
 					DateCreated = DateTime.UtcNow,
-					Entry = worldInfo.Entry,
-					Keys = worldInfo.Keys,
+					Entry = worldInfo.Entry.Replace("\r\n", "\n"),
+					Keys = worldInfo.Keys.Replace("\r\n", "\n"),
 					Prompt = prompt
 				});
 			}

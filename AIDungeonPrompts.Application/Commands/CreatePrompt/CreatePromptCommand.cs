@@ -56,15 +56,15 @@ namespace AIDungeonPrompts.Application.Commands.CreatePrompt
 		{
 			var prompt = new Prompt
 			{
-				AuthorsNote = request.AuthorsNote,
+				AuthorsNote = request.AuthorsNote?.Replace("\r\n", "\n"),
 				DateCreated = DateTime.UtcNow,
 				DateEdited = null,
-				Memory = request.Memory,
+				Memory = request.Memory?.Replace("\r\n", "\n"),
 				Nsfw = request.Nsfw,
-				PromptContent = request.PromptContent,
-				Quests = request.Quests,
-				Title = request.Title,
-				Description = request.Description,
+				PromptContent = request.PromptContent.Replace("\r\n", "\n"),
+				Quests = request.Quests?.Replace("\r\n", "\n"),
+				Title = request.Title.Replace("\r\n", "\n"),
+				Description = request.Description?.Replace("\r\n", "\n"),
 				OwnerId = request.OwnerId,
 				Upvote = 0,
 				Views = 0
@@ -79,8 +79,8 @@ namespace AIDungeonPrompts.Application.Commands.CreatePrompt
 				prompt.WorldInfos.Add(new WorldInfo
 				{
 					DateCreated = DateTime.UtcNow,
-					Entry = worldInfo.Entry,
-					Keys = worldInfo.Keys,
+					Entry = worldInfo.Entry.Replace("\r\n", "\n"),
+					Keys = worldInfo.Keys.Replace("\r\n", "\n"),
 					Prompt = prompt
 				});
 			}
