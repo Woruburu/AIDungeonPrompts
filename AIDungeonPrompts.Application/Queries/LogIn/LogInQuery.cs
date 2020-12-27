@@ -1,6 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using AIDungeonPrompts.Application.Abstractions.DbContexts;
+using AIDungeonPrompts.Application.Helpers;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -23,7 +24,9 @@ namespace AIDungeonPrompts.Application.Queries.LogIn
 
 		public async Task<LogInQueryViewModel> Handle(LogInQuery request, CancellationToken cancellationToken)
 		{
-			var user = await _dbContext.Users.FirstOrDefaultAsync(e => e.Username == request.Username);
+			var user = await _dbContext
+				.Users
+				.FirstOrDefaultAsync(e => EF.Functions.ILike(e.Username, NpgsqlHelper.SafeIlike(request.Username), NpgsqlHelper.EscapeChar));
 			if (user == null)
 			{
 				throw new LoginFailedException();

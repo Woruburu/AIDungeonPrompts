@@ -10,7 +10,6 @@ namespace AIDungeonPrompts.Web
 	{
 		public static int Main(string[] args)
 		{
-			Serilog.Debugging.SelfLog.Enable(msg => Console.WriteLine(msg));
 			Log.Logger = new LoggerConfiguration()
 				.MinimumLevel.Debug()
 				.Enrich.FromLogContext()

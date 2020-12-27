@@ -7,6 +7,7 @@ namespace AIDungeonPrompts.Application.Abstractions.DbContexts
 {
 	public interface IAIDungeonPromptsDbContext
 	{
+		DbSet<ApplicationLog> ApplicationLogs { get; set; }
 		DbSet<AuditPrompt> AuditPrompts { get; set; }
 		DbSet<Prompt> Prompts { get; set; }
 		DbSet<PromptTag> PromptTags { get; set; }

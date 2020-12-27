@@ -1,23 +1,21 @@
-@model RegisterUserModel
-@{ ViewData["Title"] = "Register"; }
+@model EditUserModel
+@{ ViewData["Title"] = "Edit User"; }
 
-<h2>Register</h2>
-<br />
-
-<form asp-action="Register" method="post">
-	@Html.HiddenFor(m => m.ReturnUrl)
+<h2>Edit User</h2>
+<p>Leave any field you do not wish to edit blank.</p>
+<form asp-action="Edit" method="post">
 	<input class="honey" name="Honey" />
-	<div class="form-group required">
+	<div class="form-group">
 		@Html.LabelFor(m => m.Username)
 		<input asp-for="Username" class="form-control" />
 		<span class="invalid-feedback" asp-validation-for="Username"></span>
 	</div>
-	<div class="form-group required">
+	<div class="form-group">
 		@Html.LabelFor(m => m.Password)
 		<input type="password" asp-for="Password" class="form-control" />
 		<span class="invalid-feedback" asp-validation-for="Password"></span>
 	</div>
-	<div class="form-group required">
+	<div class="form-group">
 		@Html.LabelFor(m => m.PasswordConfirm)
 		<input type="password" asp-for="PasswordConfirm" class="form-control" />
 		<span class="invalid-feedback" asp-validation-for="PasswordConfirm"></span>

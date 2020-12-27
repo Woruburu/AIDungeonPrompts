@@ -6,6 +6,8 @@ using AIDungeonPrompts.Infrastructure;
 using AIDungeonPrompts.Infrastructure.Identity;
 using AIDungeonPrompts.Persistence;
 using AIDungeonPrompts.Persistence.DbContexts;
+using AIDungeonPrompts.Web.HostedServices;
+using AIDungeonPrompts.Web.Middleware;
 using CorrelationId;
 using CorrelationId.DependencyInjection;
 using FluentValidation.AspNetCore;
@@ -66,7 +68,7 @@ namespace AIDungeonPrompts.Web
 			{
 				HttpOnly = HttpOnlyPolicy.Always,
 				Secure = CookieSecurePolicy.Always,
-				MinimumSameSitePolicy = SameSiteMode.Strict
+				MinimumSameSitePolicy = SameSiteMode.Strict,
 			});
 
 			context.Database.Migrate();
@@ -95,6 +97,7 @@ namespace AIDungeonPrompts.Web
 			app.UseAuthorization();
 
 			app.UseMiddleware<CurrentUserMiddleware>();
+			app.UseMiddleware<HoneyMiddleware>();
 
 			app.UseEndpoints(endpoints =>
 			{
@@ -107,9 +110,14 @@ namespace AIDungeonPrompts.Web
 		// This method gets called by the runtime. Use this method to add services to the container.
 		public void ConfigureServices(IServiceCollection services)
 		{
-			services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-				.AddCookie();
+			services
+				.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+				.AddCookie(builder =>
+				{
+					builder.LoginPath = "/user/login";
+				});
 
+			// See: https://docs.microsoft.com/en-us/aspnet/core/security/data-protection/implementation/key-storage-providers?view=aspnetcore-5.0&tabs=visual-studio#entity-framework-core
 			services.AddDataProtection()
 				.PersistKeysToDbContext<AIDungeonPromptsDbContext>();
 
@@ -134,7 +142,8 @@ namespace AIDungeonPrompts.Web
 						typeof(Startup)
 					}.Select(t => t.Assembly).ToArray())
 				);
-			// See: https://docs.microsoft.com/en-us/aspnet/core/security/data-protection/implementation/key-storage-providers?view=aspnetcore-5.0&tabs=visual-studio#entity-framework-core
+
+			services.AddHostedService<ApplicationLogCleanerHostedService>();
 		}
 	}
 }

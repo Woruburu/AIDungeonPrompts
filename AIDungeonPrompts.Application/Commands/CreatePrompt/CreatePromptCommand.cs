@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AIDungeonPrompts.Application.Abstractions.DbContexts;
+using AIDungeonPrompts.Application.Helpers;
 using AIDungeonPrompts.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -96,7 +97,7 @@ namespace AIDungeonPrompts.Application.Commands.CreatePrompt
 					prompt.Nsfw = true;
 					continue;
 				}
-				var tag = await _dbContext.Tags.FirstOrDefaultAsync(e => EF.Functions.ILike(e.Name, promptTag));
+				var tag = await _dbContext.Tags.FirstOrDefaultAsync(e => EF.Functions.ILike(e.Name, NpgsqlHelper.SafeIlike(promptTag), NpgsqlHelper.EscapeChar));
 				if (tag == null)
 				{
 					prompt.PromptTags.Add(new PromptTag { Prompt = prompt, Tag = new Tag { Name = promptTag } });

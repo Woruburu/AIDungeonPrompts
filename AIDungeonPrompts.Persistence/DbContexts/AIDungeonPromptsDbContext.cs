@@ -18,6 +18,7 @@ namespace AIDungeonPrompts.Persistence.DbContexts
 		{
 		}
 
+		public DbSet<ApplicationLog> ApplicationLogs { get; set; }
 		public DbSet<AuditPrompt> AuditPrompts { get; set; }
 		public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
 		public DbSet<Prompt> Prompts { get; set; }
