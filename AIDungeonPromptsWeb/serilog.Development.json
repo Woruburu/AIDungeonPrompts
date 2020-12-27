@@ -1,8 +1,9 @@
 {
 	"Serilog": {
 		"MinimumLevel": {
+			"Default": "Information",
 			"Override": {
-				"Microsoft.EntityFrameworkCore": "Information",
+				"Microsoft.EntityFrameworkCore": "Information"
 			}
 		},
 		"WriteTo": [

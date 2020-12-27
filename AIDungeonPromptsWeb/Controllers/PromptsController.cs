@@ -28,16 +28,11 @@ namespace AIDungeonPrompts.Web.Controllers
 
 		// TODO: think about bringing this in
 		//[HttpPost("/{id}/claim"), ValidateAntiForgeryToken]
-		//public async Task<IActionResult> Claim(int? id, string? honey)
+		//public async Task<IActionResult> Claim(int? id)
 		//{
 		//	if (id == null)
 		//	{
 		//		return NotFound();
-		//	}
-
-		//	if (!string.IsNullOrWhiteSpace(honey))
-		//	{
-		//		return RedirectToAction("View", new { id });
 		//	}
 
 		//	if (_currentUserService.TryGetCurrentUser(out var user))
@@ -61,13 +56,8 @@ namespace AIDungeonPrompts.Web.Controllers
 		}
 
 		[HttpPost, ValidateAntiForgeryToken]
-		public async Task<IActionResult> Create(bool? addWi, string? honey, bool confirm, CreatePromptViewModel model)
+		public async Task<IActionResult> Create(bool? addWi, bool confirm, CreatePromptViewModel model)
 		{
-			if (!string.IsNullOrWhiteSpace(honey))
-			{
-				return View(model);
-			}
-
 			if (addWi != null && addWi.Value)
 			{
 				ModelState.Clear();
@@ -103,16 +93,11 @@ namespace AIDungeonPrompts.Web.Controllers
 		}
 
 		[HttpPost("/{id}/edit"), ValidateAntiForgeryToken, Authorize]
-		public async Task<IActionResult> Edit(int? id, bool? addWi, string? honey, bool confirm, UpdatePromptViewModel model)
+		public async Task<IActionResult> Edit(int? id, bool? addWi, bool confirm, UpdatePromptViewModel model)
 		{
 			if (id == null || !_currentUserService.TryGetCurrentUser(out var user))
 			{
 				return NotFound();
-			}
-
-			if (!string.IsNullOrWhiteSpace(honey))
-			{
-				return View(model);
 			}
 
 			var prompt = await _mediator.Send(new GetPromptQuery { Id = id.Value });
@@ -203,13 +188,13 @@ namespace AIDungeonPrompts.Web.Controllers
 		}
 
 		[HttpPost("{id}/report"), ValidateAntiForgeryToken]
-		public async Task<IActionResult> Report(int? id, string? honey, CreateReportViewModel viewModel)
+		public async Task<IActionResult> Report(int? id, CreateReportViewModel viewModel)
 		{
 			if (id == null || id == default)
 			{
 				return NotFound();
 			}
-			if (!string.IsNullOrWhiteSpace(honey) || !ModelState.IsValid)
+			if (!ModelState.IsValid)
 			{
 				viewModel.Prompt = await _mediator.Send(new GetPromptQuery { Id = id.Value });
 				return View(viewModel);

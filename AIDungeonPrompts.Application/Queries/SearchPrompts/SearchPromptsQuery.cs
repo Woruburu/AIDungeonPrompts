@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AIDungeonPrompts.Application.Abstractions.DbContexts;
+using AIDungeonPrompts.Application.Helpers;
 using AIDungeonPrompts.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -20,6 +21,7 @@ namespace AIDungeonPrompts.Application.Queries.SearchPrompts
 		public TagJoin TagJoin { get; set; }
 		public List<string> Tags { get; set; } = new List<string>();
 		public bool TagsFuzzy { get; set; }
+		public int? User { get; set; }
 	}
 
 	public class SearchPromptsQueryHandler : IRequestHandler<SearchPromptsQuery, SearchPromptsViewModel>
@@ -53,7 +55,7 @@ namespace AIDungeonPrompts.Application.Queries.SearchPrompts
 
 			if (!string.IsNullOrWhiteSpace(request.Search))
 			{
-				query = query.Where(e => EF.Functions.ILike(e.Title, $"%{request.Search}%"));
+				query = query.Where(e => EF.Functions.ILike(e.Title, $"%{NpgsqlHelper.SafeIlike(request.Search)}%", NpgsqlHelper.EscapeChar));
 			}
 
 			if (request.Tags.Count > 0)
@@ -70,7 +72,7 @@ namespace AIDungeonPrompts.Application.Queries.SearchPrompts
 						{
 							query = query.Where(
 								prompt => prompt.PromptTags.Any(
-									promptTag => EF.Functions.ILike(promptTag.Tag!.Name, $"{item}")
+									promptTag => EF.Functions.ILike(promptTag.Tag!.Name, item)
 								)
 							);
 						}
@@ -79,7 +81,8 @@ namespace AIDungeonPrompts.Application.Queries.SearchPrompts
 					case TagJoin.Or:
 						query = query.Where(
 							prompt => prompt.PromptTags.Any(
-								promptTag => request.Tags.Any(t => EF.Functions.ILike(promptTag.Tag!.Name, t))
+								promptTag => request.Tags.Any(tag => EF.Functions.ILike(promptTag.Tag!.Name, tag)
+								)
 							)
 						);
 						break;
@@ -87,6 +90,11 @@ namespace AIDungeonPrompts.Application.Queries.SearchPrompts
 			}
 
 			var skip = (request.Page - 1) * request.PageSize;
+
+			if (request.User != null)
+			{
+				query = query.Where(e => e.OwnerId == request.User.Value);
+			}
 
 			var results = await query
 				.Skip(skip)
@@ -99,6 +107,7 @@ namespace AIDungeonPrompts.Application.Queries.SearchPrompts
 					Nsfw = prompt.Nsfw,
 					Description = prompt.Description,
 					DateCreated = prompt.DateCreated,
+					OwnerId = prompt.OwnerId,
 					SearchPromptsTagViewModel = prompt.PromptTags
 						.Select(promptTag => new SearchPromptsTagViewModel
 						{

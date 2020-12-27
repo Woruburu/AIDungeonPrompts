@@ -2,6 +2,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AIDungeonPrompts.Application.Abstractions.DbContexts;
+using AIDungeonPrompts.Application.Helpers;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -25,7 +26,7 @@ namespace AIDungeonPrompts.Application.Queries.SimilarPrompt
 		public async Task<SimilarPromptViewModel> Handle(SimilarPromptQuery request, CancellationToken cancellationToken)
 		{
 			var query = _dbContext.Prompts
-				.Where(prompt => EF.Functions.ILike(prompt.Title, $"{request.Title}"));
+				.Where(prompt => EF.Functions.ILike(prompt.Title, NpgsqlHelper.SafeIlike(request.Title), NpgsqlHelper.EscapeChar));
 
 			if (request.CurrentId.HasValue)
 			{

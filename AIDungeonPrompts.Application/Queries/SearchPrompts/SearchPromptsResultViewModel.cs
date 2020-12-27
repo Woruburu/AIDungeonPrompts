@@ -13,6 +13,8 @@ namespace AIDungeonPrompts.Application.Queries.SearchPrompts
 		[Display(Name = "NSFW?")]
 		public bool Nsfw { get; set; }
 
+		public int? OwnerId { get; set; }
+
 		[Display(Name = "Prompt")]
 		public string PromptContent { get; set; } = string.Empty;
 

@@ -10,7 +10,7 @@ namespace AIDungeonPrompts.Persistence
 {
 	public static class PersistenceInjectionExtensions
 	{
-		private static string _auditScopeId = "AuditScopeId";
+		private const string AuditScopeId = "AuditScopeId";
 
 		public static IServiceCollection AddPersistenceLayer(this IServiceCollection services,
 			string databaseConnection)
@@ -25,7 +25,7 @@ namespace AIDungeonPrompts.Persistence
 
 			Configuration.AddCustomAction(ActionType.OnScopeCreated, scope =>
 			{
-				scope.SetCustomField(_auditScopeId, Guid.NewGuid());
+				scope.SetCustomField(AuditScopeId, Guid.NewGuid());
 			});
 			_ = Configuration.Setup()
 				.UseEntityFramework(ef => ef
@@ -46,7 +46,7 @@ namespace AIDungeonPrompts.Persistence
 						{
 							auditEntity.DateCreated = DateTime.UtcNow;
 							auditEntity.Entry = entry.ToJson();
-							auditEntity.AuditScopeId = (Guid)evt.CustomFields[_auditScopeId];
+							auditEntity.AuditScopeId = (Guid)evt.CustomFields[AuditScopeId];
 						})
 					).IgnoreMatchedProperties(true)
 				);

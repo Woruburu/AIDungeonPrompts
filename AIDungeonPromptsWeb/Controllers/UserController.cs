@@ -4,9 +4,11 @@ using AIDungeonPrompts.Application.Commands.CreateUser;
 using AIDungeonPrompts.Application.Commands.UpdateUser;
 using AIDungeonPrompts.Application.Exceptions;
 using AIDungeonPrompts.Application.Queries.LogIn;
+using AIDungeonPrompts.Application.Queries.SearchPrompts;
 using AIDungeonPrompts.Web.Extensions;
 using AIDungeonPrompts.Web.Models.User;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AIDungeonPrompts.Web.Controllers
@@ -22,15 +24,89 @@ namespace AIDungeonPrompts.Web.Controllers
 			_currentUserService = currentUserService;
 		}
 
+		[Authorize, HttpGet("[controller]/[action]")]
+
+		public IActionResult Edit()
+		{
+			if (!_currentUserService.TryGetCurrentUser(out var user))
+			{
+				return NotFound();
+			}
+
+			return View(new EditUserModel
+			{
+				Username = user!.Username
+			});
+		}
+
+		[Authorize, HttpPost("[controller]/[action]"), ValidateAntiForgeryToken]
+		public async Task<IActionResult> Edit(EditUserModel model)
+		{
+			if (!_currentUserService.TryGetCurrentUser(out var user))
+			{
+				return NotFound();
+			}
+
+			if (!string.Equals(model.Password, model.PasswordConfirm))
+			{
+				ModelState.AddModelError(nameof(model.PasswordConfirm), "Passwords do not match");
+			}
+
+			if (!ModelState.IsValid)
+			{
+				return View(model);
+			}
+
+			try
+			{
+				await _mediator.Send(new UpdateUserCommand
+				{
+					Username = model.Username,
+					Password = model.Password,
+					Id = user!.Id
+				});
+			}
+			catch (UsernameNotUniqueException)
+			{
+				ModelState.AddModelError(nameof(model.Username), "Username already exists");
+				return View(model);
+			}
+
+			return RedirectToAction("Index");
+		}
+
+		[Authorize, HttpGet("[controller]")]
+		public async Task<IActionResult> Index(int? page)
+		{
+			if (!_currentUserService.TryGetCurrentUser(out var user))
+			{
+				return NotFound();
+			}
+
+			var result = await _mediator.Send(new SearchPromptsQuery
+			{
+				User = user!.Id,
+				Page = page ?? 1,
+				PageSize = 6
+			});
+
+			return View(new IndexUserModel
+			{
+				Username = user!.Username,
+				UserPrompts = result,
+				Page = page
+			});
+		}
+
 		public IActionResult LogIn()
 		{
 			return View(new LogInModel());
 		}
 
 		[HttpPost, ValidateAntiForgeryToken]
-		public async Task<IActionResult> LogIn(string? honey, LogInModel model)
+		public async Task<IActionResult> LogIn(LogInModel model)
 		{
-			if (!string.IsNullOrWhiteSpace(honey) || !ModelState.IsValid)
+			if (!ModelState.IsValid)
 			{
 				return View(model);
 			}
@@ -63,11 +139,11 @@ namespace AIDungeonPrompts.Web.Controllers
 		}
 
 		[HttpPost, ValidateAntiForgeryToken]
-		public async Task<IActionResult> Register(string? honey, RegisterUserModel model)
+		public async Task<IActionResult> Register(RegisterUserModel model)
 		{
-			if (!string.IsNullOrWhiteSpace(honey))
+			if (!string.Equals(model.Password, model.PasswordConfirm))
 			{
-				return View(model);
+				ModelState.AddModelError(nameof(model.PasswordConfirm), "Passwords do not match");
 			}
 
 			if (!ModelState.IsValid)
@@ -96,7 +172,7 @@ namespace AIDungeonPrompts.Web.Controllers
 					await HttpContext.SignInUserAsync(userId);
 				}
 			}
-			catch (UsernameNotUniqueException _)
+			catch (UsernameNotUniqueException)
 			{
 				ModelState.AddModelError(nameof(model.Username), "Username already exists");
 				return View(model);

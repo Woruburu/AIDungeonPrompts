@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using AIDungeonPrompts.Application.Abstractions.DbContexts;
 using AIDungeonPrompts.Application.Exceptions;
+using AIDungeonPrompts.Application.Helpers;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,8 +12,8 @@ namespace AIDungeonPrompts.Application.Commands.UpdateUser
 	public class UpdateUserCommand : IRequest
 	{
 		public int Id { get; set; }
-		public string Password { get; set; } = string.Empty;
-		public string Username { get; set; } = string.Empty;
+		public string? Password { get; set; }
+		public string? Username { get; set; }
 	}
 
 	public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand>
@@ -32,13 +33,25 @@ namespace AIDungeonPrompts.Application.Commands.UpdateUser
 				throw new UserNotFoundException();
 			}
 
-			if (await _dbContext.Users.FirstOrDefaultAsync(e => e.Username == request.Username && e.Id != request.Id) != null)
+			if (!string.IsNullOrWhiteSpace(request.Username))
 			{
-				throw new UsernameNotUniqueException();
+				if (await _dbContext
+					.Users
+					.FirstOrDefaultAsync(e =>
+						EF.Functions.ILike(e.Username, NpgsqlHelper.SafeIlike(request.Username), NpgsqlHelper.EscapeChar) &&
+						e.Id != request.Id) != null)
+				{
+					throw new UsernameNotUniqueException();
+				}
+
+				user.Username = request.Username;
 			}
 
-			user.Username = request.Username;
-			user.Password = BCrypt.Net.BCrypt.EnhancedHashPassword(request.Password);
+			if (!string.IsNullOrWhiteSpace(request.Password))
+			{
+				user.Password = BCrypt.Net.BCrypt.EnhancedHashPassword(request.Password);
+			}
+
 			user.DateEdited = DateTime.UtcNow;
 
 			_dbContext.Users.Update(user);
