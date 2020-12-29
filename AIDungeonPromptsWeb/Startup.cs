@@ -145,6 +145,8 @@ namespace AIDungeonPrompts.Web
 
 			services.AddHostedService<ApplicationLogCleanerHostedService>();
 			services.AddHostedService<ReportCleanerHostedService>();
+			// This shouldn't ever need to be enabled again
+			//services.AddHostedService<NewlineFixerHostedService>();
 		}
 	}
 }

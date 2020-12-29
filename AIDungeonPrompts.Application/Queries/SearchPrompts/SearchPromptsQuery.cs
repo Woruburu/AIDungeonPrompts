@@ -78,6 +78,17 @@ namespace AIDungeonPrompts.Application.Queries.SearchPrompts
 						}
 						break;
 
+					case TagJoin.None:
+						foreach (var item in request.Tags)
+						{
+							query = query.Where(
+								prompt => !prompt.PromptTags.Any(
+									promptTag => EF.Functions.ILike(promptTag.Tag!.Name, item)
+								)
+							);
+						}
+						break;
+
 					case TagJoin.Or:
 						query = query.Where(
 							prompt => prompt.PromptTags.Any(
