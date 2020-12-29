@@ -4,12 +4,10 @@
 <h2>Reports</h2>
 <p>
 	<strong>
-		All cleared reports will be removed at midnight.
-		<br />
-		Current server time is: @(DateTime.Now.ToString("t", System.Globalization.CultureInfo.CreateSpecificCulture("en-us")))
+		All reports marked as fixed will be removed at midnight. Current server time is: @(DateTime.Now.ToString("t", System.Globalization.CultureInfo.CreateSpecificCulture("en-us")))
 	</strong>
 </p>
-<table class="table">
+<table class="table table-striped">
 	<thead>
 		<tr>
 			<th>
@@ -22,7 +20,7 @@
 				Prompt Link
 			</th>
 			<th>
-				Cleared
+				Fixed
 			</th>
 		</tr>
 	</thead>
@@ -33,8 +31,10 @@
 				<td>@report.ReportReason.GetEnumDisplayName()</td>
 				<td>@report.ExtraDetails</td>
 				<td>
-					<a asp-action="View" asp-controller="Prompts" asp-route-id="@report.PromptId">
-						@report.PromptTitle
+					<a target="_blank" asp-action="View" asp-controller="Prompts" asp-route-id="@report.PromptId">
+						<div>
+							@report.PromptTitle
+						</div>
 					</a>
 				</td>
 				<td>
@@ -45,7 +45,7 @@
 					else
 					{
 						<form method="post" asp-controller="reports" asp-action="clear" asp-route-id="@report.Id" >
-							<button class="btn btn-primary">Clear</button>
+							<button class="btn btn-outline-success">Mark as Fixed</button>
 						</form>
 					}
 				</td>

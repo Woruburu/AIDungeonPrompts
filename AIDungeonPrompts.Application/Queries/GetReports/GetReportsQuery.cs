@@ -34,7 +34,7 @@ namespace AIDungeonPrompts.Application.Queries.GetReports
 			var query = _dbContext.Reports.Include(e => e.Prompt).AsQueryable();
 			if (user!.Role == RoleEnum.TagEdit)
 			{
-				query = query.Where(e => e.ReportReason == ReportReason.IncorrectTags);
+				query = query.Where(e => e.ReportReason == ReportReason.IncorrectTags || e.ReportReason == ReportReason.UntaggedNsfw);
 			}
 			var result = await query.ToListAsync();
 
