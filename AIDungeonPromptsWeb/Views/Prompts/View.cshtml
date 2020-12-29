@@ -1,15 +1,15 @@
 @model ViewPromptViewModel
+@using AIDungeonPrompts.Application.Helpers 
 @{
 	ViewData["Title"] = Model.Prompt.Title;
 	var showEdit = false;
-	var canClaim = false;
-	if (userService.TryGetCurrentUser(out var user) && user!.Id == Model.Prompt.OwnerId)
-	{		
-		showEdit = true;	
-	}
-	if (Model.Prompt.OwnerId == null)
+	if (userService.TryGetCurrentUser(out var user) && (
+			user!.Id == Model.Prompt.OwnerId ||
+			RoleHelper.CanEdit(user.Role)
+		)
+	)
 	{
-		canClaim = true;
+		showEdit = true;	
 	}
 }
 @if (Model.Reported ?? false)
@@ -27,13 +27,6 @@
 		<p>Created on @Model.Prompt.DateCreated.ToString("yyyy/MM/dd")</p>
 	</div>
 	<div class="ml-auto d-flex">
-		@*@if (canClaim) {
-			<div>
-				<form method="post" asp-action="Claim" asp-route-id="@Model.Prompt.Id">
-					<button class="btn btn-outline-primary mr-2 px-3">Claim</button>
-				</form>
-			</div>
-		}*@
 		@if (showEdit) {
 			<div>
 				<a asp-action="Edit" asp-route-id="@Model.Prompt.Id" class="btn btn-outline-success mr-2 px-3">Edit</a>

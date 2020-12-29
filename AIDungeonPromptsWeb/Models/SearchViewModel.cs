@@ -19,6 +19,7 @@ namespace AIDungeonPrompts.Web.Models
 		public TagJoin TagJoin { get; set; }
 
 		public string? Tags { get; set; }
+
 	}
 
 	public class SearchViewModel : SearchRequestParameters

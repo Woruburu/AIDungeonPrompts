@@ -1,14 +1,14 @@
-using AIDungeonPrompts.Domain.Entities.Abstract;
 using AIDungeonPrompts.Domain.Enums;
 
-namespace AIDungeonPrompts.Domain.Entities
+namespace AIDungeonPrompts.Application.Queries.GetReports
 {
-	public class Report : BaseDomainEntity
+	public class GetReportViewModel
 	{
 		public bool Cleared { get; set; }
 		public string? ExtraDetails { get; set; }
-		public Prompt? Prompt { get; set; }
+		public int Id { get; set; }
 		public int PromptId { get; set; }
+		public string PromptTitle { get; set; } = string.Empty;
 		public ReportReason ReportReason { get; set; }
 	}
 }

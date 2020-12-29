@@ -1,0 +1,55 @@
+@model AIDungeonPrompts.Application.Queries.GetReports.GetReportsViewModel
+@using AIDungeonPrompts.Application.Extensions 
+
+<h2>Reports</h2>
+<p>
+	<strong>
+		All reports marked as fixed will be removed at midnight. Current server time is: @(DateTime.Now.ToString("t", System.Globalization.CultureInfo.CreateSpecificCulture("en-us")))
+	</strong>
+</p>
+<table class="table table-striped">
+	<thead>
+		<tr>
+			<th>
+				Report Reason
+			</th>
+			<th>
+				Extra Details
+			</th>
+			<th>
+				Prompt Link
+			</th>
+			<th>
+				Fixed
+			</th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach (var report in Model.Reports.OrderBy(e => e.Cleared))
+		{
+			<tr>
+				<td>@report.ReportReason.GetEnumDisplayName()</td>
+				<td>@report.ExtraDetails</td>
+				<td>
+					<a target="_blank" asp-action="View" asp-controller="Prompts" asp-route-id="@report.PromptId">
+						<div>
+							@report.PromptTitle
+						</div>
+					</a>
+				</td>
+				<td>
+					@if (report.Cleared)
+					{
+						<input disabled type="checkbox" checked />
+					}
+					else
+					{
+						<form method="post" asp-controller="reports" asp-action="clear" asp-route-id="@report.Id" >
+							<button class="btn btn-outline-success">Mark as Fixed</button>
+						</form>
+					}
+				</td>
+			</tr>
+		}
+	</tbody>
+</table>
