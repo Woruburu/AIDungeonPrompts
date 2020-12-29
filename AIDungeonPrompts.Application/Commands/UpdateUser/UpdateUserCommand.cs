@@ -22,7 +22,7 @@ namespace AIDungeonPrompts.Application.Commands.UpdateUser
 
 		public UpdateUserCommandHandler(IAIDungeonPromptsDbContext dbContext)
 		{
-			_dbContext = dbContext ?? throw new System.ArgumentNullException(nameof(dbContext));
+			_dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
 		}
 
 		public async Task<Unit> Handle(UpdateUserCommand request, CancellationToken cancellationToken)

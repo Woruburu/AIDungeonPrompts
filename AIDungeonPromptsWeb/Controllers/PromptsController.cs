@@ -5,6 +5,7 @@ using AIDungeonPrompts.Application.Abstractions.Identity;
 using AIDungeonPrompts.Application.Commands.CreatePrompt;
 using AIDungeonPrompts.Application.Commands.CreateTransientUser;
 using AIDungeonPrompts.Application.Commands.UpdatePrompt;
+using AIDungeonPrompts.Application.Helpers;
 using AIDungeonPrompts.Application.Queries.GetPrompt;
 using AIDungeonPrompts.Application.Queries.SimilarPrompt;
 using AIDungeonPrompts.Web.Extensions;
@@ -26,29 +27,6 @@ namespace AIDungeonPrompts.Web.Controllers
 			_currentUserService = currentUserService;
 		}
 
-		// TODO: think about bringing this in
-		//[HttpPost("/{id}/claim"), ValidateAntiForgeryToken]
-		//public async Task<IActionResult> Claim(int? id)
-		//{
-		//	if (id == null)
-		//	{
-		//		return NotFound();
-		//	}
-
-		//	if (_currentUserService.TryGetCurrentUser(out var user))
-		//	{
-		//		await _mediator.Send(new ClaimPromptCommand { PromptId = id.Value, OwnerId = user!.Id });
-		//	}
-		//	else
-		//	{
-		//		var userId = await _mediator.Send(new CreateTransientUserCommand());
-		//		await HttpContext.SignInUserAsync(userId);
-		//		await _mediator.Send(new ClaimPromptCommand { PromptId = id.Value, OwnerId = userId });
-		//	}
-
-		//	return RedirectToAction("View", new { id });
-		//}
-
 		[HttpGet("[controller]/create")]
 		public ActionResult Create()
 		{
@@ -58,7 +36,7 @@ namespace AIDungeonPrompts.Web.Controllers
 		[HttpPost, ValidateAntiForgeryToken]
 		public async Task<IActionResult> Create(bool? addWi, bool confirm, CreatePromptViewModel model)
 		{
-			if (addWi != null && addWi.Value)
+			if (addWi == true)
 			{
 				ModelState.Clear();
 				model.Command.WorldInfos.Add(new CreatePromptCommandWorldInfo());
@@ -102,7 +80,7 @@ namespace AIDungeonPrompts.Web.Controllers
 
 			var prompt = await _mediator.Send(new GetPromptQuery { Id = id.Value });
 
-			if (prompt?.OwnerId != user!.Id)
+			if (prompt?.OwnerId != user!.Id && !RoleHelper.CanEdit(user.Role))
 			{
 				return NotFound();
 			}
@@ -142,7 +120,7 @@ namespace AIDungeonPrompts.Web.Controllers
 
 			var prompt = await _mediator.Send(new GetPromptQuery { Id = id.Value });
 
-			if (prompt?.OwnerId != user!.Id)
+			if (prompt?.OwnerId != user!.Id && !RoleHelper.CanEdit(user.Role))
 			{
 				return NotFound();
 			}
@@ -160,6 +138,7 @@ namespace AIDungeonPrompts.Web.Controllers
 					PromptTags = string.Join(", ", prompt.PromptTags.Select(pt => pt.Name)),
 					Quests = prompt.Quests,
 					Title = prompt.Title,
+					OwnerId = prompt.OwnerId,
 					WorldInfos = prompt.WorldInfos.Any() ? prompt.WorldInfos.Select(wi => new UpdatePromptCommandWorldInfo
 					{
 						Entry = wi.Entry,

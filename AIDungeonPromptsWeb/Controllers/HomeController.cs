@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using AIDungeonPrompts.Application.Queries.RandomPrompt;
 using AIDungeonPrompts.Application.Queries.SearchPrompts;
 using AIDungeonPrompts.Web.ColorScheme;
 using AIDungeonPrompts.Web.Cookies;
@@ -85,6 +86,12 @@ namespace AIDungeonPrompts.Web.Controllers
 				MatchExact = request.MatchExact,
 				TagJoin = request.TagJoin
 			});
+		}
+
+		public async Task<IActionResult> Random()
+		{
+			var result = await _mediator.Send(new RandomPromptQuery());
+			return RedirectToAction("View", "Prompts", new { result.Id });
 		}
 
 		[HttpGet("/whats-new")]

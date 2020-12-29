@@ -1,5 +1,12 @@
 @model UpdatePromptViewModel
-@{ ViewData["Title"] = "Edit"; }
+@using AIDungeonPrompts.Domain.Enums; 
+@{
+	ViewData["Title"] = "Edit";
+	userService.TryGetCurrentUser(out var user);
+	var isOwner = user!.Id == Model.Command.OwnerId;
+	var canEditField = isOwner ? isOwner : (user.Role & RoleEnum.FieldEdit) != 0;
+	var canEditTags = isOwner ? isOwner : (user.Role & RoleEnum.TagEdit) != 0;
+}
 
 <h2>Edit Prompt</h2>
 <br />
@@ -8,47 +15,56 @@
 
 	<div class="form-group required">
 		@Html.LabelFor(m => m.Command.Title)
-		<input asp-for="Command.Title" class="form-control" />
+		<input readonly="@(!canEditField)" asp-for="Command.Title" class="form-control" />
 		<span class="invalid-feedback" asp-validation-for="Command.Title"></span>
 	</div>
 	<div class="form-group">
 		@Html.LabelFor(m => m.Command.Description)
-		<textarea asp-for="Command.Description" class="form-control"></textarea>
+		<textarea readonly="@(!canEditField)" asp-for="Command.Description" class="form-control"></textarea>
 		<span class="invalid-feedback" asp-validation-for="Command.Description"></span>
 	</div>
 	<div class="form-group required">
 		@Html.LabelFor(m => m.Command.PromptContent)
-		<textarea asp-for="Command.PromptContent" class="form-control"></textarea>
+		<textarea readonly="@(!canEditField)" asp-for="Command.PromptContent" class="form-control"></textarea>
 		<span class="invalid-feedback" asp-validation-for="Command.PromptContent"></span>
 	</div>
 	<div class="form-group required">
 		@Html.LabelFor(m => m.Command.PromptTags)
-		<input asp-for="Command.PromptTags" class="form-control" />
+		<input readonly="@(!canEditTags)" asp-for="Command.PromptTags" class="form-control" />
 		<span class="invalid-feedback" asp-validation-for="Command.PromptTags"></span>
 	</div>
 	<div class="form-group">
 		@Html.LabelFor(m => m.Command.Memory)
-		<textarea asp-for="Command.Memory" class="form-control"></textarea>
+		<textarea readonly="@(!canEditField)" asp-for="Command.Memory" class="form-control"></textarea>
 		<span class="invalid-feedback" asp-validation-for="Command.Memory"></span>
 	</div>
 	<div class="form-group">
 		@Html.LabelFor(m => m.Command.Quests)
-		<textarea asp-for="Command.Quests" class="form-control"></textarea>
+		<textarea readonly="@(!canEditField)" asp-for="Command.Quests" class="form-control"></textarea>
 		<span class="invalid-feedback" asp-validation-for="Command.Quests"></span>
 	</div>
 	<div class="form-group">
 		@Html.LabelFor(m => m.Command.AuthorsNote)
-		<textarea asp-for="Command.AuthorsNote" class="form-control"></textarea>
+		<textarea readonly="@(!canEditField)" asp-for="Command.AuthorsNote" class="form-control"></textarea>
 		<span class="invalid-feedback" asp-validation-for="Command.AuthorsNote"></span>
 	</div>
 	<div class="form-check">
-		<input asp-for="Command.Nsfw" class="form-check-input">
-		@Html.LabelFor(m => m.Command.Nsfw, new { @class = "form-check-label" })
+		@if (canEditTags)
+		{
+			<input asp-for="Command.Nsfw" class="form-check-input">
+			@Html.LabelFor(m => m.Command.Nsfw, new { @class = "form-check-label" })
+		}
+		else
+		{
+			@Html.HiddenFor(m => m.Command.Nsfw)
+			<input disabled asp-for="Command.Nsfw" class="form-check-input">
+			@Html.LabelFor(m => m.Command.Nsfw, new { @class = "form-check-label" })
+		}
 	</div>
 	<br />
 	<div>
 		@Html.LabelFor(m => m.Command.WorldInfos)
-		@Html.EditorFor(m => m.Command.WorldInfos)
+		@Html.EditorFor(m => m.Command.WorldInfos, new { Disabled = !canEditField })
 		<button asp-route-addWi="@true" asp-fragment="world-infos" class="btn btn-secondary" onclick="wiAddClick()">Add Another</button>
 	</div>
 	<div id="world-infos"></div>

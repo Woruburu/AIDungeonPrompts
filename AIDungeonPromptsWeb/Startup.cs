@@ -144,6 +144,7 @@ namespace AIDungeonPrompts.Web
 				);
 
 			services.AddHostedService<ApplicationLogCleanerHostedService>();
+			services.AddHostedService<ReportCleanerHostedService>();
 		}
 	}
 }

@@ -94,6 +94,7 @@ namespace AIDungeonPrompts.Web.Controllers
 			{
 				Username = user!.Username,
 				UserPrompts = result,
+				UserRoles = user!.Role,
 				Page = page
 			});
 		}
