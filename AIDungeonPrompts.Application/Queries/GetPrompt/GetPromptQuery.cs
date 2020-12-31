@@ -7,12 +7,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AIDungeonPrompts.Application.Queries.GetPrompt
 {
-	public class GetPromptQuery : IRequest<GetPromptViewModel>
+	public class GetPromptQuery : IRequest<GetPromptViewModel?>
 	{
+		public GetPromptQuery(int id)
+		{
+			Id = id;
+		}
+
 		public int Id { get; set; }
 	}
 
-	public class GetPromptQueryHandler : IRequestHandler<GetPromptQuery, GetPromptViewModel>
+	public class GetPromptQueryHandler : IRequestHandler<GetPromptQuery, GetPromptViewModel?>
 	{
 		private readonly IAIDungeonPromptsDbContext _dbContext;
 
@@ -21,13 +26,14 @@ namespace AIDungeonPrompts.Application.Queries.GetPrompt
 			_dbContext = dbContext;
 		}
 
-		public async Task<GetPromptViewModel> Handle(GetPromptQuery request, CancellationToken cancellationToken)
+		public async Task<GetPromptViewModel?> Handle(GetPromptQuery request, CancellationToken cancellationToken)
 		{
 			return await _dbContext.Prompts
 				.Include(e => e.WorldInfos)
 				.Include(e => e.PromptTags)
 				.ThenInclude(e => e.Tag)
-				.AsNoTracking().Select(prompt => new GetPromptViewModel
+				.AsNoTracking()
+				.Select(prompt => new GetPromptViewModel
 				{
 					AuthorsNote = prompt.AuthorsNote,
 					Id = prompt.Id,

@@ -1,10 +1,15 @@
-using AIDungeonPrompts.Application.Queries.LogIn;
+using System.ComponentModel.DataAnnotations;
 
 namespace AIDungeonPrompts.Web.Models.User
 {
 	public class LogInModel
 	{
-		public LogInQuery LogInQuery { get; set; } = new LogInQuery();
+		[Required]
+		public string Password { get; set; } = string.Empty;
+
 		public string? ReturnUrl { get; set; }
+
+		[Required]
+		public string Username { get; set; } = string.Empty;
 	}
 }

@@ -1,14 +1,15 @@
 using System.Threading.Tasks;
 using AIDungeonPrompts.Application.Abstractions.Identity;
 using AIDungeonPrompts.Application.Commands.ClearReport;
-using AIDungeonPrompts.Application.Helpers;
 using AIDungeonPrompts.Application.Queries.GetReports;
+using AIDungeonPrompts.Web.Constants;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AIDungeonPrompts.Web.Controllers
 {
+	[Authorize(Policy = PolicyValueConstants.EditorsOnly)]
 	public class ReportsController : Controller
 	{
 		private readonly ICurrentUserService _currentUserService;
@@ -20,25 +21,21 @@ namespace AIDungeonPrompts.Web.Controllers
 			_currentUserService = currentUserService;
 		}
 
-		[HttpPost("[controller]/clear/{id}"), Authorize, ValidateAntiForgeryToken]
+		[HttpPost("[controller]/clear/{id}"), ValidateAntiForgeryToken]
 		public async Task<IActionResult> Clear(int? id)
 		{
-			if (!_currentUserService.TryGetCurrentUser(out var user) || !RoleHelper.CanEdit(user!.Role) || id == null)
-			{
-				return NotFound();
-			}
-			await _mediator.Send(new ClearReportCommand { Id = id.Value });
+			await _mediator.Send(new ClearReportCommand(id.Value));
 			return RedirectToAction("Index");
 		}
 
-		[HttpGet("[controller]"), Authorize]
+		[HttpGet("[controller]")]
 		public async Task<IActionResult> Index()
 		{
-			if (!_currentUserService.TryGetCurrentUser(out var user) || !RoleHelper.CanEdit(user!.Role))
+			if (!_currentUserService.TryGetCurrentUser(out var user))
 			{
 				return NotFound();
 			}
-			var reports = await _mediator.Send(new GetReportsQuery());
+			var reports = await _mediator.Send(new GetReportsQuery(user!.Role));
 			return View(reports);
 		}
 	}

@@ -42,7 +42,7 @@ namespace AIDungeonPrompts.Web.HostedServices
 				return;
 			}
 
-			var allPrompts = await dbContext.Prompts.Include(e => e.WorldInfos).ToListAsync();
+			var allPrompts = await dbContext.Prompts.Include(e => e.WorldInfos).ToListAsync(cancellationToken);
 			_logger.LogInformation($"Updating {allPrompts.Count} prompts from \\r\\n to \\n");
 			foreach (var prompt in allPrompts)
 			{

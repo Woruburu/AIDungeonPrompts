@@ -2,13 +2,12 @@
 @using AIDungeonPrompts.Application.Extensions
 @{
 	ViewData["Title"] = "My Profile";
-	userService.TryGetCurrentUser(out var user);
 }
 
 <h2>My Profile</h2>
 <br />
 <div class="row">
-	@if (user != null && string.IsNullOrWhiteSpace(user.Password))
+	@if (Model.IsTransient)
 	{
 		<div class="col-12">
 			<p>

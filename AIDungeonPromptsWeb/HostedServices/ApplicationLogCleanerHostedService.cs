@@ -38,7 +38,7 @@ namespace AIDungeonPrompts.Web.HostedServices
 			var logsToRemove = await dbContext
 				.ApplicationLogs
 				.Where(e => e.TimeStamp < DateTime.UtcNow.AddDays(-7))
-				.ToListAsync();
+				.ToListAsync(cancellationToken);
 			_logger.LogInformation($"Removing {logsToRemove.Count} logs.");
 			dbContext.ApplicationLogs.RemoveRange(logsToRemove);
 			await dbContext.SaveChangesAsync(cancellationToken);

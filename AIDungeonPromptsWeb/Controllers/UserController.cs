@@ -3,6 +3,7 @@ using AIDungeonPrompts.Application.Abstractions.Identity;
 using AIDungeonPrompts.Application.Commands.CreateUser;
 using AIDungeonPrompts.Application.Commands.UpdateUser;
 using AIDungeonPrompts.Application.Exceptions;
+using AIDungeonPrompts.Application.Queries.GetUser;
 using AIDungeonPrompts.Application.Queries.LogIn;
 using AIDungeonPrompts.Application.Queries.SearchPrompts;
 using AIDungeonPrompts.Web.Extensions;
@@ -85,7 +86,7 @@ namespace AIDungeonPrompts.Web.Controllers
 
 			var result = await _mediator.Send(new SearchPromptsQuery
 			{
-				User = user!.Id,
+				UserId = user!.Id,
 				Page = page ?? 1,
 				PageSize = 6
 			});
@@ -95,13 +96,14 @@ namespace AIDungeonPrompts.Web.Controllers
 				Username = user!.Username,
 				UserPrompts = result,
 				UserRoles = user!.Role,
-				Page = page
+				Page = page,
+				IsTransient = user!.IsTransient
 			});
 		}
 
-		public IActionResult LogIn()
+		public IActionResult LogIn(string returnUrl)
 		{
-			return View(new LogInModel());
+			return View(new LogInModel { ReturnUrl = returnUrl });
 		}
 
 		[HttpPost, ValidateAntiForgeryToken]
@@ -114,8 +116,8 @@ namespace AIDungeonPrompts.Web.Controllers
 
 			try
 			{
-				var user = await _mediator.Send(model.LogInQuery);
-				await HttpContext.SignInUserAsync(user.Id);
+				var user = await _mediator.Send(new LogInQuery(model.Username, model.Password));
+				await HttpContext.SignInUserAsync(user);
 			}
 			catch (LoginFailedException)
 			{
@@ -170,7 +172,8 @@ namespace AIDungeonPrompts.Web.Controllers
 						Username = model.Username,
 						Password = model.Password
 					});
-					await HttpContext.SignInUserAsync(userId);
+					user = await _mediator.Send(new GetUserQuery(userId));
+					await HttpContext.SignInUserAsync(user);
 				}
 			}
 			catch (UsernameNotUniqueException)

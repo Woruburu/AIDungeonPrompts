@@ -7,6 +7,7 @@ using AIDungeonPrompts.Application.Commands.CreateTransientUser;
 using AIDungeonPrompts.Application.Commands.UpdatePrompt;
 using AIDungeonPrompts.Application.Helpers;
 using AIDungeonPrompts.Application.Queries.GetPrompt;
+using AIDungeonPrompts.Application.Queries.GetUser;
 using AIDungeonPrompts.Application.Queries.SimilarPrompt;
 using AIDungeonPrompts.Web.Extensions;
 using AIDungeonPrompts.Web.Models.Prompts;
@@ -48,7 +49,7 @@ namespace AIDungeonPrompts.Web.Controllers
 				return View(model);
 			}
 
-			var duplicate = await _mediator.Send(new SimilarPromptQuery { Title = model.Command.Title });
+			var duplicate = await _mediator.Send(new SimilarPromptQuery(model.Command.Title));
 			if (duplicate.Matched && !confirm)
 			{
 				model.SimilarPromptQuery = duplicate;
@@ -58,7 +59,8 @@ namespace AIDungeonPrompts.Web.Controllers
 			if (!_currentUserService.TryGetCurrentUser(out var user))
 			{
 				var userId = await _mediator.Send(new CreateTransientUserCommand());
-				await HttpContext.SignInUserAsync(userId);
+				user = await _mediator.Send(new GetUserQuery(userId));
+				await HttpContext.SignInUserAsync(user);
 				model.Command.OwnerId = userId;
 			}
 			else
@@ -78,7 +80,7 @@ namespace AIDungeonPrompts.Web.Controllers
 				return NotFound();
 			}
 
-			var prompt = await _mediator.Send(new GetPromptQuery { Id = id.Value });
+			var prompt = await _mediator.Send(new GetPromptQuery(id.Value));
 
 			if (prompt?.OwnerId != user!.Id && !RoleHelper.CanEdit(user.Role))
 			{
@@ -99,7 +101,7 @@ namespace AIDungeonPrompts.Web.Controllers
 				return View(model);
 			}
 
-			var duplicate = await _mediator.Send(new SimilarPromptQuery { Title = model.Command.Title, CurrentId = model.Command.Id });
+			var duplicate = await _mediator.Send(new SimilarPromptQuery(model.Command.Title, model.Command.Id));
 			if (duplicate.Matched && !confirm)
 			{
 				model.SimilarPromptQuery = duplicate;
@@ -118,9 +120,9 @@ namespace AIDungeonPrompts.Web.Controllers
 				return NotFound();
 			}
 
-			var prompt = await _mediator.Send(new GetPromptQuery { Id = id.Value });
+			var prompt = await _mediator.Send(new GetPromptQuery(id.Value));
 
-			if (prompt?.OwnerId != user!.Id && !RoleHelper.CanEdit(user.Role))
+			if (prompt == null || (prompt?.OwnerId != user!.Id && !RoleHelper.CanEdit(user.Role)))
 			{
 				return NotFound();
 			}
@@ -158,7 +160,7 @@ namespace AIDungeonPrompts.Web.Controllers
 			{
 				return NotFound();
 			}
-			var prompt = await _mediator.Send(new GetPromptQuery { Id = id.Value });
+			var prompt = await _mediator.Send(new GetPromptQuery(id.Value));
 			if (prompt == null)
 			{
 				return NotFound();
@@ -173,9 +175,14 @@ namespace AIDungeonPrompts.Web.Controllers
 			{
 				return NotFound();
 			}
+			var prompt = await _mediator.Send(new GetPromptQuery(id.Value));
+			if (prompt == null)
+			{
+				return NotFound();
+			}
 			if (!ModelState.IsValid)
 			{
-				viewModel.Prompt = await _mediator.Send(new GetPromptQuery { Id = id.Value });
+				viewModel.Prompt = prompt;
 				return View(viewModel);
 			}
 			viewModel.Command.PromptId = id.Value;
@@ -190,7 +197,7 @@ namespace AIDungeonPrompts.Web.Controllers
 			{
 				return NotFound();
 			}
-			var prompt = await _mediator.Send(new GetPromptQuery { Id = id.Value });
+			var prompt = await _mediator.Send(new GetPromptQuery(id.Value));
 			if (prompt == null)
 			{
 				return NotFound();

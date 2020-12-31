@@ -1,4 +1,4 @@
-@model AIDungeonPrompts.Application.Queries.GetReports.GetReportsViewModel
+@model List<AIDungeonPrompts.Application.Queries.GetReports.GetReportViewModel>
 @using AIDungeonPrompts.Application.Extensions 
 
 <h2>Reports</h2>
@@ -25,7 +25,7 @@
 		</tr>
 	</thead>
 	<tbody>
-		@foreach (var report in Model.Reports.OrderBy(e => e.Cleared))
+		@foreach (var report in Model.OrderBy(e => e.Cleared))
 		{
 			<tr>
 				<td>@report.ReportReason.GetEnumDisplayName()</td>

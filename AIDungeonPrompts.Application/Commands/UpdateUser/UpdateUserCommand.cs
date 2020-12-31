@@ -30,7 +30,7 @@ namespace AIDungeonPrompts.Application.Commands.UpdateUser
 			var user = await _dbContext.Users.FindAsync(request.Id);
 			if (user == null)
 			{
-				throw new UserNotFoundException();
+				throw new UpdateUserNotFoundException();
 			}
 
 			if (!string.IsNullOrWhiteSpace(request.Username))

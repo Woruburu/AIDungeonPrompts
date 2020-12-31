@@ -1,5 +1,5 @@
 using System.Threading.Tasks;
-using AIDungeonPrompts.Domain.Entities;
+using AIDungeonPrompts.Application.Queries.GetUser;
 
 namespace AIDungeonPrompts.Application.Abstractions.Identity
 {
@@ -7,6 +7,6 @@ namespace AIDungeonPrompts.Application.Abstractions.Identity
 	{
 		Task SetCurrentUser(int userId);
 
-		bool TryGetCurrentUser(out User? user);
+		bool TryGetCurrentUser(out GetUserViewModel? user);
 	}
 }

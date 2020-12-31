@@ -6,6 +6,7 @@ using AIDungeonPrompts.Infrastructure;
 using AIDungeonPrompts.Infrastructure.Identity;
 using AIDungeonPrompts.Persistence;
 using AIDungeonPrompts.Persistence.DbContexts;
+using AIDungeonPrompts.Web.Constants;
 using AIDungeonPrompts.Web.HostedServices;
 using AIDungeonPrompts.Web.Middleware;
 using CorrelationId;
@@ -142,6 +143,14 @@ namespace AIDungeonPrompts.Web
 						typeof(Startup)
 					}.Select(t => t.Assembly).ToArray())
 				);
+
+			services.AddAuthorization(options =>
+			{
+				options.AddPolicy(
+					PolicyValueConstants.EditorsOnly,
+					policy => policy.RequireClaim(ClaimValueConstants.CanEdit, true.ToString())
+				);
+			});
 
 			services.AddHostedService<ApplicationLogCleanerHostedService>();
 			services.AddHostedService<ReportCleanerHostedService>();

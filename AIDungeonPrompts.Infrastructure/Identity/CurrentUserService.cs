@@ -1,26 +1,26 @@
 using System.Threading.Tasks;
-using AIDungeonPrompts.Application.Abstractions.DbContexts;
 using AIDungeonPrompts.Application.Abstractions.Identity;
-using AIDungeonPrompts.Domain.Entities;
+using AIDungeonPrompts.Application.Queries.GetUser;
+using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace AIDungeonPrompts.Infrastructure.Identity
 {
 	public class CurrentUserService : ICurrentUserService
 	{
-		private readonly IAIDungeonPromptsDbContext _dbContext;
 		private readonly ILogger<CurrentUserService> _logger;
-		private User? _currentUser;
+		private readonly IMediator _mediator;
+		private GetUserViewModel? _currentUser;
 
-		public CurrentUserService(IAIDungeonPromptsDbContext dbContext, ILogger<CurrentUserService> logger)
+		public CurrentUserService(ILogger<CurrentUserService> logger, IMediator mediator)
 		{
-			_dbContext = dbContext;
 			_logger = logger;
+			_mediator = mediator;
 		}
 
 		public async Task SetCurrentUser(int userId)
 		{
-			var user = await _dbContext.Users.FindAsync(userId);
+			var user = await _mediator.Send(new GetUserQuery(userId));
 			if (user == null)
 			{
 				_logger.LogWarning($"User with ID {userId} could not be found.");
@@ -28,7 +28,7 @@ namespace AIDungeonPrompts.Infrastructure.Identity
 			_currentUser = user;
 		}
 
-		public bool TryGetCurrentUser(out User? user)
+		public bool TryGetCurrentUser(out GetUserViewModel? user)
 		{
 			user = _currentUser;
 			return user != null;

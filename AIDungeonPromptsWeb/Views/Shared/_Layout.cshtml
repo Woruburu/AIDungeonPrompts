@@ -1,7 +1,7 @@
 @using AIDungeonPrompts.Application.Helpers 
 @using AIDungeonPrompts.Web.ColorScheme
 @{
-	var colorPrefString = Context.Request.Cookies[CookieValueDefaults.DarkModePreference];
+	var colorPrefString = Context.Request.Cookies[CookieValueConstants.DarkModePreference];
 	if (string.IsNullOrWhiteSpace(colorPrefString) || !Enum.TryParse<ColorSchemePreference>(colorPrefString, out var colorPref))
 	{
 		colorPref = ColorSchemePreference.Dark;
