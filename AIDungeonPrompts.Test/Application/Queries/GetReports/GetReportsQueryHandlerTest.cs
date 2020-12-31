@@ -33,7 +33,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.GetReports
 			var query = new GetReportsQuery(RoleEnum.FieldEdit);
 
 			//act
-			var actual = await _handler.Handle(query, default);
+			var actual = await _handler.Handle(query);
 
 			//assert
 			Assert.Equal(7, actual.Count);
@@ -56,7 +56,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.GetReports
 			var query = new GetReportsQuery(RoleEnum.TagEdit);
 
 			//act
-			var actual = await _handler.Handle(query, default);
+			var actual = await _handler.Handle(query);
 
 			//assert
 			Assert.Equal(2, actual.Count);
@@ -72,7 +72,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.GetReports
 			var query = new GetReportsQuery(role);
 
 			//act
-			var actual = await _handler.Handle(query, default);
+			var actual = await _handler.Handle(query);
 
 			//assert
 			Assert.Empty(actual);
@@ -86,7 +86,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.GetReports
 
 			//act + assert
 			await Assert.ThrowsAsync<GetReportUnauthorizedUserException>(async () =>
-				await _handler.Handle(query, default)
+				await _handler.Handle(query)
 			);
 		}
 	}

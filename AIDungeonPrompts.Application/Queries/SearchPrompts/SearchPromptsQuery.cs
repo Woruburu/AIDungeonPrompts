@@ -67,7 +67,7 @@ namespace AIDungeonPrompts.Application.Queries.SearchPrompts
 			_dbContext = dbContext;
 		}
 
-		public async Task<SearchPromptsViewModel> Handle(SearchPromptsQuery request, CancellationToken cancellationToken)
+		public async Task<SearchPromptsViewModel> Handle(SearchPromptsQuery request, CancellationToken cancellationToken = default)
 		{
 			var query = _dbContext.Prompts
 				.Include(prompt => prompt.PromptTags)

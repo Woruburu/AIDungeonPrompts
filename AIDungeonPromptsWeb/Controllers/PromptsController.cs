@@ -122,7 +122,7 @@ namespace AIDungeonPrompts.Web.Controllers
 
 			var prompt = await _mediator.Send(new GetPromptQuery(id.Value));
 
-			if (prompt == null || (prompt?.OwnerId != user!.Id && !RoleHelper.CanEdit(user.Role)))
+			if (prompt == null || (prompt.OwnerId != user!.Id && !RoleHelper.CanEdit(user.Role)))
 			{
 				return NotFound();
 			}

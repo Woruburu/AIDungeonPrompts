@@ -25,7 +25,7 @@ namespace AIDungeonPrompts.Application.Commands.ClearReport
 			_dbContext = dbContext;
 		}
 
-		public async Task<Unit> Handle(ClearReportCommand request, CancellationToken cancellationToken)
+		public async Task<Unit> Handle(ClearReportCommand request, CancellationToken cancellationToken = default)
 		{
 			var report = await _dbContext.Reports.FirstOrDefaultAsync(report => report.Id == request.Id);
 			if (report == null)

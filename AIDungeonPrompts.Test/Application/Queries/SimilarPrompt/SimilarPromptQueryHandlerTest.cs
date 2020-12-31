@@ -41,7 +41,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.SimilarPrompt
 			var query = new SimilarPromptQuery("TestTitle", prompt.Id);
 
 			//act
-			var actual = await _handler.Handle(query, default);
+			var actual = await _handler.Handle(query);
 
 			//assert
 			Assert.True(actual.Matched);
@@ -68,7 +68,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.SimilarPrompt
 			var query = new SimilarPromptQuery("TestTitle");
 
 			//act
-			var actual = await _handler.Handle(query, default);
+			var actual = await _handler.Handle(query);
 
 			//assert
 			Assert.True(actual.Matched);
@@ -82,7 +82,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.SimilarPrompt
 			var query = new SimilarPromptQuery("TestTitle");
 
 			//act
-			var actual = await _handler.Handle(query, default);
+			var actual = await _handler.Handle(query);
 
 			//assert
 			Assert.False(actual.Matched);
@@ -102,7 +102,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.SimilarPrompt
 			var query = new SimilarPromptQuery("NewTitle");
 
 			//act
-			var actual = await _handler.Handle(query, default);
+			var actual = await _handler.Handle(query);
 
 			//assert
 			Assert.False(actual.Matched);
@@ -122,7 +122,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.SimilarPrompt
 			var query = new SimilarPromptQuery("TestTitle");
 
 			//act
-			var actual = await _handler.Handle(query, default);
+			var actual = await _handler.Handle(query);
 
 			//assert
 			Assert.True(actual.Matched);

@@ -31,7 +31,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.SearchPrompts
 			await DbContext.SaveChangesAsync();
 
 			//act
-			var actual = await _handler.Handle(query, default);
+			var actual = await _handler.Handle(query);
 
 			//assert
 			Assert.True(actual.Results[0].DateCreated > actual.Results[^1].DateCreated);
@@ -44,7 +44,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.SearchPrompts
 			var query = new SearchPromptsQuery();
 
 			//act
-			var actual = await _handler.Handle(query, default);
+			var actual = await _handler.Handle(query);
 
 			//assert
 			Assert.Empty(actual.Results);
@@ -65,7 +65,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.SearchPrompts
 			await DbContext.SaveChangesAsync();
 
 			//act
-			var actual = await _handler.Handle(query, default);
+			var actual = await _handler.Handle(query);
 
 			//assert
 			Assert.Empty(actual.Results);
@@ -84,7 +84,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.SearchPrompts
 			await DbContext.SaveChangesAsync();
 
 			//act
-			var actual = await _handler.Handle(query, default);
+			var actual = await _handler.Handle(query);
 
 			//assert
 			Assert.Equal(15, actual.Results.Count);
@@ -104,7 +104,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.SearchPrompts
 			await DbContext.SaveChangesAsync();
 
 			//act
-			var actual = await _handler.Handle(query, default);
+			var actual = await _handler.Handle(query);
 
 			//assert
 			Assert.Equal(5, actual.Results.Count);
@@ -127,7 +127,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.SearchPrompts
 			await DbContext.SaveChangesAsync();
 
 			//act
-			var actual = await _handler.Handle(query, default);
+			var actual = await _handler.Handle(query);
 
 			//assert
 			Assert.Single(actual.Results);
@@ -148,7 +148,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.SearchPrompts
 			};
 
 			//act
-			var actual = await _handler.Handle(query, default);
+			var actual = await _handler.Handle(query);
 
 			//assert
 			Assert.Equal(5, actual.Results.Count);
@@ -173,7 +173,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.SearchPrompts
 			await DbContext.SaveChangesAsync();
 
 			//act
-			var actual = await _handler.Handle(query, default);
+			var actual = await _handler.Handle(query);
 
 			//assert
 			Assert.Equal(expectedAmount, actual.Results.Count);
@@ -204,7 +204,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.SearchPrompts
 			await DbContext.SaveChangesAsync();
 
 			//act
-			var actual = await _handler.Handle(query, default);
+			var actual = await _handler.Handle(query);
 
 			//assert
 			Assert.Equal(expectedAmount, actual.Results.Count);
@@ -233,7 +233,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.SearchPrompts
 			await DbContext.SaveChangesAsync();
 
 			//act
-			var actual = await _handler.Handle(query, default);
+			var actual = await _handler.Handle(query);
 
 			//assert
 			Assert.Equal(expectedAmount, actual.Results.Count);
@@ -263,7 +263,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.SearchPrompts
 			await DbContext.SaveChangesAsync();
 
 			//act
-			var actual = await _handler.Handle(query, default);
+			var actual = await _handler.Handle(query);
 
 			//assert
 			Assert.Equal(expectedAmount, actual.Results.Count);
@@ -295,7 +295,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.SearchPrompts
 			await DbContext.SaveChangesAsync();
 
 			//act
-			var actual = await _handler.Handle(query, default);
+			var actual = await _handler.Handle(query);
 
 			//assert
 			Assert.Equal(expectedAmount, actual.Results.Count);
@@ -327,7 +327,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.SearchPrompts
 			await DbContext.SaveChangesAsync();
 
 			//act
-			var actual = await _handler.Handle(query, default);
+			var actual = await _handler.Handle(query);
 
 			//assert
 			Assert.Equal(expectedAmount, actual.Results.Count);
@@ -356,7 +356,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.SearchPrompts
 			await DbContext.SaveChangesAsync();
 
 			//act
-			var actual = await _handler.Handle(query, default);
+			var actual = await _handler.Handle(query);
 
 			//assert
 			Assert.Equal(expectedAmount, actual.Results.Count);
@@ -376,7 +376,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.SearchPrompts
 			await DbContext.SaveChangesAsync();
 
 			//act
-			var actual = await _handler.Handle(query, default);
+			var actual = await _handler.Handle(query);
 
 			//assert
 			Assert.True(actual.Results[^1].DateCreated > actual.Results[0].DateCreated);
@@ -395,7 +395,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.SearchPrompts
 			await DbContext.SaveChangesAsync();
 
 			//act
-			var actual = await _handler.Handle(query, default);
+			var actual = await _handler.Handle(query);
 
 			//assert
 			Assert.Equal(10, actual.Results.Count);
@@ -415,7 +415,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.SearchPrompts
 			await DbContext.SaveChangesAsync();
 
 			//act
-			var actual = await _handler.Handle(query, default);
+			var actual = await _handler.Handle(query);
 
 			//assert
 			Assert.Equal(5, actual.Results.Count);
@@ -432,7 +432,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.SearchPrompts
 			await DbContext.SaveChangesAsync();
 
 			//act
-			var actual = await _handler.Handle(query, default);
+			var actual = await _handler.Handle(query);
 
 			//assert
 			Assert.Equal(10, actual.Results.Count);
@@ -455,7 +455,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.SearchPrompts
 			await DbContext.SaveChangesAsync();
 
 			//act
-			var actual = await _handler.Handle(query, default);
+			var actual = await _handler.Handle(query);
 
 			//assert
 			Assert.Equal(10, actual.Results.Count);

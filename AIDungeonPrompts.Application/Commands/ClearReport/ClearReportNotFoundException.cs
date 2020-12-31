@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Runtime.Serialization;
 
 namespace AIDungeonPrompts.Application.Commands.ClearReport
 {
 	[Serializable]
-	internal class ClearReportNotFoundException : Exception
+	public class ClearReportNotFoundException : Exception
 	{
 		public ClearReportNotFoundException()
 		{

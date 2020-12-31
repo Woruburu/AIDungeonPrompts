@@ -25,7 +25,7 @@ namespace AIDungeonPrompts.Application.Queries.GetUser
 			_dbContext = dbContext;
 		}
 
-		public async Task<GetUserViewModel?> Handle(GetUserQuery request, CancellationToken cancellationToken)
+		public async Task<GetUserViewModel?> Handle(GetUserQuery request, CancellationToken cancellationToken = default)
 		{
 			var user = await _dbContext
 				.Users

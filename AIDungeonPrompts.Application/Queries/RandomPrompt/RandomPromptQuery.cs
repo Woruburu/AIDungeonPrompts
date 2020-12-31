@@ -21,7 +21,8 @@ namespace AIDungeonPrompts.Application.Queries.RandomPrompt
 			_dbContext = dbContext;
 		}
 
-		public async Task<RandomPromptViewModel?> Handle(RandomPromptQuery request, CancellationToken cancellationToken)
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Security", "SCS0005:Weak random generator", Justification = "Cryptographic Generator not required")]
+		public async Task<RandomPromptViewModel?> Handle(RandomPromptQuery request, CancellationToken cancellationToken = default)
 		{
 			var count = await _dbContext.Prompts.CountAsync();
 			var value = new Random().Next(count);

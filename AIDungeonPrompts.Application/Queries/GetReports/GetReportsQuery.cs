@@ -29,7 +29,7 @@ namespace AIDungeonPrompts.Application.Queries.GetReports
 			_dbContext = dbContext;
 		}
 
-		public async Task<List<GetReportViewModel>> Handle(GetReportsQuery request, CancellationToken cancellationToken)
+		public async Task<List<GetReportViewModel>> Handle(GetReportsQuery request, CancellationToken cancellationToken = default)
 		{
 			if (!RoleHelper.CanEdit(request.Role))
 			{

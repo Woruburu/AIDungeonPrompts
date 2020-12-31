@@ -29,7 +29,7 @@ namespace AIDungeonPrompts.Application.Queries.LogIn
 			_dbContext = dbContext;
 		}
 
-		public async Task<GetUserViewModel> Handle(LogInQuery request, CancellationToken cancellationToken)
+		public async Task<GetUserViewModel> Handle(LogInQuery request, CancellationToken cancellationToken = default)
 		{
 			var username = NpgsqlHelper.SafeIlike(request.Username);
 			var user = await _dbContext

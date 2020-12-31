@@ -53,7 +53,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.Login
 			var query = new LogInQuery(expectedUsername, password);
 
 			//act
-			var actual = await _handler.Handle(query, default);
+			var actual = await _handler.Handle(query);
 
 			//assert
 			Assert.Equal(user.Id, actual.Id);
@@ -79,7 +79,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.Login
 			var query = new LogInQuery(expectedUsername.ToUpper(), password);
 
 			//act
-			var actual = await _handler.Handle(query, default);
+			var actual = await _handler.Handle(query);
 
 			//assert
 			Assert.Equal(user.Id, actual.Id);
@@ -104,7 +104,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.Login
 			//act + assert
 			await Assert.ThrowsAsync<LoginFailedException>(async () =>
 			{
-				await _handler.Handle(query, default);
+				await _handler.Handle(query);
 			});
 		}
 
@@ -120,7 +120,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.Login
 			//act + assert
 			await Assert.ThrowsAsync<LoginFailedException>(async () =>
 			{
-				await _handler.Handle(query, default);
+				await _handler.Handle(query);
 			});
 		}
 
@@ -133,7 +133,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.Login
 			//act + assert
 			await Assert.ThrowsAsync<LoginFailedException>(async () =>
 			{
-				await _handler.Handle(query, default);
+				await _handler.Handle(query);
 			});
 		}
 	}

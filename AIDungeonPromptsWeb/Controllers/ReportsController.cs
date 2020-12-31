@@ -24,6 +24,10 @@ namespace AIDungeonPrompts.Web.Controllers
 		[HttpPost("[controller]/clear/{id}"), ValidateAntiForgeryToken]
 		public async Task<IActionResult> Clear(int? id)
 		{
+			if (id == null)
+			{
+				return NotFound();
+			}
 			await _mediator.Send(new ClearReportCommand(id.Value));
 			return RedirectToAction("Index");
 		}

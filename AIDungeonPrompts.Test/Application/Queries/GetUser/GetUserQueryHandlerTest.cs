@@ -22,7 +22,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.GetUser
 			var query = new GetUserQuery(int.MaxValue);
 
 			//act
-			var actual = await _handler.Handle(query, default);
+			var actual = await _handler.Handle(query);
 
 			//assert
 			Assert.Null(actual);
@@ -41,7 +41,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.GetUser
 			var query = new GetUserQuery(int.MaxValue);
 
 			//act
-			var actual = await _handler.Handle(query, default);
+			var actual = await _handler.Handle(query);
 
 			//assert
 			Assert.Null(actual);
@@ -75,7 +75,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.GetUser
 			var query = new GetUserQuery(user.Id);
 
 			//act
-			var actual = await _handler.Handle(query, default);
+			var actual = await _handler.Handle(query);
 
 			//assert
 			Assert.Equal(user.Id, actual.Id);

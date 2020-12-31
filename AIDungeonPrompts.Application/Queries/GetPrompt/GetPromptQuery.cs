@@ -26,7 +26,7 @@ namespace AIDungeonPrompts.Application.Queries.GetPrompt
 			_dbContext = dbContext;
 		}
 
-		public async Task<GetPromptViewModel?> Handle(GetPromptQuery request, CancellationToken cancellationToken)
+		public async Task<GetPromptViewModel?> Handle(GetPromptQuery request, CancellationToken cancellationToken = default)
 		{
 			return await _dbContext.Prompts
 				.Include(e => e.WorldInfos)

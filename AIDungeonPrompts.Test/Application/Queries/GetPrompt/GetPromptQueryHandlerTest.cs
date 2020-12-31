@@ -43,7 +43,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.GetPrompt
 			var query = new GetPromptQuery(prompt.Id);
 
 			//act
-			var result = await _handler.Handle(query, default);
+			var result = await _handler.Handle(query);
 
 			//assert
 			Assert.Equal(prompt.Id, result.Id);
@@ -58,7 +58,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.GetPrompt
 			var query = new GetPromptQuery(int.MaxValue);
 
 			//act
-			var result = await _handler.Handle(query, default);
+			var result = await _handler.Handle(query);
 
 			//assert
 			Assert.Null(result);
@@ -73,7 +73,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.GetPrompt
 			await DbContext.SaveChangesAsync();
 
 			//act
-			var result = await _handler.Handle(query, default);
+			var result = await _handler.Handle(query);
 
 			//assert
 			Assert.Null(result);

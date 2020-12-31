@@ -32,7 +32,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.RandomPrompt
 			var query = new RandomPromptQuery();
 
 			//act
-			var actual = await _handler.Handle(query, default);
+			var actual = await _handler.Handle(query);
 
 			//assert
 			Assert.True(DbContext.Prompts.Any(e => e.Id == actual.Id));
@@ -45,7 +45,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.RandomPrompt
 			var query = new RandomPromptQuery();
 
 			//act
-			var actual = await _handler.Handle(query, default);
+			var actual = await _handler.Handle(query);
 
 			//assert
 			Assert.Null(actual);
