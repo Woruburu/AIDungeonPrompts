@@ -9,7 +9,7 @@ using Xunit;
 
 namespace AIDungeonPrompts.Test.Application.Queries.SearchPrompts
 {
-	public class SearchPromptsQueryHandlerTest : AbstractDatabaseFixtureTest
+	public class SearchPromptsQueryHandlerTest : DatabaseFixtureTest
 	{
 		private readonly SearchPromptsQueryHandler _handler;
 

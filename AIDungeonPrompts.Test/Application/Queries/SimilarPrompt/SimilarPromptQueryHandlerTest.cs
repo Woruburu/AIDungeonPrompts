@@ -6,7 +6,7 @@ using Xunit;
 
 namespace AIDungeonPrompts.Test.Application.Queries.SimilarPrompt
 {
-	public class SimilarPromptQueryHandlerTest : AbstractDatabaseFixtureTest
+	public class SimilarPromptQueryHandlerTest : DatabaseFixtureTest
 	{
 		private readonly SimilarPromptQueryHandler _handler;
 

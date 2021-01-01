@@ -7,7 +7,7 @@ using Xunit;
 
 namespace AIDungeonPrompts.Test.Application.Queries.GetReports
 {
-	public class GetReportsQueryHandlerTest : AbstractDatabaseFixtureTest
+	public class GetReportsQueryHandlerTest : DatabaseFixtureTest
 	{
 		private readonly GetReportsQueryHandler _handler;
 

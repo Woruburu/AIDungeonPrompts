@@ -5,9 +5,9 @@ using Xunit;
 namespace AIDungeonPrompts.Test.Collections.Database
 {
 	[Collection("DatabaseFixture")]
-	public abstract class AbstractDatabaseFixtureTest : IDisposable
+	public abstract class DatabaseFixtureTest : IDisposable
 	{
-		protected AbstractDatabaseFixtureTest(DatabaseFixture fixture)
+		protected DatabaseFixtureTest(DatabaseFixture fixture)
 		{
 			DbContext = fixture.DbContext;
 		}

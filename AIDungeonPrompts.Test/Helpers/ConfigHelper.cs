@@ -8,6 +8,7 @@ namespace AIDungeonPrompts.Test.Helpers
 		{
 			return new ConfigurationBuilder()
 				.AddJsonFile("appsettings.Test.json")
+				.AddEnvironmentVariables()
 				.Build();
 		}
 	}

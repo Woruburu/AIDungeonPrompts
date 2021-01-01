@@ -7,7 +7,7 @@ using Xunit;
 
 namespace AIDungeonPrompts.Test.Application.Queries.RandomPrompt
 {
-	public class RandomPromptQueryHandlerTest : AbstractDatabaseFixtureTest
+	public class RandomPromptQueryHandlerTest : DatabaseFixtureTest
 	{
 		private readonly RandomPromptQueryHandler _handler;
 

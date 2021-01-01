@@ -14,13 +14,14 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D116DCE6-E9DB-4D50-8364-AB1FB9A55DA4}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		.github\workflows\dotnet.yml = .github\workflows\dotnet.yml
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AIDungeonPrompts.Persistence", "AIDungeonPrompts.Persistence\AIDungeonPrompts.Persistence.csproj", "{1B0C5D90-944D-4BC2-9B3F-B13CE4C5EF71}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AIDungeonPrompts.Infrastructure", "AIDungeonPrompts.Infrastructure\AIDungeonPrompts.Infrastructure.csproj", "{8F6A8A1E-67CE-4A59-B81F-65A2A53637DF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIDungeonPrompts.Test", "AIDungeonPrompts.Test\AIDungeonPrompts.Test.csproj", "{A15197F5-0BAA-4F0C-868C-6B112A71AE00}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AIDungeonPrompts.Test", "AIDungeonPrompts.Test\AIDungeonPrompts.Test.csproj", "{A15197F5-0BAA-4F0C-868C-6B112A71AE00}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

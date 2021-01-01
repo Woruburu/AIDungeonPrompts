@@ -6,7 +6,7 @@ using Xunit;
 
 namespace AIDungeonPrompts.Test.Application.Queries.GetPrompt
 {
-	public class GetPromptQueryHandlerTest : AbstractDatabaseFixtureTest
+	public class GetPromptQueryHandlerTest : DatabaseFixtureTest
 	{
 		private readonly GetPromptQueryHandler _handler;
 

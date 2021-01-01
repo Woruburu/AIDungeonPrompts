@@ -6,7 +6,7 @@ using Xunit;
 
 namespace AIDungeonPrompts.Test.Application.Commands.ClearReport
 {
-	public class ClearReportCommandHandlerTest : AbstractDatabaseFixtureTest
+	public class ClearReportCommandHandlerTest : DatabaseFixtureTest
 	{
 		private readonly ClearReportCommandHandler _handler;
 

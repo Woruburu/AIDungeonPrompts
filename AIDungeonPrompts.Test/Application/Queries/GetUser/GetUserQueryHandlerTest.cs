@@ -6,7 +6,7 @@ using Xunit;
 
 namespace AIDungeonPrompts.Test.Application.Queries.GetUser
 {
-	public class GetUserQueryHandlerTest : AbstractDatabaseFixtureTest
+	public class GetUserQueryHandlerTest : DatabaseFixtureTest
 	{
 		private readonly GetUserQueryHandler _handler;
 

@@ -7,7 +7,7 @@ using Xunit;
 
 namespace AIDungeonPrompts.Test.Application.Queries.Login
 {
-	public class LogInQueryHandlerTest : AbstractDatabaseFixtureTest
+	public class LogInQueryHandlerTest : DatabaseFixtureTest
 	{
 		private readonly LogInQueryHandler _handler;
 
