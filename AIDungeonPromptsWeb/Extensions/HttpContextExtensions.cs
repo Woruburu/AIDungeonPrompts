@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using AIDungeonPrompts.Application.Helpers;
+using AIDungeonPrompts.Application.Queries.GetUser;
+using AIDungeonPrompts.Web.Constants;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
@@ -10,15 +13,15 @@ namespace AIDungeonPrompts.Web.Extensions
 {
 	public static class HttpContextExtensions
 	{
-		public static Task SignInUserAsync(this HttpContext context, int id)
+		public static Task SignInUserAsync(this HttpContext context, GetUserViewModel user)
 		{
 			var claims = new List<Claim>
 			{
-				new Claim(ClaimTypes.NameIdentifier, id.ToString())
+				new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+				new Claim(ClaimValueConstants.CanEdit, RoleHelper.CanEdit(user.Role).ToString())
 			};
 
-			var claimsIdentity = new ClaimsIdentity(
-				claims, CookieAuthenticationDefaults.AuthenticationScheme);
+			var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
 			var authProperties = new AuthenticationProperties
 			{

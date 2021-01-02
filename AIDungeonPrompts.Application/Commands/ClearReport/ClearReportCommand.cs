@@ -8,6 +8,11 @@ namespace AIDungeonPrompts.Application.Commands.ClearReport
 {
 	public class ClearReportCommand : IRequest
 	{
+		public ClearReportCommand(int id)
+		{
+			Id = id;
+		}
+
 		public int Id { get; set; }
 	}
 
@@ -20,9 +25,13 @@ namespace AIDungeonPrompts.Application.Commands.ClearReport
 			_dbContext = dbContext;
 		}
 
-		public async Task<Unit> Handle(ClearReportCommand request, CancellationToken cancellationToken)
+		public async Task<Unit> Handle(ClearReportCommand request, CancellationToken cancellationToken = default)
 		{
 			var report = await _dbContext.Reports.FirstOrDefaultAsync(report => report.Id == request.Id);
+			if (report == null)
+			{
+				throw new ClearReportNotFoundException();
+			}
 			report.Cleared = true;
 			_dbContext.Reports.Update(report);
 			await _dbContext.SaveChangesAsync(cancellationToken);

@@ -52,7 +52,7 @@ namespace AIDungeonPrompts.Application.Commands.CreatePrompt
 			_dbContext = dbContext;
 		}
 
-		public async Task<int> Handle(CreatePromptCommand request, CancellationToken cancellationToken)
+		public async Task<int> Handle(CreatePromptCommand request, CancellationToken cancellationToken = default)
 		{
 			var prompt = new Prompt
 			{

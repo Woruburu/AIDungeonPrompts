@@ -2,13 +2,17 @@
 @using AIDungeonPrompts.Application.Extensions
 @{
 	ViewData["Title"] = "My Profile";
-	userService.TryGetCurrentUser(out var user);
 }
 
-<h2>My Profile</h2>
+<div class="d-flex">
+	<h2>My Profile</h2>
+	<div class="ml-auto">
+		<a id="log-out-button" data-transient="@Model.IsTransient" class="btn btn-outline-danger" asp-action="logout">Log Out</a>
+	</div>
+</div>
 <br />
 <div class="row">
-	@if (user != null && string.IsNullOrWhiteSpace(user.Password))
+	@if (Model.IsTransient)
 	{
 		<div class="col-12">
 			<p>
@@ -148,4 +152,34 @@
 			</li>
 		</ul>
 	</nav>
+}
+
+<!-- Logout Modal -->
+<div id="log-out-modal" class="modal fade" tabindex="-1" role="dialog">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">Confirm Log Out</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<p>
+					You are not registered. If you log out now you will lose access to all your previously created prompts.
+					<br />
+					<br />
+					Are you sure you want to continue?
+				</p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">Return</button>
+				<a class="btn btn-danger" asp-action="logout">Log Out</a>
+			</div>
+		</div>
+	</div>
+</div>
+
+@section Scripts {
+	<script src="~/js/user/index.js" asp-append-version="true"></script>
 }

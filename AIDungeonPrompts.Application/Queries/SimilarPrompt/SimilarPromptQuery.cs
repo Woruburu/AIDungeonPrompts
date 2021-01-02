@@ -10,6 +10,12 @@ namespace AIDungeonPrompts.Application.Queries.SimilarPrompt
 {
 	public class SimilarPromptQuery : IRequest<SimilarPromptViewModel>
 	{
+		public SimilarPromptQuery(string title, int? currentId = null)
+		{
+			Title = title;
+			CurrentId = currentId;
+		}
+
 		public int? CurrentId { get; set; }
 		public string Title { get; set; } = string.Empty;
 	}
@@ -23,7 +29,7 @@ namespace AIDungeonPrompts.Application.Queries.SimilarPrompt
 			_dbContext = dbContext;
 		}
 
-		public async Task<SimilarPromptViewModel> Handle(SimilarPromptQuery request, CancellationToken cancellationToken)
+		public async Task<SimilarPromptViewModel> Handle(SimilarPromptQuery request, CancellationToken cancellationToken = default)
 		{
 			var query = _dbContext.Prompts
 				.Where(prompt => EF.Functions.ILike(prompt.Title, NpgsqlHelper.SafeIlike(request.Title), NpgsqlHelper.EscapeChar));
@@ -33,11 +39,13 @@ namespace AIDungeonPrompts.Application.Queries.SimilarPrompt
 				query = query.Where(e => e.Id != request.CurrentId.Value);
 			}
 
-			var similarPrompts = await query.Select(prompt => new SimilarPromptDetailsViewModel
-			{
-				Id = prompt.Id,
-				Title = prompt.Title
-			})
+			var similarPrompts = await query
+				.AsNoTracking()
+				.Select(prompt => new SimilarPromptDetailsViewModel
+				{
+					Id = prompt.Id,
+					Title = prompt.Title
+				})
 				.ToListAsync();
 
 			if (similarPrompts.Count < 1)

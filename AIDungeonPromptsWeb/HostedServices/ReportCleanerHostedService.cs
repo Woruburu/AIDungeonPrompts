@@ -38,7 +38,7 @@ namespace AIDungeonPrompts.Web.HostedServices
 			var reportsToRemove = await dbContext
 				.Reports
 				.Where(e => e.Cleared)
-				.ToListAsync();
+				.ToListAsync(cancellationToken);
 			_logger.LogInformation($"Removing {reportsToRemove.Count} reports.");
 			dbContext.Reports.RemoveRange(reportsToRemove);
 			await dbContext.SaveChangesAsync(cancellationToken);

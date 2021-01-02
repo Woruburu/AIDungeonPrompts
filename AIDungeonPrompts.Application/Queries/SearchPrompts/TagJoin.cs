@@ -8,6 +8,9 @@ namespace AIDungeonPrompts.Application.Queries.SearchPrompts
 		And,
 
 		[Display(Name = "Results can include any tag")]
-		Or
+		Or,
+
+		[Display(Name = "Results exclude all tags")]
+		None
 	}
 }

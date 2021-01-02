@@ -1,46 +1,51 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AIDungeonPrompts.Application.Abstractions.DbContexts;
-using AIDungeonPrompts.Application.Abstractions.Identity;
+using AIDungeonPrompts.Application.Helpers;
 using AIDungeonPrompts.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace AIDungeonPrompts.Application.Queries.GetReports
 {
-	public class GetReportsQuery : IRequest<GetReportsViewModel>
+	public class GetReportsQuery : IRequest<List<GetReportViewModel>>
 	{
-	}
-
-	public class GetReportsQueryHandler : IRequestHandler<GetReportsQuery, GetReportsViewModel>
-	{
-		private readonly ICurrentUserService _currentUserService;
-		private readonly IAIDungeonPromptsDbContext _dbContext;
-
-		public GetReportsQueryHandler(IAIDungeonPromptsDbContext dbContext, ICurrentUserService currentUserService)
+		public GetReportsQuery(RoleEnum role)
 		{
-			_dbContext = dbContext;
-			_currentUserService = currentUserService;
+			Role = role;
 		}
 
-		public async Task<GetReportsViewModel> Handle(GetReportsQuery request, CancellationToken cancellationToken)
+		public RoleEnum Role { get; set; }
+	}
+
+	public class GetReportsQueryHandler : IRequestHandler<GetReportsQuery, List<GetReportViewModel>>
+	{
+		private readonly IAIDungeonPromptsDbContext _dbContext;
+
+		public GetReportsQueryHandler(IAIDungeonPromptsDbContext dbContext)
 		{
-			if (!_currentUserService.TryGetCurrentUser(out var user))
+			_dbContext = dbContext;
+		}
+
+		public async Task<List<GetReportViewModel>> Handle(GetReportsQuery request, CancellationToken cancellationToken = default)
+		{
+			if (!RoleHelper.CanEdit(request.Role))
 			{
-				throw new UnauthorizedUserReportException();
+				throw new GetReportUnauthorizedUserException();
 			}
 
 			var query = _dbContext.Reports.Include(e => e.Prompt).AsQueryable();
-			if (user!.Role == RoleEnum.TagEdit)
+			if (request.Role == RoleEnum.TagEdit)
 			{
-				query = query.Where(e => e.ReportReason == ReportReason.IncorrectTags || e.ReportReason == ReportReason.UntaggedNsfw);
+				query = query.Where(e =>
+					e.ReportReason == ReportReason.IncorrectTags ||
+					e.ReportReason == ReportReason.UntaggedNsfw);
 			}
-			var result = await query.ToListAsync();
-
-			return new GetReportsViewModel
-			{
-				Reports = result.Select(report => new GetReportViewModel
+			return await query
+				.AsNoTracking()
+				.Select(report => new GetReportViewModel
 				{
 					Id = report.Id,
 					ExtraDetails = report.ExtraDetails,
@@ -48,8 +53,7 @@ namespace AIDungeonPrompts.Application.Queries.GetReports
 					PromptTitle = report.Prompt!.Title,
 					ReportReason = report.ReportReason,
 					Cleared = report.Cleared
-				}).ToList()
-			};
+				}).ToListAsync();
 		}
 	}
 }

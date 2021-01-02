@@ -12,16 +12,50 @@ namespace AIDungeonPrompts.Application.Queries.SearchPrompts
 {
 	public class SearchPromptsQuery : IRequest<SearchPromptsViewModel>
 	{
+		private int _page = 1;
+		private int _pageSize = 10;
+
 		public SearchNsfw Nsfw { get; set; }
 		public SearchOrderBy OrderBy { get; set; }
-		public int Page { get; set; } = 1;
-		public int PageSize { get; set; } = 10;
+
+		public int Page
+		{
+			get => _page;
+			set
+			{
+				if (value < 1)
+				{
+					_page = 1;
+				}
+				else
+				{
+					_page = value;
+				}
+			}
+		}
+
+		public int PageSize
+		{
+			get => _pageSize;
+			set
+			{
+				if (value < 1)
+				{
+					_pageSize = 1;
+				}
+				else
+				{
+					_pageSize = value;
+				}
+			}
+		}
+
 		public bool Reverse { get; set; }
 		public string Search { get; set; } = string.Empty;
 		public TagJoin TagJoin { get; set; }
 		public List<string> Tags { get; set; } = new List<string>();
 		public bool TagsFuzzy { get; set; }
-		public int? User { get; set; }
+		public int? UserId { get; set; }
 	}
 
 	public class SearchPromptsQueryHandler : IRequestHandler<SearchPromptsQuery, SearchPromptsViewModel>
@@ -33,7 +67,7 @@ namespace AIDungeonPrompts.Application.Queries.SearchPrompts
 			_dbContext = dbContext;
 		}
 
-		public async Task<SearchPromptsViewModel> Handle(SearchPromptsQuery request, CancellationToken cancellationToken)
+		public async Task<SearchPromptsViewModel> Handle(SearchPromptsQuery request, CancellationToken cancellationToken = default)
 		{
 			var query = _dbContext.Prompts
 				.Include(prompt => prompt.PromptTags)
@@ -78,6 +112,17 @@ namespace AIDungeonPrompts.Application.Queries.SearchPrompts
 						}
 						break;
 
+					case TagJoin.None:
+						foreach (var item in request.Tags)
+						{
+							query = query.Where(
+								prompt => !prompt.PromptTags.Any(
+									promptTag => EF.Functions.ILike(promptTag.Tag!.Name, item)
+								)
+							);
+						}
+						break;
+
 					case TagJoin.Or:
 						query = query.Where(
 							prompt => prompt.PromptTags.Any(
@@ -91,14 +136,15 @@ namespace AIDungeonPrompts.Application.Queries.SearchPrompts
 
 			var skip = (request.Page - 1) * request.PageSize;
 
-			if (request.User != null)
+			if (request.UserId != null)
 			{
-				query = query.Where(e => e.OwnerId == request.User.Value);
+				query = query.Where(e => e.OwnerId == request.UserId.Value);
 			}
 
 			var results = await query
 				.Skip(skip)
 				.Take(request.PageSize)
+				.AsNoTracking()
 				.Select(prompt => new SearchPromptsResultViewModel
 				{
 					Id = prompt.Id,

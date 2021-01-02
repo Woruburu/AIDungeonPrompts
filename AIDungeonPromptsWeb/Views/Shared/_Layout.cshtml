@@ -1,7 +1,7 @@
 @using AIDungeonPrompts.Application.Helpers 
 @using AIDungeonPrompts.Web.ColorScheme
 @{
-	var colorPrefString = Context.Request.Cookies[CookieValueDefaults.DarkModePreference];
+	var colorPrefString = Context.Request.Cookies[CookieValueConstants.DarkModePreference];
 	if (string.IsNullOrWhiteSpace(colorPrefString) || !Enum.TryParse<ColorSchemePreference>(colorPrefString, out var colorPref))
 	{
 		colorPref = ColorSchemePreference.Dark;
@@ -22,20 +22,16 @@
 		switch (colorPref)
 		{
 			case ColorSchemePreference.Light:
-				<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+				<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" asp-append-version="true"/>
 				break;
 			case ColorSchemePreference.Dark:
-				<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.dark.min.css" />
+				<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.dark.min.css" asp-append-version="true"/>
 				break;
 		}
 	}
 	<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 	<noscript>
-		<style>
-			.collapse:not(.show) {
-				display: unset;
-			}
-		</style>
+		<link rel="stylesheet" href="~/css/noscript.css" asp-append-version="true" />
 	</noscript>
 </head>
 <body>
@@ -120,8 +116,8 @@
 			</form>
 		</div>
 	</footer>
-	<script src="~/lib/jquery/dist/jquery.min.js"></script>
-	<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="~/lib/jquery/dist/jquery.min.js" asp-append-version="true"></script>
+	<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js" asp-append-version="true"></script>
 	<script src="~/js/site.js" asp-append-version="true"></script>
 	@await RenderSectionAsync("Scripts", required: false)
 </body>

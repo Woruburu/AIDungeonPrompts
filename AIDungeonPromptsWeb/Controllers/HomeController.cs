@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using AIDungeonPrompts.Application.Queries.RandomPrompt;
 using AIDungeonPrompts.Application.Queries.SearchPrompts;
 using AIDungeonPrompts.Web.ColorScheme;
-using AIDungeonPrompts.Web.Cookies;
+using AIDungeonPrompts.Web.Constants;
 using AIDungeonPrompts.Web.Models;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -35,7 +35,7 @@ namespace AIDungeonPrompts.Web.Controllers
 					MaxAge = new TimeSpan(365, 0, 0, 0),
 					Secure = true,
 				};
-				Response.Cookies.Append(CookieValueDefaults.DarkModePreference, ((int)preference).ToString(), cookieOptions);
+				Response.Cookies.Append(CookieValueConstants.DarkModePreference, ((int)preference).ToString(), cookieOptions);
 			}
 			if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
 			{

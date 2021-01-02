@@ -18,14 +18,14 @@
 	@Html.HiddenFor(m => m.ReturnUrl)
 	<input class="honey" name="Honey" />
 	<div class="form-group required">
-		@Html.LabelFor(m => m.LogInQuery.Username)
-		<input asp-for="LogInQuery.Username" class="form-control" />
-		<span class="invalid-feedback" asp-validation-for="LogInQuery.Username"></span>
+		@Html.LabelFor(m => m.Username)
+		<input asp-for="Username" class="form-control" />
+		<span class="invalid-feedback" asp-validation-for="Username"></span>
 	</div>
 	<div class="form-group required">
-		@Html.LabelFor(m => m.LogInQuery.Password)
-		<input type="password" asp-for="LogInQuery.Password" class="form-control" />
-		<span class="invalid-feedback" asp-validation-for="LogInQuery.Password"></span>
+		@Html.LabelFor(m => m.Password)
+		<input type="password" asp-for="Password" class="form-control" />
+		<span class="invalid-feedback" asp-validation-for="Password"></span>
 	</div>
 	<div class="d-flex flex-row-reverse">
 		<button type="submit" class="btn btn-lg btn-primary">Submit</button>
