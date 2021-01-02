@@ -39,23 +39,31 @@ namespace AIDungeonPrompts.Test.Application.Commands.ClearReport
 			Assert.True(DbContext.Reports.Find(report.Id).Cleared);
 		}
 
-		[Fact]
-		public async Task Handle_ThrowsClearReportNotFoundException_WhenTheDatabaseIsEmpty()
+		[Theory]
+		[InlineData(-10)]
+		[InlineData(0)]
+		[InlineData(64)]
+		[InlineData(256)]
+		[InlineData(int.MaxValue)]
+		public async Task Handle_ThrowsClearReportNotFoundException_WhenTheDatabaseIsEmpty(int id)
 		{
 			//arrange
-			var command = new ClearReportCommand(default);
+			var command = new ClearReportCommand(id);
 
 			//act + assert
 			await Assert.ThrowsAsync<ClearReportNotFoundException>(async () => await _handler.Handle(command));
 		}
 
-		[Fact]
-		public async Task Handle_ThrowsClearReportNotFoundException_WhenTheReportIdIsNotFound()
+		[Theory]
+		[InlineData(-10)]
+		[InlineData(0)]
+		[InlineData(int.MaxValue)]
+		public async Task Handle_ThrowsClearReportNotFoundException_WhenTheReportIdIsNotFound(int id)
 		{
 			//arrange
 			DbContext.Reports.Add(new Report { Prompt = new Prompt() });
 			await DbContext.SaveChangesAsync();
-			var command = new ClearReportCommand(int.MaxValue);
+			var command = new ClearReportCommand(id);
 
 			//act + assert
 			await Assert.ThrowsAsync<ClearReportNotFoundException>(async () => await _handler.Handle(command));

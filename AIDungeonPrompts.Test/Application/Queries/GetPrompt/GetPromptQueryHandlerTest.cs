@@ -51,11 +51,16 @@ namespace AIDungeonPrompts.Test.Application.Queries.GetPrompt
 			Assert.Equal(expectedContent, result.PromptContent);
 		}
 
-		[Fact]
-		public async Task Handle_ReturnsNull_WhenTheDatabaseIsEmpty()
+		[Theory]
+		[InlineData(-10)]
+		[InlineData(0)]
+		[InlineData(64)]
+		[InlineData(256)]
+		[InlineData(int.MaxValue)]
+		public async Task Handle_ReturnsNull_WhenTheDatabaseIsEmpty(int id)
 		{
 			//arrange
-			var query = new GetPromptQuery(int.MaxValue);
+			var query = new GetPromptQuery(id);
 
 			//act
 			var result = await _handler.Handle(query);
@@ -64,11 +69,14 @@ namespace AIDungeonPrompts.Test.Application.Queries.GetPrompt
 			Assert.Null(result);
 		}
 
-		[Fact]
-		public async Task Handle_ReturnsNull_WhenTheNoEntryWithTheGivenIdExists()
+		[Theory]
+		[InlineData(-10)]
+		[InlineData(0)]
+		[InlineData(int.MaxValue)]
+		public async Task Handle_ReturnsNull_WhenTheNoEntryWithTheGivenIdExists(int id)
 		{
 			//arrange
-			var query = new GetPromptQuery(int.MaxValue);
+			var query = new GetPromptQuery(id);
 			DbContext.Prompts.AddRange(new Prompt(), new Prompt(), new Prompt());
 			await DbContext.SaveChangesAsync();
 

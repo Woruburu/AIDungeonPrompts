@@ -1,5 +1,6 @@
 using System;
 using AIDungeonPrompts.Persistence.DbContexts;
+using Microsoft.EntityFrameworkCore;
 using Xunit;
 
 namespace AIDungeonPrompts.Test.Collections.Database
@@ -9,22 +10,26 @@ namespace AIDungeonPrompts.Test.Collections.Database
 	{
 		protected DatabaseFixtureTest(DatabaseFixture fixture)
 		{
-			DbContext = fixture.DbContext;
+			DbContext = new AIDungeonPromptsDbContext(fixture.DbContextOptions);
+			DbContextOptions = fixture.DbContextOptions;
 		}
 
-		internal AIDungeonPromptsDbContext DbContext { get; }
+		public AIDungeonPromptsDbContext DbContext { get; }
+		public DbContextOptions<AIDungeonPromptsDbContext> DbContextOptions { get; }
 
 		public void Dispose()
 		{
-			DbContext.ApplicationLogs.RemoveRange(DbContext.ApplicationLogs);
-			DbContext.WorldInfos.RemoveRange(DbContext.WorldInfos);
-			DbContext.Reports.RemoveRange(DbContext.Reports);
-			DbContext.Prompts.RemoveRange(DbContext.Prompts);
-			DbContext.Tags.RemoveRange(DbContext.Tags);
-			DbContext.PromptTags.RemoveRange(DbContext.PromptTags);
-			DbContext.AuditPrompts.RemoveRange(DbContext.AuditPrompts);
-			DbContext.Users.RemoveRange(DbContext.Users);
-			DbContext.SaveChanges();
+			var dbContext = new AIDungeonPromptsDbContext(DbContextOptions);
+			dbContext.ApplicationLogs.RemoveRange(DbContext.ApplicationLogs);
+			dbContext.WorldInfos.RemoveRange(DbContext.WorldInfos);
+			dbContext.Reports.RemoveRange(DbContext.Reports);
+			dbContext.PromptTags.RemoveRange(DbContext.PromptTags);
+			dbContext.Prompts.RemoveRange(DbContext.Prompts);
+			dbContext.Tags.RemoveRange(DbContext.Tags);
+			dbContext.AuditPrompts.RemoveRange(DbContext.AuditPrompts);
+			dbContext.Users.RemoveRange(DbContext.Users);
+			dbContext.SaveChanges();
+			DbContext.Dispose();
 		}
 	}
 }

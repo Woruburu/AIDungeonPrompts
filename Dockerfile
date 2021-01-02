@@ -9,6 +9,7 @@ COPY ["AIDungeonPromptsWeb/AIDungeonPrompts.Web.csproj", "AIDungeonPromptsWeb/"]
 COPY ["AIDungeonPrompts.Application/AIDungeonPrompts.Application.csproj", "AIDungeonPrompts.Application/"]
 COPY ["AIDungeonPrompts.Domain/AIDungeonPrompts.Domain.csproj", "AIDungeonPrompts.Domain/"]
 COPY ["AIDungeonPrompts.Persistence/AIDungeonPrompts.Persistence.csproj", "AIDungeonPrompts.Persistence/"]
+COPY ["AIDungeonPrompts.Persistence/AIDungeonPrompts.Infrastructure.csproj", "AIDungeonPrompts.Infrastructure/"]
 RUN dotnet restore "AIDungeonPromptsWeb/AIDungeonPrompts.Web.csproj"
 COPY . .
 WORKDIR "/src/AIDungeonPromptsWeb"

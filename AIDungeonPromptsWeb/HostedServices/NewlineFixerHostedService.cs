@@ -1,4 +1,3 @@
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 using AIDungeonPrompts.Application.Abstractions.DbContexts;
@@ -9,11 +8,10 @@ using Microsoft.Extensions.Logging;
 
 namespace AIDungeonPrompts.Web.HostedServices
 {
-	public class NewlineFixerHostedService : IHostedService, IDisposable
+	public class NewlineFixerHostedService : IHostedService
 	{
 		private readonly ILogger<NewlineFixerHostedService> _logger;
 		private readonly IServiceScopeFactory _serviceScopeFactory;
-		private bool _disposedValue;
 
 		public NewlineFixerHostedService(
 			ILogger<NewlineFixerHostedService> logger,
@@ -24,21 +22,14 @@ namespace AIDungeonPrompts.Web.HostedServices
 			_serviceScopeFactory = serviceScopeFactory;
 		}
 
-		public void Dispose()
-		{
-			// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-			Dispose(disposing: true);
-			GC.SuppressFinalize(this);
-		}
-
 		public async Task StartAsync(CancellationToken cancellationToken)
 		{
-			_logger.LogInformation($"{nameof(ApplicationLogCleanerHostedService)} Starting");
+			_logger.LogInformation($"{nameof(NewlineFixerHostedService)} Starting");
 			using var services = _serviceScopeFactory.CreateScope();
 			var dbContext = services.ServiceProvider.GetRequiredService<IAIDungeonPromptsDbContext>();
 			if (dbContext == null)
 			{
-				_logger.LogWarning($"{nameof(ApplicationLogCleanerHostedService)}: Could not get DbContext from services");
+				_logger.LogWarning($"{nameof(NewlineFixerHostedService)}: Could not get DbContext from services");
 				return;
 			}
 
@@ -60,34 +51,12 @@ namespace AIDungeonPrompts.Web.HostedServices
 			}
 			dbContext.Prompts.UpdateRange(allPrompts);
 			await dbContext.SaveChangesAsync(cancellationToken);
-			_logger.LogInformation($"{nameof(ApplicationLogCleanerHostedService)} Finished");
+			_logger.LogInformation($"{nameof(NewlineFixerHostedService)} Finished");
 		}
 
 		public Task StopAsync(CancellationToken cancellationToken)
 		{
 			return Task.CompletedTask;
 		}
-
-		protected virtual void Dispose(bool disposing)
-		{
-			if (!_disposedValue)
-			{
-				if (disposing)
-				{
-					// TODO: dispose managed state (managed objects)
-				}
-
-				// TODO: free unmanaged resources (unmanaged objects) and override finalizer
-				// TODO: set large fields to null
-				_disposedValue = true;
-			}
-		}
-
-		// // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
-		// ~NewlineFixerHostedService()
-		// {
-		//     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-		//     Dispose(disposing: false);
-		// }
 	}
 }

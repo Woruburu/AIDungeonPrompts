@@ -17,7 +17,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.SimilarPrompt
 		[InlineData(null)]
 		[InlineData("")]
 		[InlineData("	")]
-		public async Task ValidateAsync_IsNotValid_WhenTitleIsEmpty(string title)
+		public async Task ValidateAsync_ReturnsNotValid_WhenTitleIsEmpty(string title)
 		{
 			//arrange
 			var query = new SimilarPromptQuery(title);
@@ -33,7 +33,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.SimilarPrompt
 		[InlineData(null)]
 		[InlineData("")]
 		[InlineData("	")]
-		public async Task ValidateAsync_IsNotValid_WhenTitleIsEmpty_AndIdIsDefault(string title)
+		public async Task ValidateAsync_ReturnsNotValid_WhenTitleIsEmpty_AndIdIsDefault(string title)
 		{
 			//arrange
 			var query = new SimilarPromptQuery(title, default);
@@ -46,7 +46,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.SimilarPrompt
 		}
 
 		[Fact]
-		public async Task ValidateAsync_IsValid_WhenTitleHasValue()
+		public async Task ValidateAsync_ReturnsValid_WhenTitleHasValue()
 		{
 			//arrange
 			var query = new SimilarPromptQuery("Value");
@@ -62,7 +62,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.SimilarPrompt
 		[InlineData(1)]
 		[InlineData(10)]
 		[InlineData(256)]
-		public async Task ValidateAsync_IsValid_WhenTitleHasValue_AndIdIsHasValue(int id)
+		public async Task ValidateAsync_ReturnsValid_WhenTitleHasValue_AndIdIsHasValue(int id)
 		{
 			//arrange
 			var query = new SimilarPromptQuery("Value", id);

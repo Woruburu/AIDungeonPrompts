@@ -13,6 +13,19 @@ namespace AIDungeonPrompts.Test.Application.Queries.GetPrompt
 			_validator = new GetPromptQueryValidator();
 		}
 
+		[Fact]
+		public async Task ValidateAsync_ReturnsNotValid_WhenTheGivenIdIsDefault()
+		{
+			//arrange
+			var query = new GetPromptQuery(default);
+
+			//act
+			var actual = await _validator.ValidateAsync(query);
+
+			//assert
+			Assert.False(actual.IsValid);
+		}
+
 		[Theory]
 		[InlineData(1)]
 		[InlineData(34)]
@@ -28,19 +41,6 @@ namespace AIDungeonPrompts.Test.Application.Queries.GetPrompt
 
 			//assert
 			Assert.True(actual.IsValid);
-		}
-
-		[Fact]
-		public async Task ValidateAsync_ReturnsValidationError_WhenTheGivenIdIsDefault()
-		{
-			//arrange
-			var query = new GetPromptQuery(default);
-
-			//act
-			var actual = await _validator.ValidateAsync(query);
-
-			//assert
-			Assert.False(actual.IsValid);
 		}
 	}
 }

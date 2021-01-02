@@ -9,6 +9,7 @@ using AIDungeonPrompts.Application.Queries.SearchPrompts;
 using AIDungeonPrompts.Web.Extensions;
 using AIDungeonPrompts.Web.Models.User;
 using MediatR;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -129,6 +130,12 @@ namespace AIDungeonPrompts.Web.Controllers
 			{
 				return Redirect(model.ReturnUrl);
 			}
+			return RedirectToAction("Index", "Home");
+		}
+
+		public IActionResult LogOut()
+		{
+			HttpContext.SignOutAsync();
 			return RedirectToAction("Index", "Home");
 		}
 

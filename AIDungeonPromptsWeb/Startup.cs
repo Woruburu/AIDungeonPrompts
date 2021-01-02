@@ -20,11 +20,13 @@ using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Net.Http.Headers;
+using NWebsec.AspNetCore.Mvc.Csp;
 using Serilog;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
@@ -44,6 +46,8 @@ namespace AIDungeonPrompts.Web
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
 		public void Configure(IApplicationBuilder app, IWebHostEnvironment env, AIDungeonPromptsDbContext context)
 		{
+			app.UseForwardedHeaders();
+
 			if (env.IsDevelopment())
 			{
 				app.UseDeveloperExceptionPage();
@@ -87,6 +91,7 @@ namespace AIDungeonPrompts.Web
 			});
 
 			app.UseHttpsRedirection();
+			app.UseXXssProtection(options => options.EnabledWithBlockMode());
 
 			app.UseCorrelationId();
 
@@ -111,6 +116,14 @@ namespace AIDungeonPrompts.Web
 		// This method gets called by the runtime. Use this method to add services to the container.
 		public void ConfigureServices(IServiceCollection services)
 		{
+			services.Configure<ForwardedHeadersOptions>(options =>
+			{
+				options.ForwardedHeaders =
+					ForwardedHeaders.XForwardedFor |
+					ForwardedHeaders.XForwardedProto |
+					ForwardedHeaders.XForwardedHost;
+			});
+
 			services
 				.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
 				.AddCookie(builder =>
@@ -135,7 +148,15 @@ namespace AIDungeonPrompts.Web
 					builder.LowercaseUrls = true;
 					builder.LowercaseQueryStrings = true;
 				})
-				.AddControllersWithViews()
+				.AddControllersWithViews(builder =>
+				{
+					builder.Filters.Add(typeof(CspAttribute));
+					builder.Filters.Add(new CspDefaultSrcAttribute { Self = true });
+					builder.Filters.Add(new CspImgSrcAttribute { Self = true, CustomSources = "data:" });
+					builder.Filters.Add(new CspScriptSrcAttribute { Self = true, UnsafeEval = false, UnsafeInline = false });
+					builder.Filters.Add(new CspStyleSrcAttribute { Self = true, UnsafeInline = false });
+					builder.Filters.Add(new CspObjectSrcAttribute { None = true });
+				})
 				.AddFluentValidation(fv =>
 					fv.RegisterValidatorsFromAssemblies(new[]
 					{

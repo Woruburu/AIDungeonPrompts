@@ -32,7 +32,7 @@
 			</p>
 			<p class="card-text pre-line truncated">@(!string.IsNullOrWhiteSpace(Model.Description) ? Model.Description : Model.PromptContent)</p>
 		</div>
-		<div class="card-footer bg-transparent d-flex" style="border:0">
+		<div class="card-footer bg-transparent d-flex border-0">
 			<div class="ml-auto"></div>
 			@if (diplayEdit && showEdit) { 
 				<a asp-action="Edit" asp-controller="Prompts" asp-route-id="@Model.Id" class="align-self-end btn btn-outline-success mr-2 px-3">Edit</a>			
