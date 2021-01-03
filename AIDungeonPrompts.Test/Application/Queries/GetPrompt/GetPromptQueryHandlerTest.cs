@@ -1,7 +1,10 @@
 using System.Threading.Tasks;
+using AIDungeonPrompts.Application.Abstractions.Identity;
 using AIDungeonPrompts.Application.Queries.GetPrompt;
+using AIDungeonPrompts.Application.Queries.GetUser;
 using AIDungeonPrompts.Domain.Entities;
 using AIDungeonPrompts.Test.Collections.Database;
+using Moq;
 using Xunit;
 
 namespace AIDungeonPrompts.Test.Application.Queries.GetPrompt
@@ -9,10 +12,12 @@ namespace AIDungeonPrompts.Test.Application.Queries.GetPrompt
 	public class GetPromptQueryHandlerTest : DatabaseFixtureTest
 	{
 		private readonly GetPromptQueryHandler _handler;
+		private readonly Mock<ICurrentUserService> _mockUserService;
 
 		public GetPromptQueryHandlerTest(DatabaseFixture fixture) : base(fixture)
 		{
-			_handler = new GetPromptQueryHandler(DbContext);
+			_mockUserService = new Mock<ICurrentUserService>();
+			_handler = new GetPromptQueryHandler(DbContext, _mockUserService.Object);
 		}
 
 		[Theory]
@@ -51,6 +56,45 @@ namespace AIDungeonPrompts.Test.Application.Queries.GetPrompt
 			Assert.Equal(expectedContent, result.PromptContent);
 		}
 
+		[Fact]
+		public async Task Handle_ReturnsNull_IfPromptIsDraft_AndUserServiceDoesNotReturnUser()
+		{
+			//arrange
+			var prompt = new Prompt() { IsDraft = true };
+			DbContext.Prompts.Add(prompt);
+			await DbContext.SaveChangesAsync();
+			GetUserViewModel? user = null;
+			_mockUserService.Setup(e => e.TryGetCurrentUser(out user)).Returns(false);
+			var query = new GetPromptQuery(prompt.Id);
+
+			//act
+			var result = await _handler.Handle(query);
+
+			//assert
+			Assert.Null(result);
+		}
+
+		[Fact]
+		public async Task Handle_ReturnsNull_IfPromptIsDraft_AndUserServiceReturnsUserWithIncorrectId()
+		{
+			//arrange
+			var prompt = new Prompt() { IsDraft = true, Owner = new User { Username = "TestUser" } };
+			DbContext.Prompts.Add(prompt);
+			await DbContext.SaveChangesAsync();
+			var user = new GetUserViewModel
+			{
+				Id = int.MaxValue
+			};
+			_mockUserService.Setup(e => e.TryGetCurrentUser(out user)).Returns(true);
+			var query = new GetPromptQuery(prompt.Id);
+
+			//act
+			var result = await _handler.Handle(query);
+
+			//assert
+			Assert.Null(result);
+		}
+
 		[Theory]
 		[InlineData(-10)]
 		[InlineData(0)]
@@ -85,6 +129,29 @@ namespace AIDungeonPrompts.Test.Application.Queries.GetPrompt
 
 			//assert
 			Assert.Null(result);
+		}
+
+		[Fact]
+		public async Task Handle_ReturnsPrompt_IfPromptIsDraft_AndUserServiceReturnsUserWithCorrectId()
+		{
+			//arrange
+			var owner = new User { Username = "TestUser" };
+			var prompt = new Prompt() { IsDraft = true, Owner = owner };
+			DbContext.Prompts.Add(prompt);
+			await DbContext.SaveChangesAsync();
+			var user = new GetUserViewModel
+			{
+				Id = owner.Id
+			};
+			_mockUserService.Setup(e => e.TryGetCurrentUser(out user)).Returns(true);
+			var query = new GetPromptQuery(prompt.Id);
+
+			//act
+			var result = await _handler.Handle(query);
+
+			//assert
+			Assert.NotNull(result);
+			Assert.True(result.IsDraft);
 		}
 	}
 }

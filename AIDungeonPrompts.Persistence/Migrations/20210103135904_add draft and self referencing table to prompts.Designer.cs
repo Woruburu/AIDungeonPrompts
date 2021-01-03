@@ -3,15 +3,17 @@ using System;
 using AIDungeonPrompts.Persistence.DbContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace AIDungeonPrompts.Persistence.Migrations
 {
     [DbContext(typeof(AIDungeonPromptsDbContext))]
-    partial class AIDungeonPromptsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210103135904_add draft and self referencing table to prompts")]
+    partial class adddraftandselfreferencingtabletoprompts
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

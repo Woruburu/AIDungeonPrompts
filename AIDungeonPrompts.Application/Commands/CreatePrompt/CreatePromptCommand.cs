@@ -33,6 +33,8 @@ namespace AIDungeonPrompts.Application.Commands.CreatePrompt
 
 		public string? Quests { get; set; }
 
+		public bool SaveDraft { get; set; }
+
 		[Required(ErrorMessage = "Please supply a Title")]
 		public string Title { get; set; } = string.Empty;
 
@@ -67,7 +69,8 @@ namespace AIDungeonPrompts.Application.Commands.CreatePrompt
 				Description = request.Description?.Replace("\r\n", "\n"),
 				OwnerId = request.OwnerId,
 				Upvote = 0,
-				Views = 0
+				Views = 0,
+				IsDraft = request.SaveDraft
 			};
 
 			foreach (var worldInfo in request.WorldInfos)

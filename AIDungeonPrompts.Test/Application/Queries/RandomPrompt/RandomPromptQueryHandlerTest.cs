@@ -50,5 +50,27 @@ namespace AIDungeonPrompts.Test.Application.Queries.RandomPrompt
 			//assert
 			Assert.Null(actual);
 		}
+
+		[Theory]
+		[InlineData(1)]
+		[InlineData(3)]
+		[InlineData(10)]
+		[InlineData(200)]
+		public async Task Handle_ReturnsNull_WhenThereAreOnlyDraftPromptsInDatabase(int amount)
+		{
+			//arrange
+			for (var i = 0; i < amount; i++)
+			{
+				DbContext.Prompts.Add(new Prompt { IsDraft = true });
+			}
+			await DbContext.SaveChangesAsync();
+			var query = new RandomPromptQuery();
+
+			//act
+			var actual = await _handler.Handle(query);
+
+			//assert
+			Assert.Null(actual);
+		}
 	}
 }

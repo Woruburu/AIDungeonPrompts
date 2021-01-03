@@ -6,11 +6,15 @@ namespace AIDungeonPrompts.Domain.Entities
 	public class Prompt : BaseDomainEntity
 	{
 		public string? AuthorsNote { get; set; }
+		public List<Prompt> Children { get; set; } = new List<Prompt>();
 		public string? Description { get; set; }
+		public bool IsDraft { get; set; }
 		public string? Memory { get; set; }
 		public bool Nsfw { get; set; }
 		public User? Owner { get; set; }
 		public int? OwnerId { get; set; }
+		public Prompt? Parent { get; set; }
+		public int? ParentId { get; set; }
 		public string PromptContent { get; set; } = string.Empty;
 		public List<PromptTag> PromptTags { get; set; } = new List<PromptTag>();
 		public string? Quests { get; set; }

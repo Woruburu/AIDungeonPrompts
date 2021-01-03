@@ -10,9 +10,15 @@
 <div class="col-sm-12 col-md-6 mb-4">
 	<div class="card">
 		<div class="card-body">
-			<a asp-controller="Prompts" asp-action="View" asp-route-id="@Model.Id">
-				<h5 class="card-title">@Model.Title</h5>
-			</a>
+			<div class="d-flex">
+				<a class="w-100" asp-controller="Prompts" asp-action="View" asp-route-id="@Model.Id">
+					<h5 class="card-title">@Model.Title</h5>
+				</a>
+				@if (Model.IsDraft)
+				{
+					<h4><span class="badge badge-warning">Draft</span></h4>
+				}
+			</div>
 			<p tabindex="-1" class="tags truncated">
 				Created: @Model.DateCreated.ToString("yyyy/MM/dd")
 				<br/>

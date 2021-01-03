@@ -35,25 +35,30 @@ namespace AIDungeonPrompts.Web.Controllers
 		}
 
 		[HttpPost, ValidateAntiForgeryToken]
-		public async Task<IActionResult> Create(bool? addWi, bool confirm, CreatePromptViewModel model)
+		public async Task<IActionResult> Create(bool addWi, bool confirm, bool saveDraft, CreatePromptViewModel model)
 		{
-			if (addWi == true)
+			model.Command.SaveDraft = saveDraft;
+
+			if (addWi)
 			{
 				ModelState.Clear();
 				model.Command.WorldInfos.Add(new CreatePromptCommandWorldInfo());
 				return View(model);
 			}
 
-			if (!ModelState.IsValid)
+			if (!model.Command.SaveDraft)
 			{
-				return View(model);
-			}
+				if (!ModelState.IsValid)
+				{
+					return View(model);
+				}
 
-			var duplicate = await _mediator.Send(new SimilarPromptQuery(model.Command.Title));
-			if (duplicate.Matched && !confirm)
-			{
-				model.SimilarPromptQuery = duplicate;
-				return View(model);
+				var duplicate = await _mediator.Send(new SimilarPromptQuery(model.Command.Title));
+				if (duplicate.Matched && !confirm)
+				{
+					model.SimilarPromptQuery = duplicate;
+					return View(model);
+				}
 			}
 
 			if (!_currentUserService.TryGetCurrentUser(out var user))
@@ -73,8 +78,10 @@ namespace AIDungeonPrompts.Web.Controllers
 		}
 
 		[HttpPost("/{id}/edit"), ValidateAntiForgeryToken, Authorize]
-		public async Task<IActionResult> Edit(int? id, bool? addWi, bool confirm, UpdatePromptViewModel model)
+		public async Task<IActionResult> Edit(int? id, bool addWi, bool saveDraft, bool confirm, UpdatePromptViewModel model)
 		{
+			model.Command.SaveDraft = saveDraft;
+
 			if (id == null || !_currentUserService.TryGetCurrentUser(out var user))
 			{
 				return NotFound();
@@ -89,23 +96,26 @@ namespace AIDungeonPrompts.Web.Controllers
 
 			model.Command.Id = id.Value;
 
-			if (addWi != null && addWi.Value)
+			if (addWi)
 			{
 				ModelState.Clear();
 				model.Command.WorldInfos.Add(new UpdatePromptCommandWorldInfo());
 				return View(model);
 			}
 
-			if (!ModelState.IsValid)
+			if (!model.Command.SaveDraft)
 			{
-				return View(model);
-			}
+				if (!ModelState.IsValid)
+				{
+					return View(model);
+				}
 
-			var duplicate = await _mediator.Send(new SimilarPromptQuery(model.Command.Title, model.Command.Id));
-			if (duplicate.Matched && !confirm)
-			{
-				model.SimilarPromptQuery = duplicate;
-				return View(model);
+				var duplicate = await _mediator.Send(new SimilarPromptQuery(model.Command.Title, model.Command.Id));
+				if (duplicate.Matched && !confirm)
+				{
+					model.SimilarPromptQuery = duplicate;
+					return View(model);
+				}
 			}
 
 			await _mediator.Send(model.Command);

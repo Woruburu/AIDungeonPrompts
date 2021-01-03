@@ -51,21 +51,21 @@ namespace AIDungeonPrompts.Web
 			if (env.IsDevelopment())
 			{
 				app.UseDeveloperExceptionPage();
-				app.UseHttpsRedirection();
 			}
 			else
 			{
 				app.UseExceptionHandler("/Home/Error");
 			}
 
-			app.Use(async (context, next) =>
-			{
-				context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
-				await next();
-			});
+			context.Database.Migrate();
 
 			// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
 			app.UseHsts();
+			app.UseXContentTypeOptions();
+			app.UseXfo(options => options.Deny());
+			app.UseHttpsRedirection();
+			app.UseXXssProtection(options => options.EnabledWithBlockMode());
+			app.UseReferrerPolicy(opts => opts.NoReferrer());
 
 			app.UseStatusCodePages();
 
@@ -76,7 +76,8 @@ namespace AIDungeonPrompts.Web
 				MinimumSameSitePolicy = SameSiteMode.Strict,
 			});
 
-			context.Database.Migrate();
+			app.UseCorrelationId();
+			app.UseSerilogRequestLogging();
 
 			app.UseStaticFiles(new StaticFileOptions()
 			{
@@ -89,13 +90,6 @@ namespace AIDungeonPrompts.Web
 					};
 				}
 			});
-
-			app.UseHttpsRedirection();
-			app.UseXXssProtection(options => options.EnabledWithBlockMode());
-
-			app.UseCorrelationId();
-
-			app.UseSerilogRequestLogging();
 
 			app.UseRouting();
 

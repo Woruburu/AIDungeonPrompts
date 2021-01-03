@@ -15,6 +15,7 @@ namespace AIDungeonPrompts.Application.Queries.SearchPrompts
 		private int _page = 1;
 		private int _pageSize = 10;
 
+		public bool IncludeDrafts { get; set; }
 		public SearchNsfw Nsfw { get; set; }
 		public SearchOrderBy OrderBy { get; set; }
 
@@ -141,6 +142,11 @@ namespace AIDungeonPrompts.Application.Queries.SearchPrompts
 				query = query.Where(e => e.OwnerId == request.UserId.Value);
 			}
 
+			if (!request.IncludeDrafts)
+			{
+				query = query.Where(e => !e.IsDraft);
+			}
+
 			var results = await query
 				.Skip(skip)
 				.Take(request.PageSize)
@@ -154,6 +160,7 @@ namespace AIDungeonPrompts.Application.Queries.SearchPrompts
 					Description = prompt.Description,
 					DateCreated = prompt.DateCreated,
 					OwnerId = prompt.OwnerId,
+					IsDraft = prompt.IsDraft,
 					SearchPromptsTagViewModel = prompt.PromptTags
 						.Select(promptTag => new SearchPromptsTagViewModel
 						{
