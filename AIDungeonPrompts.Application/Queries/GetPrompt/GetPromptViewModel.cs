@@ -12,6 +12,7 @@ namespace AIDungeonPrompts.Application.Queries.GetPrompt
 		public DateTime DateCreated { get; set; }
 		public string? Description { get; set; }
 		public int Id { get; set; }
+		public bool IsDraft { get; set; }
 		public string? Memory { get; set; }
 
 		[Display(Name = "NSFW?")]

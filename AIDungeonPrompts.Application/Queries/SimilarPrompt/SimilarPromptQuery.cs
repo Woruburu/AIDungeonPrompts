@@ -31,7 +31,9 @@ namespace AIDungeonPrompts.Application.Queries.SimilarPrompt
 
 		public async Task<SimilarPromptViewModel> Handle(SimilarPromptQuery request, CancellationToken cancellationToken = default)
 		{
-			var query = _dbContext.Prompts
+			var query = _dbContext
+				.Prompts
+				.Where(prompt => !prompt.IsDraft)
 				.Where(prompt => EF.Functions.ILike(prompt.Title, NpgsqlHelper.SafeIlike(request.Title), NpgsqlHelper.EscapeChar));
 
 			if (request.CurrentId.HasValue)

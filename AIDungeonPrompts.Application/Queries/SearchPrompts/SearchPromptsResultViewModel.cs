@@ -22,5 +22,6 @@ namespace AIDungeonPrompts.Application.Queries.SearchPrompts
 		public IEnumerable<SearchPromptsTagViewModel> SearchPromptsTagViewModel { get; set; } = new List<SearchPromptsTagViewModel>();
 
 		public string Title { get; set; } = string.Empty;
+		public bool IsDraft { get; set; }
 	}
 }

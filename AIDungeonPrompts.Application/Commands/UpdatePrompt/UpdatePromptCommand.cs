@@ -36,6 +36,8 @@ namespace AIDungeonPrompts.Application.Commands.UpdatePrompt
 
 		public string? Quests { get; set; }
 
+		public bool SaveDraft { get; set; }
+
 		[Required(ErrorMessage = "Please supply a Title")]
 		public string Title { get; set; } = string.Empty;
 
@@ -57,7 +59,7 @@ namespace AIDungeonPrompts.Application.Commands.UpdatePrompt
 			_currentUserService = currentUserService;
 		}
 
-		public async Task<Unit> Handle(UpdatePromptCommand request, CancellationToken cancellationToken)
+		public async Task<Unit> Handle(UpdatePromptCommand request, CancellationToken cancellationToken = default)
 		{
 			if (!_currentUserService.TryGetCurrentUser(out var user))
 			{
@@ -85,6 +87,7 @@ namespace AIDungeonPrompts.Application.Commands.UpdatePrompt
 				prompt.Description = request.Description?.Replace("\r\n", "\n");
 				prompt.PromptTags = new List<PromptTag>();
 				prompt.WorldInfos = new List<WorldInfo>();
+				prompt.IsDraft = request.SaveDraft;
 
 				foreach (var worldInfo in request.WorldInfos)
 				{

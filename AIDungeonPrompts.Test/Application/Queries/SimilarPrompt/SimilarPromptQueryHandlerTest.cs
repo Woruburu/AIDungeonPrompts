@@ -75,10 +75,67 @@ namespace AIDungeonPrompts.Test.Application.Queries.SimilarPrompt
 			Assert.Equal(expectedAmount, actual.SimilarPrompts.Count);
 		}
 
+		[Theory]
+		[InlineData(3, 3)]
+		[InlineData(10, 20)]
+		[InlineData(38, 60)]
+		[InlineData(120, 45)]
+		public async Task Handle_ReturnsMatchesThatDontIncludeDrafts_WhenManyTitlesMatch_ButSomeAreDrafts(int expectedAmount, int drafts)
+		{
+			//arrange
+			for (var i = 0; i < expectedAmount; i++)
+			{
+				DbContext.Prompts.Add(new Prompt
+				{
+					Title = "TestTitle",
+					PromptContent = "TestContent"
+				});
+			}
+			for (var i = 0; i < drafts; i++)
+			{
+				DbContext.Prompts.Add(new Prompt
+				{
+					Title = "TestTitle",
+					PromptContent = "TestContent",
+					IsDraft = true
+				});
+			}
+			await DbContext.SaveChangesAsync();
+			var query = new SimilarPromptQuery("TestTitle");
+
+			//act
+			var actual = await _handler.Handle(query);
+
+			//assert
+			Assert.True(actual.Matched);
+			Assert.Equal(expectedAmount, actual.SimilarPrompts.Count);
+		}
+
 		[Fact]
 		public async Task Handle_ReturnsNoMatches_WhenDatabaseIsEmpty()
 		{
 			//arrange
+			var query = new SimilarPromptQuery("TestTitle");
+
+			//act
+			var actual = await _handler.Handle(query);
+
+			//assert
+			Assert.False(actual.Matched);
+			Assert.Empty(actual.SimilarPrompts);
+		}
+
+		[Fact]
+		public async Task Handle_ReturnsNoMatches_WhenOneTitleMatches_ButIsDraft()
+		{
+			//arrange
+			DbContext.Prompts.Add(new Prompt
+			{
+				Title = "TestTitle",
+				PromptContent = "TestContent",
+				IsDraft = true
+			});
+			await DbContext.SaveChangesAsync();
 			var query = new SimilarPromptQuery("TestTitle");
 
 			//act
@@ -117,6 +174,33 @@ namespace AIDungeonPrompts.Test.Application.Queries.SimilarPrompt
 			{
 				Title = "TestTitle",
 				PromptContent = "TestContent"
+			});
+			await DbContext.SaveChangesAsync();
+			var query = new SimilarPromptQuery("TestTitle");
+
+			//act
+			var actual = await _handler.Handle(query);
+
+			//assert
+			Assert.True(actual.Matched);
+			Assert.Single(actual.SimilarPrompts);
+		}
+
+		[Fact]
+		public async Task Handle_ReturnsOneMatch_WhenTwoTitlesMatch_ButOneIsDraft()
+		{
+			//arrange
+			DbContext.Prompts.Add(new Prompt
+			{
+				Title = "TestTitle",
+				PromptContent = "TestContent",
+				IsDraft = true
+			});
+			DbContext.Prompts.Add(new Prompt
+			{
+				Title = "TestTitle",
+				PromptContent = "TestContent",
+				IsDraft = false
 			});
 			await DbContext.SaveChangesAsync();
 			var query = new SimilarPromptQuery("TestTitle");

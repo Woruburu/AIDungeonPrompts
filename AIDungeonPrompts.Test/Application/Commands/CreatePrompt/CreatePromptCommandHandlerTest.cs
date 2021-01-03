@@ -33,6 +33,40 @@ namespace AIDungeonPrompts.Test.Application.Commands.CreatePrompt
 			Assert.NotNull(DbContext.Prompts.Find(actual));
 		}
 
+		[Fact]
+		public async Task Handle_DoesNotSetPromptToDraft_WhenSaveDraftIsFalse()
+		{
+			//arrange
+			var user = new User { Username = "TestUser" };
+			DbContext.Users.Add(user);
+			await DbContext.SaveChangesAsync();
+			var command = new CreatePromptCommand { OwnerId = user.Id, SaveDraft = false };
+
+			//act
+			var actual = await _handler.Handle(command);
+
+			//assert
+			var prompt = DbContext.Prompts.Find(actual);
+			Assert.False(prompt.IsDraft);
+		}
+
+		[Fact]
+		public async Task Handle_SetsPromptToDraft_WhenSaveDraftIsTrue()
+		{
+			//arrange
+			var user = new User { Username = "TestUser" };
+			DbContext.Users.Add(user);
+			await DbContext.SaveChangesAsync();
+			var command = new CreatePromptCommand { OwnerId = user.Id, SaveDraft = true };
+
+			//act
+			var actual = await _handler.Handle(command);
+
+			//assert
+			var prompt = DbContext.Prompts.Find(actual);
+			Assert.True(prompt.IsDraft);
+		}
+
 		[Theory]
 		[InlineData(0)]
 		[InlineData(-10)]

@@ -24,7 +24,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.SearchPrompts
 			//arrange
 			var query = new SearchPromptsQuery()
 			{
-				PageSize = 15
+				PageSize = 20
 			};
 			var prompts = GeneratePromptData();
 			DbContext.Prompts.AddRange(prompts);
@@ -35,6 +35,28 @@ namespace AIDungeonPrompts.Test.Application.Queries.SearchPrompts
 
 			//assert
 			Assert.True(actual.Results[0].DateCreated > actual.Results[^1].DateCreated);
+		}
+
+		[Fact]
+		public async Task Handle_ReturnsDrafts_WhenIncludesDraftsIsTrue()
+		{
+			//arrange
+			var query = new SearchPromptsQuery()
+			{
+				PageSize = 20,
+				IncludeDrafts = true
+			};
+			var prompts = GeneratePromptData();
+			DbContext.Prompts.AddRange(prompts);
+			DbContext.Prompts.Add(new Prompt { IsDraft = true });
+			await DbContext.SaveChangesAsync();
+
+			//act
+			var actual = await _handler.Handle(query);
+
+			//assert
+			Assert.Equal(16, actual.Results.Count);
+			Assert.Contains(actual.Results, e => e.IsDraft);
 		}
 
 		[Fact]
@@ -109,6 +131,28 @@ namespace AIDungeonPrompts.Test.Application.Queries.SearchPrompts
 			//assert
 			Assert.Equal(5, actual.Results.Count);
 			Assert.Equal(1, actual.TotalPages);
+		}
+
+		[Fact]
+		public async Task Handle_ReturnsNoDrafts_WhenIncludesDraftsIsFalse()
+		{
+			//arrange
+			var query = new SearchPromptsQuery()
+			{
+				PageSize = 20,
+				IncludeDrafts = false
+			};
+			var prompts = GeneratePromptData();
+			DbContext.Prompts.AddRange(prompts);
+			DbContext.Prompts.Add(new Prompt { IsDraft = true });
+			await DbContext.SaveChangesAsync();
+
+			//act
+			var actual = await _handler.Handle(query);
+
+			//assert
+			Assert.Equal(15, actual.Results.Count);
+			Assert.True(actual.Results.All(e => !e.IsDraft));
 		}
 
 		[Theory]

@@ -23,7 +23,13 @@
 }
 <div class="d-flex">
 	<div>
-		<h3>@Model.Prompt.Title</h3>
+		<h3>
+			@if (Model.Prompt.IsDraft)
+			{
+				<span class="mr-2 badge badge-warning">Draft</span>
+			}
+			@Model.Prompt.Title
+		</h3>
 		<p>Created on @Model.Prompt.DateCreated.ToString("yyyy/MM/dd")</p>
 	</div>
 	<div class="ml-auto d-flex">

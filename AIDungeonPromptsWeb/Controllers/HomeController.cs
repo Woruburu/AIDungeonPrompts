@@ -91,6 +91,10 @@ namespace AIDungeonPrompts.Web.Controllers
 		public async Task<IActionResult> Random()
 		{
 			var result = await _mediator.Send(new RandomPromptQuery());
+			if (result == null)
+			{
+				return RedirectToAction("Index");
+			}
 			return RedirectToAction("View", "Prompts", new { result.Id });
 		}
 

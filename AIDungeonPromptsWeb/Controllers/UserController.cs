@@ -89,7 +89,8 @@ namespace AIDungeonPrompts.Web.Controllers
 			{
 				UserId = user!.Id,
 				Page = page ?? 1,
-				PageSize = 6
+				PageSize = 6,
+				IncludeDrafts = true
 			});
 
 			return View(new IndexUserModel

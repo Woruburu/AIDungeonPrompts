@@ -2,6 +2,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AIDungeonPrompts.Application.Abstractions.DbContexts;
+using AIDungeonPrompts.Application.Abstractions.Identity;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,15 +21,17 @@ namespace AIDungeonPrompts.Application.Queries.GetPrompt
 	public class GetPromptQueryHandler : IRequestHandler<GetPromptQuery, GetPromptViewModel?>
 	{
 		private readonly IAIDungeonPromptsDbContext _dbContext;
+		private readonly ICurrentUserService _userService;
 
-		public GetPromptQueryHandler(IAIDungeonPromptsDbContext dbContext)
+		public GetPromptQueryHandler(IAIDungeonPromptsDbContext dbContext, ICurrentUserService userService)
 		{
 			_dbContext = dbContext;
+			_userService = userService;
 		}
 
 		public async Task<GetPromptViewModel?> Handle(GetPromptQuery request, CancellationToken cancellationToken = default)
 		{
-			return await _dbContext.Prompts
+			var prompt = await _dbContext.Prompts
 				.Include(e => e.WorldInfos)
 				.Include(e => e.PromptTags)
 				.ThenInclude(e => e.Tag)
@@ -55,8 +58,15 @@ namespace AIDungeonPrompts.Application.Queries.GetPrompt
 					{
 						Id = promptTag.Tag!.Id,
 						Name = promptTag.Tag!.Name
-					})
+					}),
+					IsDraft = prompt.IsDraft
 				}).FirstOrDefaultAsync(prompt => prompt.Id == request.Id);
+
+			if (prompt?.IsDraft == true && (!_userService.TryGetCurrentUser(out var user) || prompt.OwnerId != user!.Id))
+			{
+				return null;
+			}
+			return prompt;
 		}
 	}
 }
