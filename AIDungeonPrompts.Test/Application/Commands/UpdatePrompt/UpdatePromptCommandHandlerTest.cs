@@ -3,6 +3,7 @@ using AIDungeonPrompts.Application.Abstractions.Identity;
 using AIDungeonPrompts.Application.Commands.UpdatePrompt;
 using AIDungeonPrompts.Application.Queries.GetUser;
 using AIDungeonPrompts.Domain.Entities;
+using AIDungeonPrompts.Domain.Enums;
 using AIDungeonPrompts.Test.Collections.Database;
 using Moq;
 using Xunit;
@@ -18,6 +19,28 @@ namespace AIDungeonPrompts.Test.Application.Commands.UpdatePrompt
 		{
 			_mockUserService = new Mock<ICurrentUserService>();
 			_handler = new UpdatePromptCommandHandler(DbContext, _mockUserService.Object);
+		}
+
+		[Theory]
+		[InlineData(false)]
+		[InlineData(true)]
+		public async Task Handle_DoesNotChangeDraftStatus_WhenUserIsNotOwner(bool expectedDraftStatus)
+		{
+			//arrange
+			var owner = new User { Username = "TestUser" };
+			var prompt = new Prompt { IsDraft = expectedDraftStatus, Owner = owner };
+			DbContext.Prompts.Add(prompt);
+			await DbContext.SaveChangesAsync();
+			var user = new GetUserViewModel { Id = int.MaxValue, Role = RoleEnum.FieldEdit };
+			_mockUserService.Setup(e => e.TryGetCurrentUser(out user)).Returns(true);
+			var command = new UpdatePromptCommand { Id = prompt.Id, SaveDraft = !expectedDraftStatus };
+
+			//act
+			await _handler.Handle(command);
+
+			//assert
+			var actual = DbContext.Prompts.Find(prompt.Id);
+			Assert.Equal(expectedDraftStatus, actual.IsDraft);
 		}
 
 		[Theory]

@@ -94,7 +94,8 @@ namespace AIDungeonPrompts.Web.Controllers
 				return NotFound();
 			}
 
-			model.Command.Id = id.Value;
+			model.Command.Id = prompt!.Id;
+			model.Command.OwnerId = prompt.OwnerId;
 
 			if (addWi)
 			{
