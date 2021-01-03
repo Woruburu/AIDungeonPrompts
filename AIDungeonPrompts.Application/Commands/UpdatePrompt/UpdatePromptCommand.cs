@@ -87,7 +87,7 @@ namespace AIDungeonPrompts.Application.Commands.UpdatePrompt
 				prompt.Description = request.Description?.Replace("\r\n", "\n");
 				prompt.PromptTags = new List<PromptTag>();
 				prompt.WorldInfos = new List<WorldInfo>();
-				prompt.IsDraft = request.SaveDraft;
+				prompt.IsDraft = isOwner ? request.SaveDraft : prompt.IsDraft;
 
 				foreach (var worldInfo in request.WorldInfos)
 				{

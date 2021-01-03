@@ -85,15 +85,21 @@
 			</p>
 		</div>
 		<div class="d-flex">
-			<button type="submit" asp-route-saveDraft="@true" class="ml-auto btn btn-lg btn-outline-warning">Save Draft</button>
-			<button autofocus asp-route-confirm="@true" type="submit" class="ml-3 btn btn-lg btn-primary">Submit</button>
+			@if (isOwner)
+			{
+				<button type="submit" asp-route-saveDraft="@true" class="ml-auto btn btn-lg btn-outline-warning">Save Draft</button>
+			}
+			<button autofocus asp-route-confirm="@true" type="submit" class="@(!isOwner ? "ml-auto" : string.Empty) ml-3 btn btn-lg btn-primary">Submit</button>
 		</div>
 	}
 	else
 	{
 		<div class="d-flex">
-			<button type="submit" asp-route-saveDraft="@true" class="ml-auto btn btn-lg btn-outline-warning">Save Draft</button>
-			<button type="submit" class="ml-3 btn btn-lg btn-primary">Submit</button>
+			@if (isOwner)
+			{
+				<button type="submit" asp-route-saveDraft="@true" class="ml-auto btn btn-lg btn-outline-warning">Save Draft</button>
+			}
+			<button type="submit" class="@(!isOwner ? "ml-auto" : string.Empty) ml-3 btn btn-lg btn-primary">Submit</button>
 		</div>
 	}
 </form>
