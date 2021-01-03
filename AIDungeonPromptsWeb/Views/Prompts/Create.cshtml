@@ -49,7 +49,7 @@
 	<div>
 		@Html.LabelFor(m => m.Command.WorldInfos)		
 		@Html.EditorFor(m => m.Command.WorldInfos)		
-		<button id="add-wi" asp-action="AddWorldInfo" asp-fragment="world-infos" class="btn btn-secondary">Add Another</button>
+		<button id="add-wi"  asp-route-addWi="@true" asp-fragment="world-infos" class="btn btn-secondary">Add Another</button>
 	</div>
 	<div id="world-infos"></div>
 	<br />
