@@ -25,17 +25,16 @@ namespace AIDungeonPrompts.Application.Commands.CreatePrompt
 
 		public int OwnerId { get; set; }
 
-		[Display(Name = "Prompt"), Required(ErrorMessage = "Please supply a Prompt")]
+		[Display(Name = "Prompt")]
 		public string PromptContent { get; set; } = string.Empty;
 
-		[Display(Name = "Tags (comma delimited)"), Required(ErrorMessage = "Please supply at least a single tag")]
+		[Display(Name = "Tags (comma delimited)")]
 		public string PromptTags { get; set; } = string.Empty;
 
 		public string? Quests { get; set; }
 
 		public bool SaveDraft { get; set; }
 
-		[Required(ErrorMessage = "Please supply a Title")]
 		public string Title { get; set; } = string.Empty;
 
 		[Display(Name = "World Info")]

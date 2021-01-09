@@ -46,13 +46,13 @@ namespace AIDungeonPrompts.Web.Controllers
 				return View(model);
 			}
 
+			if (!ModelState.IsValid)
+			{
+				return View(model);
+			}
+
 			if (!model.Command.SaveDraft)
 			{
-				if (!ModelState.IsValid)
-				{
-					return View(model);
-				}
-
 				var duplicate = await _mediator.Send(new SimilarPromptQuery(model.Command.Title));
 				if (duplicate.Matched && !confirm)
 				{
@@ -104,13 +104,13 @@ namespace AIDungeonPrompts.Web.Controllers
 				return View(model);
 			}
 
+			if (!ModelState.IsValid)
+			{
+				return View(model);
+			}
+
 			if (!model.Command.SaveDraft)
 			{
-				if (!ModelState.IsValid)
-				{
-					return View(model);
-				}
-
 				var duplicate = await _mediator.Send(new SimilarPromptQuery(model.Command.Title, model.Command.Id));
 				if (duplicate.Matched && !confirm)
 				{

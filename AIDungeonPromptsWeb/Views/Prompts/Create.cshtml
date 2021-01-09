@@ -47,36 +47,42 @@
 	</div>
 	<br />
 	<div>
-		@Html.LabelFor(m => m.Command.WorldInfos)		
-		@Html.EditorFor(m => m.Command.WorldInfos)		
-		<button id="add-wi"  asp-route-addWi="@true" asp-fragment="world-infos" class="btn btn-secondary">Add Another</button>
+		@Html.LabelFor(m => m.Command.WorldInfos)
+		@Html.EditorFor(m => m.Command.WorldInfos)
+		<button id="add-wi" asp-route-addWi="@true" asp-fragment="world-infos" class="btn btn-secondary">Add Another</button>
 	</div>
 	<div id="world-infos"></div>
+	@*<div>
+		@Html.LabelFor(m => m.Command.Children)
+		@Html.DisplayFor(m => m.Command.Children)
+		<button id="add-wi" asp-route-addWi="@true" asp-fragment="world-infos" class="btn btn-secondary">Add Another</button>
+	</div>*@
 	<br />
 	@if (Model.SimilarPromptQuery.Matched)
 	{
 		<div class="alert alert-warning" role="alert">
 			<p>
 				There already @(Model.SimilarPromptQuery.SimilarPrompts.Count == 1 ? "exists a prompt" : "exist prompts") with the same title:
-				<br/>
+				<br />
 				@for (int i = 0; i < Model.SimilarPromptQuery.SimilarPrompts.Count; i++)
 				{
 					var prompt = Model.SimilarPromptQuery.SimilarPrompts[i];
-					<a asp-action="View" asp-controller="Prompts" asp-route-id="@prompt.Id" target="_blank" >@prompt.Title</a>@if(i != Model.SimilarPromptQuery.SimilarPrompts.Count - 1) {<span>, </span>}
+					<a asp-action="View" asp-controller="Prompts" asp-route-id="@prompt.Id" target="_blank">@prompt.Title</a>@if (i != Model.SimilarPromptQuery.SimilarPrompts.Count - 1)
+					{<span>, </span>}
 				}
-				<br/>
+				<br />
 				Please confirm this isn't a duplicate before creating a new prompt.
 			</p>
 		</div>
 		<div class="d-flex">
-			<button type="submit" asp-route-saveDraft="@true" class="ml-auto btn btn-lg btn-outline-warning">Save Draft</button>
+			<button id="save-draft" type="submit" asp-route-saveDraft="@true" class="ml-auto btn btn-lg btn-outline-warning">Save Draft</button>
 			<button autofocus asp-route-confirm="@true" type="submit" class="ml-3 btn btn-lg btn-primary">Submit</button>
 		</div>
 	}
 	else
 	{
 		<div class="d-flex">
-			<button type="submit" asp-route-saveDraft="@true" class="ml-auto btn btn-lg btn-outline-warning">Save Draft</button>
+			<button id="save-draft" type="submit" asp-route-saveDraft="@true" class="ml-auto btn btn-lg btn-outline-warning">Save Draft</button>
 			<button type="submit" class="ml-3 btn btn-lg btn-primary">Submit</button>
 		</div>
 	}

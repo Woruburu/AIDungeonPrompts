@@ -9,6 +9,7 @@ using AIDungeonPrompts.Persistence.DbContexts;
 using AIDungeonPrompts.Web.Constants;
 using AIDungeonPrompts.Web.HostedServices;
 using AIDungeonPrompts.Web.Middleware;
+using AIDungeonPrompts.Web.ModelMetadataDetailsProviders;
 using CorrelationId;
 using CorrelationId.DependencyInjection;
 using FluentValidation.AspNetCore;
@@ -150,14 +151,17 @@ namespace AIDungeonPrompts.Web
 					builder.Filters.Add(new CspScriptSrcAttribute { Self = true, UnsafeEval = false, UnsafeInline = false });
 					builder.Filters.Add(new CspStyleSrcAttribute { Self = true, UnsafeInline = false });
 					builder.Filters.Add(new CspObjectSrcAttribute { None = true });
+					builder.ModelMetadataDetailsProviders.Add(new DoNotConvertEmptyStringToNullMetadataDetailsProvider());
 				})
 				.AddFluentValidation(fv =>
+				{
+					fv.ImplicitlyValidateChildProperties = true;
 					fv.RegisterValidatorsFromAssemblies(new[]
 					{
 						typeof(ApplicationLayer),
 						typeof(Startup)
-					}.Select(t => t.Assembly).ToArray())
-				);
+					}.Select(t => t.Assembly).ToArray());
+				});
 
 			services.AddAuthorization(options =>
 			{
@@ -169,6 +173,7 @@ namespace AIDungeonPrompts.Web
 
 			services.AddHostedService<ApplicationLogCleanerHostedService>();
 			services.AddHostedService<ReportCleanerHostedService>();
+
 			// This shouldn't ever need to be enabled again
 			//services.AddHostedService<NewlineFixerHostedService>();
 		}

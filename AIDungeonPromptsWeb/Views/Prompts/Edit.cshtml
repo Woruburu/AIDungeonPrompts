@@ -65,7 +65,7 @@
 	<div>
 		@Html.LabelFor(m => m.Command.WorldInfos)
 		@Html.EditorFor(m => m.Command.WorldInfos, new { Disabled = !canEditField })
-		<button asp-route-addWi="@true" asp-fragment="world-infos" class="btn btn-secondary" onclick="wiAddClick()">Add Another</button>
+		<button id="add-wi" asp-route-addWi="@true" asp-fragment="world-infos" class="btn btn-secondary" onclick="wiAddClick()">Add Another</button>
 	</div>
 	<div id="world-infos"></div>
 	<br />
@@ -87,7 +87,7 @@
 		<div class="d-flex">
 			@if (isOwner)
 			{
-				<button type="submit" asp-route-saveDraft="@true" class="ml-auto btn btn-lg btn-outline-warning">Save Draft</button>
+				<button id="save-draft" type="submit" asp-route-saveDraft="@true" class="ml-auto btn btn-lg btn-outline-warning">Save Draft</button>
 			}
 			<button autofocus asp-route-confirm="@true" type="submit" class="@(!isOwner ? "ml-auto" : string.Empty) ml-3 btn btn-lg btn-primary">Submit</button>
 		</div>
@@ -97,7 +97,7 @@
 		<div class="d-flex">
 			@if (isOwner)
 			{
-				<button type="submit" asp-route-saveDraft="@true" class="ml-auto btn btn-lg btn-outline-warning">Save Draft</button>
+				<button id="save-draft" type="submit" asp-route-saveDraft="@true" class="ml-auto btn btn-lg btn-outline-warning">Save Draft</button>
 			}
 			<button type="submit" class="@(!isOwner ? "ml-auto" : string.Empty) ml-3 btn btn-lg btn-primary">Submit</button>
 		</div>
@@ -106,10 +106,5 @@
 
 @section Scripts {
 	<partial name="_ValidationScriptsPartial.cshtml" />
-	<script>
-		function wiAddClick() {
-			var settngs = $.data($('form')[0], 'validator').settings;
-			settngs.ignore = "*";
-		}
-	</script>
+	<script src="~/js/prompts/create.js" asp-append-version="true"></script>
 }
