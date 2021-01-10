@@ -28,17 +28,18 @@ namespace AIDungeonPrompts.Application.Commands.UpdatePrompt
 
 		public int? OwnerId { get; set; }
 
-		[Display(Name = "Prompt"), Required(ErrorMessage = "Please supply a Prompt")]
+		public int? ParentId { get; set; }
+
+		[Display(Name = "Prompt")]
 		public string PromptContent { get; set; } = string.Empty;
 
-		[Display(Name = "Tags (comma delimited)"), Required(ErrorMessage = "Please supply at least a single tag")]
+		[Display(Name = "Tags (comma delimited)")]
 		public string PromptTags { get; set; } = string.Empty;
 
 		public string? Quests { get; set; }
 
 		public bool SaveDraft { get; set; }
 
-		[Required(ErrorMessage = "Please supply a Title")]
 		public string Title { get; set; } = string.Empty;
 
 		[Display(Name = "World Info")]
@@ -87,7 +88,11 @@ namespace AIDungeonPrompts.Application.Commands.UpdatePrompt
 				prompt.Description = request.Description?.Replace("\r\n", "\n");
 				prompt.PromptTags = new List<PromptTag>();
 				prompt.WorldInfos = new List<WorldInfo>();
-				prompt.IsDraft = isOwner ? request.SaveDraft : prompt.IsDraft;
+				prompt.IsDraft = prompt.ParentId.HasValue
+					? false
+					: isOwner
+						? request.SaveDraft
+						: prompt.IsDraft;
 
 				foreach (var worldInfo in request.WorldInfos)
 				{

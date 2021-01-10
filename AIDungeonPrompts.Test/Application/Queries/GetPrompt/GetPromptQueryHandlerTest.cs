@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Threading.Tasks;
 using AIDungeonPrompts.Application.Abstractions.Identity;
 using AIDungeonPrompts.Application.Queries.GetPrompt;
@@ -18,6 +19,46 @@ namespace AIDungeonPrompts.Test.Application.Queries.GetPrompt
 		{
 			_mockUserService = new Mock<ICurrentUserService>();
 			_handler = new GetPromptQueryHandler(DbContext, _mockUserService.Object);
+		}
+
+		[Theory]
+		[InlineData(1)]
+		[InlineData(2)]
+		[InlineData(4)]
+		[InlineData(12)]
+		public async Task Handle_ReturnsAllChildPrompts(int childCount)
+		{
+			//arrange
+			var expectedTitle = "Child";
+			var owner = new User { Username = "TestUser" };
+			var parent = new Prompt()
+			{
+				Title = "Parent",
+				IsDraft = false,
+				Owner = owner
+			};
+			DbContext.Prompts.Add(parent);
+			for (var i = 0; i < childCount; i++)
+			{
+				var child = new Prompt
+				{
+					Title = expectedTitle,
+					IsDraft = true,
+					Owner = owner,
+					Parent = parent
+				};
+				DbContext.Prompts.Add(child);
+			}
+			await DbContext.SaveChangesAsync();
+			var query = new GetPromptQuery(parent.Id);
+
+			//act
+			var result = await _handler.Handle(query);
+
+			//assert
+			Assert.NotNull(result);
+			Assert.Equal(childCount, result.Children.Count());
+			Assert.All(result.Children, e => string.Equals(expectedTitle, e.Title));
 		}
 
 		[Theory]
@@ -131,6 +172,92 @@ namespace AIDungeonPrompts.Test.Application.Queries.GetPrompt
 			Assert.Null(result);
 		}
 
+		[Theory]
+		[InlineData(1)]
+		[InlineData(2)]
+		[InlineData(4)]
+		[InlineData(12)]
+		public async Task Handle_ReturnsNull_WhenTopLevelParentIsDraft_AndUserServiceReturnsNoUser(int depth)
+		{
+			//arrange
+			var owner = new User { Username = "TestUser" };
+
+			var parent = new Prompt()
+			{
+				IsDraft = true,
+				Owner = owner
+			};
+			DbContext.Prompts.Add(parent);
+			await DbContext.SaveChangesAsync();
+			var id = parent.Id;
+			for (var i = 0; i < depth; i++)
+			{
+				var child = new Prompt
+				{
+					IsDraft = false,
+					Owner = owner,
+					ParentId = id
+				};
+				DbContext.Prompts.Add(child);
+				await DbContext.SaveChangesAsync();
+				id = child.Id;
+			}
+
+			var query = new GetPromptQuery(id);
+
+			//act
+			var result = await _handler.Handle(query);
+
+			//assert
+			Assert.Null(result);
+		}
+
+		[Theory]
+		[InlineData(1)]
+		[InlineData(2)]
+		[InlineData(4)]
+		[InlineData(12)]
+		public async Task Handle_ReturnsNull_WhenTopLevelParentIsDraft_AndUserServiceReturnsUserWithWrongId(int depth)
+		{
+			//arrange
+			var owner = new User { Username = "TestUser" };
+			var newUser = new User { Username = "NewUser" };
+			DbContext.Users.Add(newUser);
+
+			var parent = new Prompt()
+			{
+				IsDraft = true,
+				Owner = owner
+			};
+			DbContext.Prompts.Add(parent);
+			await DbContext.SaveChangesAsync();
+			var id = parent.Id;
+			for (var i = 0; i < depth; i++)
+			{
+				var child = new Prompt
+				{
+					IsDraft = false,
+					Owner = owner,
+					ParentId = id
+				};
+				DbContext.Prompts.Add(child);
+				await DbContext.SaveChangesAsync();
+				id = child.Id;
+			}
+			var user = new GetUserViewModel
+			{
+				Id = newUser.Id
+			};
+			_mockUserService.Setup(e => e.TryGetCurrentUser(out user)).Returns(true);
+			var query = new GetPromptQuery(id);
+
+			//act
+			var result = await _handler.Handle(query);
+
+			//assert
+			Assert.Null(result);
+		}
+
 		[Fact]
 		public async Task Handle_ReturnsPrompt_IfPromptIsDraft_AndUserServiceReturnsUserWithCorrectId()
 		{
@@ -152,6 +279,141 @@ namespace AIDungeonPrompts.Test.Application.Queries.GetPrompt
 			//assert
 			Assert.NotNull(result);
 			Assert.True(result.IsDraft);
+		}
+
+		[Theory]
+		[InlineData(1)]
+		[InlineData(2)]
+		[InlineData(4)]
+		[InlineData(12)]
+		public async Task Handle_ReturnsPrompt_WhenTopLevelParentIsDraft_AndUserServiceReturnsUserWithMatchingId(int depth)
+		{
+			//arrange
+			var owner = new User { Username = "TestUser" };
+			var parent = new Prompt()
+			{
+				IsDraft = true,
+				Owner = owner
+			};
+			DbContext.Prompts.Add(parent);
+			await DbContext.SaveChangesAsync();
+			var id = parent.Id;
+			for (var i = 0; i < depth; i++)
+			{
+				var child = new Prompt
+				{
+					IsDraft = false,
+					Owner = owner,
+					ParentId = id
+				};
+				DbContext.Prompts.Add(child);
+				await DbContext.SaveChangesAsync();
+				id = child.Id;
+			}
+			var user = new GetUserViewModel
+			{
+				Id = owner.Id
+			};
+			_mockUserService.Setup(e => e.TryGetCurrentUser(out user)).Returns(true);
+			var query = new GetPromptQuery(id);
+
+			//act
+			var result = await _handler.Handle(query);
+
+			//assert
+			Assert.NotNull(result);
+		}
+
+		[Theory]
+		[InlineData(1)]
+		[InlineData(2)]
+		[InlineData(4)]
+		[InlineData(12)]
+		public async Task Handle_ReturnsPrompt_WhenTopLevelParentIsNotDraft(int depth)
+		{
+			//arrange
+			var owner = new User { Username = "TestUser" };
+			var parent = new Prompt()
+			{
+				IsDraft = false,
+				Owner = owner
+			};
+			DbContext.Prompts.Add(parent);
+			await DbContext.SaveChangesAsync();
+			var id = parent.Id;
+			for (var i = 0; i < depth; i++)
+			{
+				var child = new Prompt
+				{
+					IsDraft = true,
+					Owner = owner,
+					ParentId = id
+				};
+				DbContext.Prompts.Add(child);
+				await DbContext.SaveChangesAsync();
+				id = child.Id;
+			}
+			var query = new GetPromptQuery(id);
+
+			//act
+			var result = await _handler.Handle(query);
+
+			//assert
+			Assert.NotNull(result);
+		}
+
+		[Fact]
+		public async Task Handle_ReturnsPromptWithNoParentId_WhenPromptDoesNotHaveAParent()
+		{
+			//arrange
+			var owner = new User { Username = "TestUser" };
+			var parent = new Prompt()
+			{
+				Title = "Parent",
+				IsDraft = false,
+				Owner = owner
+			};
+			DbContext.Prompts.Add(parent);
+			await DbContext.SaveChangesAsync();
+			var query = new GetPromptQuery(parent.Id);
+
+			//act
+			var result = await _handler.Handle(query);
+
+			//assert
+			Assert.NotNull(result);
+			Assert.Null(result.ParentId);
+		}
+
+		[Fact]
+		public async Task Handle_ReturnsPromptWithParentIdSet_WhenPromptHasAParent()
+		{
+			//arrange
+			var owner = new User { Username = "TestUser" };
+			var parent = new Prompt()
+			{
+				Title = "Parent",
+				IsDraft = false,
+				Owner = owner
+			};
+			DbContext.Prompts.Add(parent);
+			var child = new Prompt
+			{
+				IsDraft = true,
+				Owner = owner,
+				Parent = parent
+			};
+			DbContext.Prompts.Add(child);
+			await DbContext.SaveChangesAsync();
+			var query = new GetPromptQuery(child.Id);
+
+			//act
+			var result = await _handler.Handle(query);
+
+			//assert
+			Assert.NotNull(result);
+			Assert.NotNull(result.ParentId);
+			Assert.Equal(parent.Id, result.ParentId);
 		}
 	}
 }

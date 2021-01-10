@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -31,10 +32,31 @@ namespace AIDungeonPrompts.Application.Queries.GetPrompt
 
 		public async Task<GetPromptViewModel?> Handle(GetPromptQuery request, CancellationToken cancellationToken = default)
 		{
+			var isDraft = true;
+			if (_dbContext is DbContext dbContext)
+			{
+				var findParent = await _dbContext.Prompts.Include(e => e.Parent).FirstOrDefaultAsync(e => e.Id == request.Id);
+				if (findParent == null)
+				{
+					return null;
+				}
+				while (findParent!.ParentId != null)
+				{
+					await dbContext.Entry(findParent).Reference(e => e.Parent).LoadAsync();
+					findParent = findParent.Parent;
+				}
+				isDraft = findParent.IsDraft;
+			}
+			else
+			{
+				throw new Exception($"{nameof(_dbContext)} was not a DbContext");
+			}
+
 			var prompt = await _dbContext.Prompts
 				.Include(e => e.WorldInfos)
 				.Include(e => e.PromptTags)
 				.ThenInclude(e => e.Tag)
+				.Include(e => e.Children)
 				.AsNoTracking()
 				.Select(prompt => new GetPromptViewModel
 				{
@@ -47,6 +69,7 @@ namespace AIDungeonPrompts.Application.Queries.GetPrompt
 					Title = prompt.Title,
 					Description = prompt.Description,
 					DateCreated = prompt.DateCreated,
+					ParentId = prompt.ParentId,
 					OwnerId = prompt.OwnerId,
 					WorldInfos = prompt.WorldInfos.Select(worldInfo => new GetPromptWorldInfoViewModel
 					{
@@ -59,10 +82,15 @@ namespace AIDungeonPrompts.Application.Queries.GetPrompt
 						Id = promptTag.Tag!.Id,
 						Name = promptTag.Tag!.Name
 					}),
-					IsDraft = prompt.IsDraft
+					IsDraft = prompt.IsDraft,
+					Children = prompt.Children.Select(child => new GetPromptChild
+					{
+						Id = child.Id,
+						Title = child.Title
+					})
 				}).FirstOrDefaultAsync(prompt => prompt.Id == request.Id);
 
-			if (prompt?.IsDraft == true && (!_userService.TryGetCurrentUser(out var user) || prompt.OwnerId != user!.Id))
+			if (prompt == null || (isDraft && (!_userService.TryGetCurrentUser(out var user) || prompt.OwnerId != user!.Id)))
 			{
 				return null;
 			}

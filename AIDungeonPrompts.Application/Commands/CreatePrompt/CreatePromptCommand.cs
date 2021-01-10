@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AIDungeonPrompts.Application.Abstractions.DbContexts;
+using AIDungeonPrompts.Application.Abstractions.Identity;
 using AIDungeonPrompts.Application.Helpers;
 using AIDungeonPrompts.Domain.Entities;
 using MediatR;
@@ -25,17 +26,18 @@ namespace AIDungeonPrompts.Application.Commands.CreatePrompt
 
 		public int OwnerId { get; set; }
 
-		[Display(Name = "Prompt"), Required(ErrorMessage = "Please supply a Prompt")]
+		public int? ParentId { get; set; }
+
+		[Display(Name = "Prompt")]
 		public string PromptContent { get; set; } = string.Empty;
 
-		[Display(Name = "Tags (comma delimited)"), Required(ErrorMessage = "Please supply at least a single tag")]
+		[Display(Name = "Tags (comma delimited)")]
 		public string PromptTags { get; set; } = string.Empty;
 
 		public string? Quests { get; set; }
 
 		public bool SaveDraft { get; set; }
 
-		[Required(ErrorMessage = "Please supply a Title")]
 		public string Title { get; set; } = string.Empty;
 
 		[Display(Name = "World Info")]
@@ -47,15 +49,30 @@ namespace AIDungeonPrompts.Application.Commands.CreatePrompt
 
 	public class CreatePromptCommandHandler : IRequestHandler<CreatePromptCommand, int>
 	{
+		private readonly ICurrentUserService _currentUserService;
 		private readonly IAIDungeonPromptsDbContext _dbContext;
 
-		public CreatePromptCommandHandler(IAIDungeonPromptsDbContext dbContext)
+		public CreatePromptCommandHandler(IAIDungeonPromptsDbContext dbContext, ICurrentUserService currentUserService)
 		{
 			_dbContext = dbContext;
+			_currentUserService = currentUserService;
 		}
 
 		public async Task<int> Handle(CreatePromptCommand request, CancellationToken cancellationToken = default)
 		{
+			if (request.ParentId.HasValue)
+			{
+				if (!_currentUserService.TryGetCurrentUser(out var user))
+				{
+					throw new CreatePromptUnauthorizedParentException();
+				}
+				var parent = await _dbContext.Prompts.FindAsync(request.ParentId);
+				if (parent.OwnerId != user!.Id)
+				{
+					throw new CreatePromptUnauthorizedParentException();
+				}
+			}
+
 			var prompt = new Prompt
 			{
 				AuthorsNote = request.AuthorsNote?.Replace("\r\n", "\n"),
@@ -70,7 +87,8 @@ namespace AIDungeonPrompts.Application.Commands.CreatePrompt
 				OwnerId = request.OwnerId,
 				Upvote = 0,
 				Views = 0,
-				IsDraft = request.SaveDraft
+				IsDraft = request.ParentId.HasValue ? false : request.SaveDraft,
+				ParentId = request.ParentId
 			};
 
 			foreach (var worldInfo in request.WorldInfos)

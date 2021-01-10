@@ -14,7 +14,8 @@ namespace AIDungeonPrompts.Persistence.Configurations
 			builder.HasIndex(e => e.Title);
 			builder.HasOne(e => e.Owner)
 				.WithMany(e => e.Prompts)
-				.HasForeignKey(e => e.OwnerId);
+				.HasForeignKey(e => e.OwnerId)
+				.OnDelete(DeleteBehavior.Cascade);
 		}
 	}
 }

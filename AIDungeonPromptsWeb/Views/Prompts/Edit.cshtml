@@ -1,38 +1,55 @@
 @model UpdatePromptViewModel
-@using AIDungeonPrompts.Domain.Enums; 
+@using AIDungeonPrompts.Domain.Enums;
 @{
 	ViewData["Title"] = "Edit";
 	userService.TryGetCurrentUser(out var user);
 	var isOwner = user!.Id == Model.Command.OwnerId;
 	var canEditField = isOwner ? isOwner : (user.Role & RoleEnum.FieldEdit) != 0;
 	var canEditTags = isOwner ? isOwner : (user.Role & RoleEnum.TagEdit) != 0;
+	var canDelete = isOwner ? isOwner : (user.Role & RoleEnum.Delete) != 0;
 }
-
+@if (Model.Command.ParentId.HasValue)
+{
+	<div class="alert alert-primary">
+		You are editing a sub scenario. <a asp-action="Edit" asp-route-id="@Model.Command.ParentId">Click here to return to the parent.</a>
+		<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+			<span aria-hidden="true">&times;</span>
+		</button>
+	</div>
+	<br />
+}
 <h2>Edit Prompt</h2>
 <br />
 <form asp-controller="Prompts" asp-action="Edit" method="post">
 	<input class="honey" name="Honey" />
-
+	@Html.HiddenFor(e => e.Command.Id)
+	@Html.HiddenFor(e => e.Command.ParentId)
 	<div class="form-group required">
 		@Html.LabelFor(m => m.Command.Title)
 		<input readonly="@(!canEditField)" asp-for="Command.Title" class="form-control" />
 		<span class="invalid-feedback" asp-validation-for="Command.Title"></span>
 	</div>
-	<div class="form-group">
-		@Html.LabelFor(m => m.Command.Description)
-		<textarea readonly="@(!canEditField)" asp-for="Command.Description" class="form-control"></textarea>
-		<span class="invalid-feedback" asp-validation-for="Command.Description"></span>
-	</div>
+	@if (!Model.Command.ParentId.HasValue)
+	{
+		<div class="form-group">
+			@Html.LabelFor(m => m.Command.Description)
+			<textarea readonly="@(!canEditField)" asp-for="Command.Description" class="form-control"></textarea>
+			<span class="invalid-feedback" asp-validation-for="Command.Description"></span>
+		</div>
+	}
 	<div class="form-group required">
 		@Html.LabelFor(m => m.Command.PromptContent)
 		<textarea readonly="@(!canEditField)" asp-for="Command.PromptContent" class="form-control"></textarea>
 		<span class="invalid-feedback" asp-validation-for="Command.PromptContent"></span>
 	</div>
-	<div class="form-group required">
-		@Html.LabelFor(m => m.Command.PromptTags)
-		<input readonly="@(!canEditTags)" asp-for="Command.PromptTags" class="form-control" />
-		<span class="invalid-feedback" asp-validation-for="Command.PromptTags"></span>
-	</div>
+	@if (!Model.Command.ParentId.HasValue)
+	{
+		<div class="form-group required">
+			@Html.LabelFor(m => m.Command.PromptTags)
+			<input readonly="@(!canEditTags)" asp-for="Command.PromptTags" class="form-control" />
+			<span class="invalid-feedback" asp-validation-for="Command.PromptTags"></span>
+		</div>
+	}
 	<div class="form-group">
 		@Html.LabelFor(m => m.Command.Memory)
 		<textarea readonly="@(!canEditField)" asp-for="Command.Memory" class="form-control"></textarea>
@@ -48,27 +65,39 @@
 		<textarea readonly="@(!canEditField)" asp-for="Command.AuthorsNote" class="form-control"></textarea>
 		<span class="invalid-feedback" asp-validation-for="Command.AuthorsNote"></span>
 	</div>
-	<div class="form-check">
-		@if (canEditTags)
-		{
-			<input asp-for="Command.Nsfw" class="form-check-input">
-			@Html.LabelFor(m => m.Command.Nsfw, new { @class = "form-check-label" })
-		}
-		else
-		{
-			@Html.HiddenFor(m => m.Command.Nsfw)
-			<input disabled asp-for="Command.Nsfw" class="form-check-input">
-			@Html.LabelFor(m => m.Command.Nsfw, new { @class = "form-check-label" })
-		}
-	</div>
+	@if (!Model.Command.ParentId.HasValue)
+	{
+		<div class="form-check">
+			@if (canEditTags)
+			{
+				<input asp-for="Command.Nsfw" class="form-check-input">
+				@Html.LabelFor(m => m.Command.Nsfw, new { @class = "form-check-label" })
+			}
+			else
+			{
+				@Html.HiddenFor(m => m.Command.Nsfw)
+				<input disabled asp-for="Command.Nsfw" class="form-check-input">
+				@Html.LabelFor(m => m.Command.Nsfw, new { @class = "form-check-label" })
+			}
+		</div>
+	}
 	<br />
 	<div>
 		@Html.LabelFor(m => m.Command.WorldInfos)
 		@Html.EditorFor(m => m.Command.WorldInfos, new { Disabled = !canEditField })
-		<button asp-route-addWi="@true" asp-fragment="world-infos" class="btn btn-secondary" onclick="wiAddClick()">Add Another</button>
+		<button disabled="@(!canEditField)" id="add-wi" asp-route-addWi="@true" asp-fragment="world-infos" class="btn btn-secondary" onclick="wiAddClick()">Add Another</button>
 	</div>
 	<div id="world-infos"></div>
 	<br />
+	<div id="sub-scenario-container">
+		<label>Sub Scenarios</label>
+		@Html.EditorFor(m => m.Children, new { CanEdit = canEditField, CanDelete = canDelete })
+		<br />
+		<button id="add-sub-scenario" disabled="@(!canEditField)" asp-route-addChild="@true" class="btn btn-secondary">Add Scenario</button>
+	</div>
+	<div id="sub-scenarios"></div>
+	<br />
+	@{ var showDraftButton = isOwner && !Model.Command.ParentId.HasValue; }
 	@if (Model.SimilarPromptQuery.Matched)
 	{
 		<div class="alert alert-warning" role="alert">
@@ -84,32 +113,45 @@
 				Please confirm this isn't a duplicate before creating a new prompt.
 			</p>
 		</div>
-		<div class="d-flex">
-			@if (isOwner)
-			{
-				<button type="submit" asp-route-saveDraft="@true" class="ml-auto btn btn-lg btn-outline-warning">Save Draft</button>
-			}
-			<button autofocus asp-route-confirm="@true" type="submit" class="@(!isOwner ? "ml-auto" : string.Empty) ml-3 btn btn-lg btn-primary">Submit</button>
-		</div>
 	}
-	else
-	{
-		<div class="d-flex">
-			@if (isOwner)
-			{
-				<button type="submit" asp-route-saveDraft="@true" class="ml-auto btn btn-lg btn-outline-warning">Save Draft</button>
-			}
-			<button type="submit" class="@(!isOwner ? "ml-auto" : string.Empty) ml-3 btn btn-lg btn-primary">Submit</button>
-		</div>
-	}
+	<div class="d-flex">
+		@if (isOwner && !Model.Command.ParentId.HasValue)
+		{
+			<button id="save-draft" type="submit" asp-route-saveDraft="@true" class="ml-auto btn btn-lg btn-outline-warning">Save Draft</button>
+		}
+		<button autofocus="@Model.SimilarPromptQuery.Matched" asp-route-confirm="@Model.SimilarPromptQuery.Matched" type="submit" class="@(!showDraftButton ? "ml-auto" : string.Empty) ml-3 btn btn-lg btn-primary">Submit</button>
+	</div>
 </form>
+
+<!-- Delete Modal -->
+<div id="prompt-delete-modal" class="modal fade" tabindex="-1" role="dialog">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">Confirm Delete</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<p>
+					Are you sure you want to delete this scenario?
+					<br/>
+					Any sub-scenarios associated will also be deleted.
+				</p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">Return</button>
+				<form method="post">
+					<button id="prompt-delete-modal-confirm" class="btn btn-danger">Delete</button>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
 
 @section Scripts {
 	<partial name="_ValidationScriptsPartial.cshtml" />
-	<script>
-		function wiAddClick() {
-			var settngs = $.data($('form')[0], 'validator').settings;
-			settngs.ignore = "*";
-		}
-	</script>
+	<script src="~/js/prompts/create.js" asp-append-version="true"></script>
+	<script src="~/js/prompts/edit.js" asp-append-version="true"></script>
 }

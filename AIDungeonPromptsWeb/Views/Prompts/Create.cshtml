@@ -1,31 +1,46 @@
 @model CreatePromptViewModel
 @{ ViewData["Title"] = "Create"; }
-
+@if (Model.Command.ParentId.HasValue)
+{
+	<div class="alert alert-primary">
+		You are creating a sub scenario. <a asp-action="Edit" asp-route-id="@Model.Command.ParentId">Click here to return to the parent.</a>
+		<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+			<span aria-hidden="true">&times;</span>
+		</button>
+	</div>
+	<br />
+}
 <h2>Create Prompt</h2>
 <br />
 <form asp-controller="Prompts" asp-action="Create" method="post">
 	<input class="honey" name="Honey" />
-
+	@Html.HiddenFor(e => e.Command.ParentId)
 	<div class="form-group required">
 		@Html.LabelFor(m => m.Command.Title)
 		<input asp-for="Command.Title" class="form-control" />
 		<span class="invalid-feedback" asp-validation-for="Command.Title"></span>
 	</div>
-	<div class="form-group">
-		@Html.LabelFor(m => m.Command.Description)
-		<textarea asp-for="Command.Description" class="form-control"></textarea>
-		<span class="invalid-feedback" asp-validation-for="Command.Description"></span>
-	</div>
+	@if (!Model.Command.ParentId.HasValue)
+	{ 
+		<div class="form-group">
+			@Html.LabelFor(m => m.Command.Description)
+			<textarea asp-for="Command.Description" class="form-control"></textarea>
+			<span class="invalid-feedback" asp-validation-for="Command.Description"></span>
+		</div>
+	}
 	<div class="form-group required">
 		@Html.LabelFor(m => m.Command.PromptContent)
 		<textarea asp-for="Command.PromptContent" class="form-control"></textarea>
 		<span class="invalid-feedback" asp-validation-for="Command.PromptContent"></span>
 	</div>
-	<div class="form-group required">
-		@Html.LabelFor(m => m.Command.PromptTags)
-		<input asp-for="Command.PromptTags" class="form-control" />
-		<span class="invalid-feedback" asp-validation-for="Command.PromptTags"></span>
-	</div>
+	@if (!Model.Command.ParentId.HasValue)
+	{
+		<div class="form-group required">
+			@Html.LabelFor(m => m.Command.PromptTags)
+			<input asp-for="Command.PromptTags" class="form-control" />
+			<span class="invalid-feedback" asp-validation-for="Command.PromptTags"></span>
+		</div>
+	}
 	<div class="form-group">
 		@Html.LabelFor(m => m.Command.Memory)
 		<textarea asp-for="Command.Memory" class="form-control"></textarea>
@@ -41,45 +56,57 @@
 		<textarea asp-for="Command.AuthorsNote" class="form-control"></textarea>
 		<span class="invalid-feedback" asp-validation-for="Command.AuthorsNote"></span>
 	</div>
-	<div class="form-check">
-		<input asp-for="Command.Nsfw" class="form-check-input">
-		@Html.LabelFor(m => m.Command.Nsfw, new { @class = "form-check-label" })
-	</div>
+	@if (!Model.Command.ParentId.HasValue)
+	{
+		<div class="form-check">
+			<input asp-for="Command.Nsfw" class="form-check-input">
+			@Html.LabelFor(m => m.Command.Nsfw, new { @class = "form-check-label" })
+		</div>
+	}
 	<br />
 	<div>
-		@Html.LabelFor(m => m.Command.WorldInfos)		
-		@Html.EditorFor(m => m.Command.WorldInfos)		
-		<button id="add-wi"  asp-route-addWi="@true" asp-fragment="world-infos" class="btn btn-secondary">Add Another</button>
+		@Html.LabelFor(m => m.Command.WorldInfos)
+		@Html.EditorFor(m => m.Command.WorldInfos)
+		<button id="add-wi" asp-route-addWi="@true" asp-fragment="world-infos" class="btn btn-secondary">Add Another</button>
 	</div>
 	<div id="world-infos"></div>
 	<br />
+	<div>
+		<label>Sub Scenarios</label>
+		<div class="card mb-4">
+			<div class="card-body">
+			</div>
+		</div>
+		<button id="add-sub-scenario" asp-route-addChild="@true" class="btn btn-secondary">Add Scenario</button>
+	</div>
+	<br />
+	@{
+		var showDraftButton = !Model.Command.ParentId.HasValue;
+	}
 	@if (Model.SimilarPromptQuery.Matched)
 	{
 		<div class="alert alert-warning" role="alert">
 			<p>
 				There already @(Model.SimilarPromptQuery.SimilarPrompts.Count == 1 ? "exists a prompt" : "exist prompts") with the same title:
-				<br/>
+				<br />
 				@for (int i = 0; i < Model.SimilarPromptQuery.SimilarPrompts.Count; i++)
 				{
 					var prompt = Model.SimilarPromptQuery.SimilarPrompts[i];
-					<a asp-action="View" asp-controller="Prompts" asp-route-id="@prompt.Id" target="_blank" >@prompt.Title</a>@if(i != Model.SimilarPromptQuery.SimilarPrompts.Count - 1) {<span>, </span>}
+					<a asp-action="View" asp-controller="Prompts" asp-route-id="@prompt.Id" target="_blank">@prompt.Title</a>@if (i != Model.SimilarPromptQuery.SimilarPrompts.Count - 1)
+					{<span>, </span>}
 				}
-				<br/>
+				<br />
 				Please confirm this isn't a duplicate before creating a new prompt.
 			</p>
 		</div>
-		<div class="d-flex">
-			<button type="submit" asp-route-saveDraft="@true" class="ml-auto btn btn-lg btn-outline-warning">Save Draft</button>
-			<button autofocus asp-route-confirm="@true" type="submit" class="ml-3 btn btn-lg btn-primary">Submit</button>
-		</div>
 	}
-	else
-	{
-		<div class="d-flex">
-			<button type="submit" asp-route-saveDraft="@true" class="ml-auto btn btn-lg btn-outline-warning">Save Draft</button>
-			<button type="submit" class="ml-3 btn btn-lg btn-primary">Submit</button>
-		</div>
-	}
+	<div class="d-flex">
+		@if (showDraftButton)
+		{ 
+			<button id="save-draft" type="submit" asp-route-saveDraft="@true" class="ml-auto btn btn-lg btn-outline-warning">Save Draft</button>
+		}
+		<button autofocus="@Model.SimilarPromptQuery.Matched" asp-route-confirm="@Model.SimilarPromptQuery.Matched" type="submit"  asp-fragment="@(Model.Command.ParentId.HasValue ? "sub-scenarios" : string.Empty)" class="@(!showDraftButton ? "ml-auto" : string.Empty) ml-3 btn btn-lg btn-primary">Submit</button>
+	</div>	
 </form>
 
 @section Scripts {

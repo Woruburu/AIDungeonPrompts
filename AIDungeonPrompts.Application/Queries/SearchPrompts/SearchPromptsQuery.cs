@@ -73,6 +73,7 @@ namespace AIDungeonPrompts.Application.Queries.SearchPrompts
 			var query = _dbContext.Prompts
 				.Include(prompt => prompt.PromptTags)
 				.ThenInclude(prompt => prompt.Tag)
+				.Where(e => e.ParentId == null)
 				.AsNoTracking();
 
 			query = OrderBy(request, query);
