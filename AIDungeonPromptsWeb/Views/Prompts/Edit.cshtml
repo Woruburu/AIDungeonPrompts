@@ -11,10 +11,7 @@
 @if (Model.Command.ParentId.HasValue)
 {
 	<div class="alert alert-primary">
-		You are editing a sub scenario. <a asp-action="Edit" asp-route-id="@Model.Command.ParentId">Click here to return to the parent.</a>
-		<button type="button" class="close" data-dismiss="alert" aria-label="Close">
-			<span aria-hidden="true">&times;</span>
-		</button>
+		You are editing a sub scenario. <a asp-action="Edit" asp-route-id="@Model.Command.ParentId">Click here to return to the parent without saving.</a>
 	</div>
 	<br />
 }
@@ -119,7 +116,9 @@
 		{
 			<button id="save-draft" type="submit" asp-route-saveDraft="@true" class="ml-auto btn btn-lg btn-outline-warning">Save Draft</button>
 		}
-		<button autofocus="@Model.SimilarPromptQuery.Matched" asp-route-confirm="@Model.SimilarPromptQuery.Matched" type="submit" class="@(!showDraftButton ? "ml-auto" : string.Empty) ml-3 btn btn-lg btn-primary">Submit</button>
+	<button autofocus="@Model.SimilarPromptQuery.Matched" asp-route-confirm="@Model.SimilarPromptQuery.Matched" type="submit" class="@(!showDraftButton ? "ml-auto" : string.Empty) ml-3 btn btn-lg btn-primary">
+		@(Model.Command.ParentId.HasValue ? "Save" : "Submit")
+	</button>
 	</div>
 </form>
 
