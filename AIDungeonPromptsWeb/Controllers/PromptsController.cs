@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using AIDungeonPrompts.Application.Abstractions.Identity;
 using AIDungeonPrompts.Application.Commands.CreatePrompt;
 using AIDungeonPrompts.Application.Commands.CreateTransientUser;
+using AIDungeonPrompts.Application.Commands.DeletePrompt;
 using AIDungeonPrompts.Application.Commands.UpdatePrompt;
 using AIDungeonPrompts.Application.Helpers;
 using AIDungeonPrompts.Application.Queries.GetPrompt;
@@ -29,15 +30,21 @@ namespace AIDungeonPrompts.Web.Controllers
 		}
 
 		[HttpGet("[controller]/create")]
-		public ActionResult Create()
+		public ActionResult Create(int? parentId)
 		{
-			return View(new CreatePromptViewModel());
+			return View(new CreatePromptViewModel
+			{
+				Command = new CreatePromptCommand
+				{
+					ParentId = parentId
+				}
+			});
 		}
 
 		[HttpPost, ValidateAntiForgeryToken]
-		public async Task<IActionResult> Create(bool addWi, bool confirm, bool saveDraft, CreatePromptViewModel model)
+		public async Task<IActionResult> Create(bool addWi, bool confirm, bool saveDraft, bool addChild, CreatePromptViewModel model)
 		{
-			model.Command.SaveDraft = saveDraft;
+			model.Command.SaveDraft = saveDraft || addChild;
 
 			if (addWi)
 			{
@@ -51,7 +58,7 @@ namespace AIDungeonPrompts.Web.Controllers
 				return View(model);
 			}
 
-			if (!model.Command.SaveDraft)
+			if (!model.Command.SaveDraft && !addChild && !model.Command.ParentId.HasValue)
 			{
 				var duplicate = await _mediator.Send(new SimilarPromptQuery(model.Command.Title));
 				if (duplicate.Matched && !confirm)
@@ -74,11 +81,47 @@ namespace AIDungeonPrompts.Web.Controllers
 			}
 
 			var id = await _mediator.Send(model.Command);
+
+			if (addChild)
+			{
+				return RedirectToAction("Create", new { parentId = id });
+			}
+
+			if (model.Command.ParentId.HasValue)
+			{
+				return RedirectToAction("Edit", new { id = model.Command.ParentId });
+			}
+
 			return RedirectToAction("View", new { id });
 		}
 
+		[HttpPost("/{id}/delete"), ValidateAntiForgeryToken, Authorize]
+		public async Task<ActionResult> Delete(int? id)
+		{
+			if (id == null || !_currentUserService.TryGetCurrentUser(out var user))
+			{
+				return NotFound();
+			}
+
+			var prompt = await _mediator.Send(new GetPromptQuery(id.Value));
+
+			if (prompt == null || (prompt.OwnerId != user!.Id && (user.Role & Domain.Enums.RoleEnum.Delete) != 0))
+			{
+				return NotFound();
+			}
+
+			await _mediator.Send(new DeletePromptCommand(prompt.Id));
+
+			if (prompt.ParentId.HasValue)
+			{
+				return RedirectToAction("Edit", new { id = prompt.ParentId });
+			}
+
+			return RedirectToAction("Index");
+		}
+
 		[HttpPost("/{id}/edit"), ValidateAntiForgeryToken, Authorize]
-		public async Task<IActionResult> Edit(int? id, bool addWi, bool saveDraft, bool confirm, UpdatePromptViewModel model)
+		public async Task<IActionResult> Edit(int? id, bool addWi, bool saveDraft, bool confirm, bool addChild, UpdatePromptViewModel model)
 		{
 			model.Command.SaveDraft = saveDraft;
 
@@ -89,12 +132,13 @@ namespace AIDungeonPrompts.Web.Controllers
 
 			var prompt = await _mediator.Send(new GetPromptQuery(id.Value));
 
-			if (prompt?.OwnerId != user!.Id && !RoleHelper.CanEdit(user.Role))
+			if (prompt == null || (prompt.OwnerId != user!.Id && !RoleHelper.CanEdit(user.Role)))
 			{
 				return NotFound();
 			}
 
-			model.Command.Id = prompt!.Id;
+			model.Children = prompt.Children.ToList();
+			model.Command.Id = prompt.Id;
 			model.Command.OwnerId = prompt.OwnerId;
 
 			if (addWi)
@@ -109,7 +153,7 @@ namespace AIDungeonPrompts.Web.Controllers
 				return View(model);
 			}
 
-			if (!model.Command.SaveDraft)
+			if (!model.Command.SaveDraft && !addChild && !model.Command.ParentId.HasValue)
 			{
 				var duplicate = await _mediator.Send(new SimilarPromptQuery(model.Command.Title, model.Command.Id));
 				if (duplicate.Matched && !confirm)
@@ -120,6 +164,17 @@ namespace AIDungeonPrompts.Web.Controllers
 			}
 
 			await _mediator.Send(model.Command);
+
+			if (addChild)
+			{
+				return RedirectToAction("Create", new { parentId = id });
+			}
+
+			if (model.Command.ParentId.HasValue)
+			{
+				return RedirectToAction("Edit", new { id = model.Command.ParentId });
+			}
+
 			return RedirectToAction("View", new { id });
 		}
 
@@ -140,6 +195,7 @@ namespace AIDungeonPrompts.Web.Controllers
 
 			return View(new UpdatePromptViewModel
 			{
+				Children = prompt.Children.ToList(),
 				Command = new UpdatePromptCommand
 				{
 					AuthorsNote = prompt.AuthorsNote,
@@ -152,14 +208,17 @@ namespace AIDungeonPrompts.Web.Controllers
 					Quests = prompt.Quests,
 					Title = prompt.Title,
 					OwnerId = prompt.OwnerId,
-					WorldInfos = prompt.WorldInfos.Any() ? prompt.WorldInfos.Select(wi => new UpdatePromptCommandWorldInfo
-					{
-						Entry = wi.Entry,
-						Keys = wi.Keys
-					}).ToList() : new List<UpdatePromptCommandWorldInfo>()
-					{
-						 new UpdatePromptCommandWorldInfo()
-					}
+					ParentId = prompt.ParentId,
+					WorldInfos = prompt.WorldInfos.Any()
+						? prompt.WorldInfos.Select(wi => new UpdatePromptCommandWorldInfo
+						{
+							Entry = wi.Entry,
+							Keys = wi.Keys
+						}).ToList()
+						: new List<UpdatePromptCommandWorldInfo>()
+						{
+							 new UpdatePromptCommandWorldInfo()
+						}
 				}
 			});
 		}

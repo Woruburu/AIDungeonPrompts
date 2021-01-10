@@ -28,6 +28,8 @@ namespace AIDungeonPrompts.Application.Commands.UpdatePrompt
 
 		public int? OwnerId { get; set; }
 
+		public int? ParentId { get; set; }
+
 		[Display(Name = "Prompt")]
 		public string PromptContent { get; set; } = string.Empty;
 
@@ -86,7 +88,11 @@ namespace AIDungeonPrompts.Application.Commands.UpdatePrompt
 				prompt.Description = request.Description?.Replace("\r\n", "\n");
 				prompt.PromptTags = new List<PromptTag>();
 				prompt.WorldInfos = new List<WorldInfo>();
-				prompt.IsDraft = isOwner ? request.SaveDraft : prompt.IsDraft;
+				prompt.IsDraft = prompt.ParentId.HasValue
+					? false
+					: isOwner
+						? request.SaveDraft
+						: prompt.IsDraft;
 
 				foreach (var worldInfo in request.WorldInfos)
 				{

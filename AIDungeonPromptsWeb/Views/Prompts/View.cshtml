@@ -1,7 +1,8 @@
 @model ViewPromptViewModel
-@using AIDungeonPrompts.Application.Helpers 
+@using AIDungeonPrompts.Application.Helpers
 @{
 	ViewData["Title"] = Model.Prompt.Title;
+	var isChild = Model.Prompt.ParentId.HasValue;
 	var showEdit = false;
 	if (userService.TryGetCurrentUser(out var user) && (
 			user!.Id == Model.Prompt.OwnerId ||
@@ -9,7 +10,7 @@
 		)
 	)
 	{
-		showEdit = true;	
+		showEdit = true;
 	}
 }
 @if (Model.Reported ?? false)
@@ -21,6 +22,13 @@
 		</button>
 	</div>
 }
+@if (isChild)
+{
+	<div class="alert alert-primary">
+		You are viewing a sub scenario. <a asp-action="View" asp-route-id="@Model.Prompt.ParentId">Click here to return to the parent.</a>
+	</div>
+	<br />
+}
 <div class="d-flex">
 	<div>
 		<h3>
@@ -30,10 +38,14 @@
 			}
 			@Model.Prompt.Title
 		</h3>
-		<p>Created on @Model.Prompt.DateCreated.ToString("yyyy/MM/dd")</p>
+		@if (!isChild)
+		{ 
+			<p>Created on @Model.Prompt.DateCreated.ToString("yyyy/MM/dd")</p>
+		}
 	</div>
 	<div class="ml-auto d-flex">
-		@if (showEdit) {
+		@if (showEdit)
+		{
 			<div>
 				<a asp-action="Edit" asp-route-id="@Model.Prompt.Id" class="btn btn-outline-success mr-2 px-3">Edit</a>
 			</div>
@@ -43,25 +55,28 @@
 		</div>
 	</div>
 </div>
-<p>
-	Tags:
-	@if (Model.Prompt.Nsfw)
-	{
-		<a class="badge badge-danger" asp-controller="Home" asp-action="Index" asp-route-NsfwSetting="2">
-			NSFW
-		</a>
-	}
-	@foreach (var tag in Model.Prompt.PromptTags)
-	{
-		<a class="badge badge-primary" asp-controller="Home" asp-action="Index" asp-route-Tags="@tag.Name">
-			@tag.Name
-		</a>
-	}
-</p>
+@if (!isChild)
+{
+	<p>
+		Tags:
+		@if (Model.Prompt.Nsfw)
+		{
+			<a class="badge badge-danger" asp-controller="Home" asp-action="Index" asp-route-NsfwSetting="2">
+				NSFW
+			</a>
+		}
+		@foreach (var tag in Model.Prompt.PromptTags)
+		{
+			<a class="badge badge-primary" asp-controller="Home" asp-action="Index" asp-route-Tags="@tag.Name">
+				@tag.Name
+			</a>
+		}
+	</p>
+}
 
 @if (!string.IsNullOrWhiteSpace(Model.Prompt.Description))
 {
-	
+
 	<h5>@Html.DisplayNameFor(m => m.Prompt.Description)</h5>
 	<div class="card mb-4">
 		<div class="card-body">
@@ -128,3 +143,10 @@
 		}
 	</div>
 }
+
+@if (Model.Prompt.Children.Any())
+{
+	<h5>Sub Scenarios</h5>
+	@Html.DisplayFor(m => m.Prompt.Children)
+}
+

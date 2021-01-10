@@ -1,0 +1,9 @@
+@model AIDungeonPrompts.Application.Queries.GetPrompt.GetPromptChild
+
+<div class="card mb-4">
+	<div class="card-body">
+		<a asp-controller="Prompts" asp-action="View" asp-route-id="@Model.Id">
+			<span class="d-block">@Model.Title</span>
+		</a>
+	</div>
+</div>

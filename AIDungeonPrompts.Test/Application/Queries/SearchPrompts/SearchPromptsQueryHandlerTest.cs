@@ -18,6 +18,40 @@ namespace AIDungeonPrompts.Test.Application.Queries.SearchPrompts
 			_handler = new SearchPromptsQueryHandler(DbContext);
 		}
 
+		[Theory]
+		[InlineData(1)]
+		[InlineData(2)]
+		[InlineData(10)]
+		[InlineData(64)]
+		[InlineData(128)]
+		public async Task Handle_DoesNotReturnPromptsWithParents(int subScenarioAmount)
+		{
+			//arrange
+			var query = new SearchPromptsQuery()
+			{
+				PageSize = 20,
+				IncludeDrafts = true
+			};
+			var prompts = GeneratePromptData();
+			var parent = prompts[0];
+			for (var i = 0; i < subScenarioAmount; i++)
+			{
+				prompts.Add(new Prompt
+				{
+					Parent = parent
+				});
+			}
+			DbContext.Prompts.AddRange(prompts);
+			DbContext.Prompts.Add(new Prompt { IsDraft = true });
+			await DbContext.SaveChangesAsync();
+
+			//act
+			var actual = await _handler.Handle(query);
+
+			//assert
+			Assert.Equal(16, actual.Results.Count);
+		}
+
 		[Fact]
 		public async Task Handle_ReturnsDateOrderedPrompts()
 		{

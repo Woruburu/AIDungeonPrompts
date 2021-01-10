@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AIDungeonPrompts.Application.Abstractions.DbContexts;
+using AIDungeonPrompts.Application.Abstractions.Identity;
 using AIDungeonPrompts.Application.Helpers;
 using AIDungeonPrompts.Domain.Entities;
 using MediatR;
@@ -24,6 +25,8 @@ namespace AIDungeonPrompts.Application.Commands.CreatePrompt
 		public bool Nsfw { get; set; }
 
 		public int OwnerId { get; set; }
+
+		public int? ParentId { get; set; }
 
 		[Display(Name = "Prompt")]
 		public string PromptContent { get; set; } = string.Empty;
@@ -46,15 +49,30 @@ namespace AIDungeonPrompts.Application.Commands.CreatePrompt
 
 	public class CreatePromptCommandHandler : IRequestHandler<CreatePromptCommand, int>
 	{
+		private readonly ICurrentUserService _currentUserService;
 		private readonly IAIDungeonPromptsDbContext _dbContext;
 
-		public CreatePromptCommandHandler(IAIDungeonPromptsDbContext dbContext)
+		public CreatePromptCommandHandler(IAIDungeonPromptsDbContext dbContext, ICurrentUserService currentUserService)
 		{
 			_dbContext = dbContext;
+			_currentUserService = currentUserService;
 		}
 
 		public async Task<int> Handle(CreatePromptCommand request, CancellationToken cancellationToken = default)
 		{
+			if (request.ParentId.HasValue)
+			{
+				if (!_currentUserService.TryGetCurrentUser(out var user))
+				{
+					throw new CreatePromptUnauthorizedParentException();
+				}
+				var parent = await _dbContext.Prompts.FindAsync(request.ParentId);
+				if (parent.OwnerId != user!.Id)
+				{
+					throw new CreatePromptUnauthorizedParentException();
+				}
+			}
+
 			var prompt = new Prompt
 			{
 				AuthorsNote = request.AuthorsNote?.Replace("\r\n", "\n"),
@@ -69,7 +87,8 @@ namespace AIDungeonPrompts.Application.Commands.CreatePrompt
 				OwnerId = request.OwnerId,
 				Upvote = 0,
 				Views = 0,
-				IsDraft = request.SaveDraft
+				IsDraft = request.ParentId.HasValue ? false : request.SaveDraft,
+				ParentId = request.ParentId
 			};
 
 			foreach (var worldInfo in request.WorldInfos)
