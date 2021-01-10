@@ -10,6 +10,7 @@ using AIDungeonPrompts.Application.Helpers;
 using AIDungeonPrompts.Application.Queries.GetPrompt;
 using AIDungeonPrompts.Application.Queries.GetUser;
 using AIDungeonPrompts.Application.Queries.SimilarPrompt;
+using AIDungeonPrompts.Domain.Enums;
 using AIDungeonPrompts.Web.Extensions;
 using AIDungeonPrompts.Web.Models.Prompts;
 using MediatR;
@@ -105,7 +106,7 @@ namespace AIDungeonPrompts.Web.Controllers
 
 			var prompt = await _mediator.Send(new GetPromptQuery(id.Value));
 
-			if (prompt == null || (prompt.OwnerId != user!.Id && (user.Role & Domain.Enums.RoleEnum.Delete) != 0))
+			if (prompt == null || (prompt.OwnerId != user!.Id && (user.Role & RoleEnum.Delete) == 0))
 			{
 				return NotFound();
 			}
