@@ -125,7 +125,10 @@
 
 @if (Model.Prompt.WorldInfos.Any())
 {
-	<h5 class="card-title">@Html.DisplayNameFor(m => m.Prompt.WorldInfos)</h5>
+	<div class="d-flex mb-2">
+		<h5 class="mt-auto mb-0 card-title mr-auto">@Html.DisplayNameFor(m => m.Prompt.WorldInfos)</h5>
+		<a class="btn btn-secondary" asp-action="DownloadWorldInfo" asp-route-Id="@Model.Prompt.Id">Download JSON</a>
+	</div>
 	<div class="row">
 		@foreach (var worldInfo in Model.Prompt.WorldInfos)
 		{

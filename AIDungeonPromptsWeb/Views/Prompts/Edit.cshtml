@@ -17,7 +17,7 @@
 }
 <h2>Edit Prompt</h2>
 <br />
-<form asp-controller="Prompts" asp-action="Edit" method="post">
+<form asp-controller="Prompts" asp-action="Edit" method="post" enctype="multipart/form-data">
 	<input class="honey" name="Honey" />
 	@Html.HiddenFor(e => e.Command.Id)
 	@Html.HiddenFor(e => e.Command.ParentId)
@@ -81,10 +81,14 @@
 	<br />
 	<div>
 		@Html.LabelFor(m => m.Command.WorldInfos)
+		<br />
+		<input type="file" disabled="@(!canEditField)" asp-for="WorldInfoFile" />
+		<button disabled="@(!canEditField)" id="upload-wi" asp-route-uploadWi="@true" asp-fragment="upload-wi" class="btn btn-secondary">Upload JSON</button><span class="ml-3"><strong>This will overwrite any entries you've already written!</strong></span>
+		<br />
+		<br />
 		@Html.EditorFor(m => m.Command.WorldInfos, new { Disabled = !canEditField })
-		<button disabled="@(!canEditField)" id="add-wi" asp-route-addWi="@true" asp-fragment="world-infos" class="btn btn-secondary" onclick="wiAddClick()">Add Another</button>
+		<button disabled="@(!canEditField)" id="add-wi" asp-route-addWi="@true" asp-fragment="add-wi" class="btn btn-secondary">Add Another</button>
 	</div>
-	<div id="world-infos"></div>
 	<br />
 	<div id="sub-scenario-container">
 		<label>Sub Scenarios</label>

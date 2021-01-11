@@ -86,7 +86,6 @@ namespace AIDungeonPrompts.Application.Commands.UpdatePrompt
 				prompt.Quests = request.Quests?.Replace("\r\n", "\n");
 				prompt.Title = request.Title.Replace("\r\n", "\n");
 				prompt.Description = request.Description?.Replace("\r\n", "\n");
-				prompt.PromptTags = new List<PromptTag>();
 				prompt.WorldInfos = new List<WorldInfo>();
 				prompt.IsDraft = prompt.ParentId.HasValue
 					? false
@@ -112,6 +111,7 @@ namespace AIDungeonPrompts.Application.Commands.UpdatePrompt
 
 			if (canEditTags)
 			{
+				prompt.PromptTags = new List<PromptTag>();
 				var promptTags = request.PromptTags.Split(',').Select(p => p.Trim().ToLower()).Distinct();
 				foreach (var promptTag in promptTags)
 				{

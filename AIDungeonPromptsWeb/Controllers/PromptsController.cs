@@ -1,5 +1,9 @@
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using AIDungeonPrompts.Application.Abstractions.Identity;
 using AIDungeonPrompts.Application.Commands.CreatePrompt;
@@ -15,19 +19,23 @@ using AIDungeonPrompts.Web.Extensions;
 using AIDungeonPrompts.Web.Models.Prompts;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace AIDungeonPrompts.Web.Controllers
 {
 	public class PromptsController : Controller
 	{
 		private readonly ICurrentUserService _currentUserService;
+		private readonly ILogger<PromptsController> _logger;
 		private readonly IMediator _mediator;
 
-		public PromptsController(IMediator mediator, ICurrentUserService currentUserService)
+		public PromptsController(IMediator mediator, ICurrentUserService currentUserService, ILogger<PromptsController> logger)
 		{
 			_mediator = mediator;
 			_currentUserService = currentUserService;
+			_logger = logger;
 		}
 
 		[HttpGet("[controller]/create")]
@@ -43,8 +51,26 @@ namespace AIDungeonPrompts.Web.Controllers
 		}
 
 		[HttpPost, ValidateAntiForgeryToken]
-		public async Task<IActionResult> Create(bool addWi, bool confirm, bool saveDraft, bool addChild, CreatePromptViewModel model)
+		public async Task<IActionResult> Create(bool addWi, bool confirm, bool saveDraft, bool addChild, bool uploadWi, CreatePromptViewModel model)
 		{
+			if (uploadWi)
+			{
+				ModelState.Clear();
+				if (model.WorldInfoFile != null)
+				{
+					var worldInfos = await ReadWorldInfoFromFileAsync(model.WorldInfoFile);
+					if (worldInfos != null && worldInfos.Count > 0)
+					{
+						model.Command.WorldInfos = worldInfos.Select(wi => new CreatePromptCommandWorldInfo
+						{
+							Keys = wi.Keys,
+							Entry = wi.Entry
+						}).ToList();
+					}
+				}
+				return View(model);
+			}
+
 			model.Command.SaveDraft = saveDraft || addChild;
 
 			if (addWi)
@@ -121,8 +147,38 @@ namespace AIDungeonPrompts.Web.Controllers
 			return RedirectToAction("Index");
 		}
 
+		[HttpGet("/{id}/world-info")]
+		public async Task<IActionResult> DownloadWorldInfo(int? id)
+		{
+			if (id == null || id == default)
+			{
+				return NotFound();
+			}
+			var prompt = await _mediator.Send(new GetPromptQuery(id.Value));
+			if (prompt == null)
+			{
+				return NotFound();
+			}
+			var worldInfos = prompt.WorldInfos.Select(wi => new WorldInfoJson
+			{
+				Entry = wi.Entry,
+				Keys = wi.Keys
+			});
+			var worldInfosString = JsonSerializer.Serialize(worldInfos, new JsonSerializerOptions
+			{
+				WriteIndented = true,
+				PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+			});
+			Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(worldInfosString));
+			var mimeType = "application/json";
+			return new FileStreamResult(stream, mimeType)
+			{
+				FileDownloadName = "worldInfo.json"
+			};
+		}
+
 		[HttpPost("/{id}/edit"), ValidateAntiForgeryToken, Authorize]
-		public async Task<IActionResult> Edit(int? id, bool addWi, bool saveDraft, bool confirm, bool addChild, UpdatePromptViewModel model)
+		public async Task<IActionResult> Edit(int? id, bool addWi, bool saveDraft, bool confirm, bool addChild, bool uploadWi, UpdatePromptViewModel model)
 		{
 			model.Command.SaveDraft = saveDraft;
 
@@ -141,6 +197,24 @@ namespace AIDungeonPrompts.Web.Controllers
 			model.Children = prompt.Children.ToList();
 			model.Command.Id = prompt.Id;
 			model.Command.OwnerId = prompt.OwnerId;
+
+			if (uploadWi)
+			{
+				ModelState.Clear();
+				if (model.WorldInfoFile != null)
+				{
+					var worldInfos = await ReadWorldInfoFromFileAsync(model.WorldInfoFile);
+					if (worldInfos != null && worldInfos.Count > 0)
+					{
+						model.Command.WorldInfos = worldInfos.Select(wi => new UpdatePromptCommandWorldInfo
+						{
+							Keys = wi.Keys,
+							Entry = wi.Entry
+						}).ToList();
+					}
+				}
+				return View(model);
+			}
 
 			if (addWi)
 			{
@@ -280,6 +354,26 @@ namespace AIDungeonPrompts.Web.Controllers
 		public IActionResult ViewOld(int? id)
 		{
 			return RedirectToActionPermanent("View", new { id });
+		}
+
+		private async Task<List<WorldInfoJson>> ReadWorldInfoFromFileAsync(IFormFile file)
+		{
+			var serializerOptions = new JsonSerializerOptions
+			{
+				PropertyNameCaseInsensitive = true
+			};
+			try
+			{
+				using var stream = file.OpenReadStream();
+				using var reader = new StreamReader(stream);
+				var fileString = await reader.ReadToEndAsync();
+				return JsonSerializer.Deserialize<List<WorldInfoJson>>(fileString, serializerOptions) ?? new List<WorldInfoJson>();
+			}
+			catch (Exception e)
+			{
+				_logger.LogError(e, "Could not read World Info from JSON");
+				return new List<WorldInfoJson>();
+			}
 		}
 	}
 }

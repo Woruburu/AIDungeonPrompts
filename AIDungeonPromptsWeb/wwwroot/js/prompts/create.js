@@ -1,10 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
 	const addWiButton = document.getElementById('add-wi');
+	const uploadWiButton = document.getElementById('upload-wi');
 	const saveDraft = document.getElementById('save-draft');
-	const addSub = document.getElementById('add-sub-scenario');
 	ignoreSettingsOnClick(addWiButton);
 	ignoreSettingsOnClick(saveDraft);
-	//ignoreSettingsOnClick(addSub);
+	ignoreSettingsOnClick(uploadWiButton);
 });
 
 function ignoreSettingsOnClick(element) {
