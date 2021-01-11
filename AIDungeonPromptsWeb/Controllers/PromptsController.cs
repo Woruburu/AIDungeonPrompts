@@ -51,7 +51,7 @@ namespace AIDungeonPrompts.Web.Controllers
 		}
 
 		[HttpPost, ValidateAntiForgeryToken]
-		public async Task<IActionResult> Create(bool addWi, bool confirm, bool saveDraft, bool addChild, bool uploadWi, CreatePromptViewModel model)
+		public async Task<IActionResult> Create(bool addWi, bool confirm, bool saveDraft, bool addChild, bool uploadWi, int? wiDelete, CreatePromptViewModel model)
 		{
 			if (uploadWi)
 			{
@@ -61,12 +61,23 @@ namespace AIDungeonPrompts.Web.Controllers
 					var worldInfos = await ReadWorldInfoFromFileAsync(model.WorldInfoFile);
 					if (worldInfos != null && worldInfos.Count > 0)
 					{
-						model.Command.WorldInfos = worldInfos.Select(wi => new CreatePromptCommandWorldInfo
+						model.Command.WorldInfos.AddRange(worldInfos.Select(wi => new CreatePromptCommandWorldInfo
 						{
 							Keys = wi.Keys,
 							Entry = wi.Entry
-						}).ToList();
+						}).ToList());
 					}
+				}
+				return View(model);
+			}
+
+			if (wiDelete.HasValue)
+			{
+				ModelState.Clear();
+				model.Command.WorldInfos.RemoveAt(wiDelete.Value);
+				if(model.Command.WorldInfos.Count < 1)
+				{
+					model.Command.WorldInfos.Add(new CreatePromptCommandWorldInfo());
 				}
 				return View(model);
 			}
@@ -178,7 +189,7 @@ namespace AIDungeonPrompts.Web.Controllers
 		}
 
 		[HttpPost("/{id}/edit"), ValidateAntiForgeryToken, Authorize]
-		public async Task<IActionResult> Edit(int? id, bool addWi, bool saveDraft, bool confirm, bool addChild, bool uploadWi, UpdatePromptViewModel model)
+		public async Task<IActionResult> Edit(int? id, bool addWi, bool saveDraft, bool confirm, bool addChild, bool uploadWi, int? wiDelete, UpdatePromptViewModel model)
 		{
 			model.Command.SaveDraft = saveDraft;
 
@@ -206,12 +217,23 @@ namespace AIDungeonPrompts.Web.Controllers
 					var worldInfos = await ReadWorldInfoFromFileAsync(model.WorldInfoFile);
 					if (worldInfos != null && worldInfos.Count > 0)
 					{
-						model.Command.WorldInfos = worldInfos.Select(wi => new UpdatePromptCommandWorldInfo
+						model.Command.WorldInfos.AddRange(worldInfos.Select(wi => new UpdatePromptCommandWorldInfo
 						{
 							Keys = wi.Keys,
 							Entry = wi.Entry
-						}).ToList();
+						}).ToList());
 					}
+				}
+				return View(model);
+			}
+
+			if (wiDelete.HasValue)
+			{
+				ModelState.Clear();
+				model.Command.WorldInfos.RemoveAt(wiDelete.Value);
+				if (model.Command.WorldInfos.Count < 1)
+				{
+					model.Command.WorldInfos.Add(new UpdatePromptCommandWorldInfo());
 				}
 				return View(model);
 			}

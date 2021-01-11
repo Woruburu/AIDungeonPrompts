@@ -83,9 +83,10 @@
 		@Html.LabelFor(m => m.Command.WorldInfos)
 		<br />
 		<input type="file" disabled="@(!canEditField)" asp-for="WorldInfoFile" />
-		<button disabled="@(!canEditField)" id="upload-wi" asp-route-uploadWi="@true" asp-fragment="upload-wi" class="btn btn-secondary">Upload JSON</button><span class="ml-3"><strong>This will overwrite any entries you've already written!</strong></span>
+		<button disabled="@(!canEditField)" id="upload-wi" asp-route-uploadWi="@true" asp-fragment="upload-wi" class="btn btn-secondary">Upload JSON</button>
 		<br />
 		<br />
+		<p>Any World Info left blank will be automatically removed on submission.</p>
 		@Html.EditorFor(m => m.Command.WorldInfos, new { Disabled = !canEditField })
 		<button disabled="@(!canEditField)" id="add-wi" asp-route-addWi="@true" asp-fragment="add-wi" class="btn btn-secondary">Add Another</button>
 	</div>
