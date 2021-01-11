@@ -64,9 +64,12 @@
 	<div>
 		@Html.LabelFor(m => m.Command.WorldInfos)
 		<br />
-		<input type="file" asp-for="WorldInfoFile" />
-		<button id="upload-wi" asp-route-uploadWi="@true" asp-fragment="upload-wi" class="btn btn-secondary">Upload JSON</button>
-		<br />
+			<div>
+				<input type="file" asp-for="WorldInfoFile" />
+			</div>
+			<div class="mt-3">
+				<button id="upload-wi" asp-route-uploadWi="@true" asp-fragment="upload-wi" class="btn btn-secondary">Upload JSON</button>
+			</div>
 		<br />
 		<p>Any World Info left blank will be automatically removed on submission.</p>
 		@Html.EditorFor(m => m.Command.WorldInfos)

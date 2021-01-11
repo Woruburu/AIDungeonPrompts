@@ -61,11 +61,24 @@ namespace AIDungeonPrompts.Web.Controllers
 					var worldInfos = await ReadWorldInfoFromFileAsync(model.WorldInfoFile);
 					if (worldInfos != null && worldInfos.Count > 0)
 					{
-						model.Command.WorldInfos.AddRange(worldInfos.Select(wi => new CreatePromptCommandWorldInfo
+						if (model.Command.WorldInfos.Count == 1
+							&& string.IsNullOrWhiteSpace(model.Command.WorldInfos[0].Entry)
+							&& string.IsNullOrWhiteSpace(model.Command.WorldInfos[0].Keys))
 						{
-							Keys = wi.Keys,
-							Entry = wi.Entry
-						}).ToList());
+							model.Command.WorldInfos = worldInfos.Select(wi => new CreatePromptCommandWorldInfo
+							{
+								Keys = wi.Keys,
+								Entry = wi.Entry
+							}).ToList();
+						}
+						else
+						{
+							model.Command.WorldInfos.AddRange(worldInfos.Select(wi => new CreatePromptCommandWorldInfo
+							{
+								Keys = wi.Keys,
+								Entry = wi.Entry
+							}));
+						}
 					}
 				}
 				return View(model);
@@ -217,11 +230,24 @@ namespace AIDungeonPrompts.Web.Controllers
 					var worldInfos = await ReadWorldInfoFromFileAsync(model.WorldInfoFile);
 					if (worldInfos != null && worldInfos.Count > 0)
 					{
-						model.Command.WorldInfos.AddRange(worldInfos.Select(wi => new UpdatePromptCommandWorldInfo
+						if(model.Command.WorldInfos.Count == 1
+							&& string.IsNullOrWhiteSpace(model.Command.WorldInfos[0].Entry)
+							&& string.IsNullOrWhiteSpace(model.Command.WorldInfos[0].Keys))
 						{
-							Keys = wi.Keys,
-							Entry = wi.Entry
-						}).ToList());
+							model.Command.WorldInfos = worldInfos.Select(wi => new UpdatePromptCommandWorldInfo
+							{
+								Keys = wi.Keys,
+								Entry = wi.Entry
+							}).ToList();
+						}
+						else
+						{  
+							model.Command.WorldInfos.AddRange(worldInfos.Select(wi => new UpdatePromptCommandWorldInfo
+							{
+								Keys = wi.Keys,
+								Entry = wi.Entry
+							}));
+						}
 					}
 				}
 				return View(model);
