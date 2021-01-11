@@ -9,7 +9,7 @@ a.navbar-brand {
 
 /* Provide sufficient contrast against white background */
 a {
-	color: #0366d6;
+	color: #007bff;
 }
 
 .btn-primary {
@@ -34,6 +34,10 @@ html {
 	html {
 		font-size: 16px;
 	}
+}
+
+textarea {
+	min-height: 8rem;
 }
 
 .border-top {
