@@ -17,7 +17,7 @@
 		<p>
 			@foreach (var group in groups)
 			{
-				<a href="#@(char.ToLower(group.Key))" class="btn btn-lg btn-info ml-1 mb-2">@group.Key</a>
+				<a href="#@(char.ToLower(group.Key))" class="btn btn-lg btn-primary ml-1 mb-2">@group.Key</a>
 			}
 		</p>
 	</div>
@@ -37,10 +37,10 @@
 						{
 							<div class="col-12 mb-3">
 								<div class="w-100 btn-group" role="group">
-									<a asp-action="Index" asp-route-Tags="@tag.Name" class="w-100 text-left btn btn btn-info">
+									<a asp-action="Index" asp-route-Tags="@tag.Name" class="w-100 text-left btn btn btn-outline-primary">
 										@tag.Name
 									</a>
-									<a asp-action="Index" asp-route-Tags="@tag.Name" class="btn btn btn-outline-info d-flex">
+									<a asp-action="Index" asp-route-Tags="@tag.Name" class="btn btn btn-primary d-flex">
 										<span class="m-auto">
 											@tag.Count
 										</span>
