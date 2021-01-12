@@ -3,7 +3,6 @@ document.addEventListener('DOMContentLoaded', () => {
 	const uploadWiButton = document.getElementById('upload-wi');
 	const wiDeleteBtns = document.getElementsByClassName('world-info-delete-btn');
 	ignoreSettingsOnClick(addWiButton);
-	ignoreSettingsOnClick(saveDraft);
 	ignoreSettingsOnClick(uploadWiButton);
 	for (var i = 0; i < wiDeleteBtns.length; i++) {
 		ignoreSettingsOnClick(wiDeleteBtns[i]);
