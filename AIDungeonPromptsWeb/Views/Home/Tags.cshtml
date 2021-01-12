@@ -33,7 +33,7 @@
 				</div>
 				<div class="card-body">			
 					<div class="row">
-						@foreach (var tag in group)
+						@foreach (var tag in group.OrderBy(e => e.Name))
 						{
 							<div class="col-12 mb-3">
 								<div class="w-100 btn-group" role="group">
