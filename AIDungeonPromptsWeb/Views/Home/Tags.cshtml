@@ -1,0 +1,56 @@
+@model List<AIDungeonPrompts.Application.Queries.GetAllTags.GetTagViewModel>
+@{ ViewData["Title"] = "All Tags"; }
+
+@{
+	var chars = new List<char> { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' };
+	var groups = Model
+		.Where(e => !string.IsNullOrWhiteSpace(e.Name))
+		.GroupBy(e => chars.Contains(char.ToLower(e.Name[0])) ? char.ToUpper(e.Name[0]) : '#')
+		.OrderBy(e => e.Key);
+}
+
+<h2>All Tags</h2>
+
+<div class="row mb-1">
+	<div class="col">
+		<h5>Quick Jump</h5>
+		<p>
+			@foreach (var group in groups)
+			{
+				<a href="#@(char.ToLower(group.Key))" class="btn btn-lg btn-primary ml-1 mb-2">@group.Key</a>
+			}
+		</p>
+	</div>
+</div>
+
+<div class="row">
+	@foreach (var group in groups)
+	{
+		<div class="col-12 col-lg-4 mb-4">
+			<div class="card">
+				<div class="card-header">
+					<h3 id="@(char.ToLower(group.Key))" class="text-center card-title">@group.Key</h3>
+				</div>
+				<div class="card-body">			
+					<div class="row">
+						@foreach (var tag in group)
+						{
+							<div class="col-12 mb-3">
+								<div class="w-100 btn-group" role="group">
+									<a asp-action="Index" asp-route-Tags="@tag.Name" class="w-100 text-left btn btn btn-outline-primary">
+										@tag.Name
+									</a>
+									<a asp-action="Index" asp-route-Tags="@tag.Name" class="btn btn btn-primary d-flex">
+										<span class="m-auto">
+											@tag.Count
+										</span>
+									</a>
+								</div>
+							</div>
+						}	
+					</div>
+				</div>
+			</div>
+		</div>
+	}
+</div>

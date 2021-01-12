@@ -13,11 +13,10 @@
 	<div class="alert alert-primary">
 		You are editing a sub scenario. <a asp-action="Edit" asp-route-id="@Model.Command.ParentId">Click here to return to the parent without saving.</a>
 	</div>
-	<br />
 }
 <h2>Edit Prompt</h2>
 <br />
-<form asp-controller="Prompts" asp-action="Edit" method="post">
+<form asp-controller="Prompts" asp-action="Edit" method="post" enctype="multipart/form-data">
 	<input class="honey" name="Honey" />
 	@Html.HiddenFor(e => e.Command.Id)
 	@Html.HiddenFor(e => e.Command.ParentId)
@@ -81,10 +80,15 @@
 	<br />
 	<div>
 		@Html.LabelFor(m => m.Command.WorldInfos)
+		<br />
+		<input type="file" disabled="@(!canEditField)" asp-for="WorldInfoFile" />
+		<button disabled="@(!canEditField)" id="upload-wi" asp-route-uploadWi="@true" asp-fragment="upload-wi" class="btn btn-secondary">Upload JSON</button>
+		<br />
+		<br />
+		<p>Any World Info left blank will be automatically removed on submission.</p>
 		@Html.EditorFor(m => m.Command.WorldInfos, new { Disabled = !canEditField })
-		<button disabled="@(!canEditField)" id="add-wi" asp-route-addWi="@true" asp-fragment="world-infos" class="btn btn-secondary" onclick="wiAddClick()">Add Another</button>
+		<button disabled="@(!canEditField)" id="add-wi" asp-route-addWi="@true" asp-fragment="add-wi" class="btn btn-secondary">Add Another</button>
 	</div>
-	<div id="world-infos"></div>
 	<br />
 	<div id="sub-scenario-container">
 		<label>Sub Scenarios</label>
@@ -136,7 +140,7 @@
 				<p>
 					Are you sure you want to delete this scenario?
 					<br/>
-					Any sub-scenarios associated will also be deleted.
+					Any sub-scenarios associated with it will also be deleted.
 				</p>
 			</div>
 			<div class="modal-footer">

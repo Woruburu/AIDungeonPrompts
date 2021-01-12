@@ -5,19 +5,19 @@
 }
 <div class="card mb-4">
 	<div class="card-body d-flex">
-		<h6 class="align-self-center flex-grow-1 flex-shrink-1">
+		<h5 class="align-self-center mb-0 flex-grow-1 flex-shrink-1">
 			@Model.Title
-		</h6>
+		</h5>
 		@if (canEdit)
 		{
 			<div class="ml-auto">
-				<a class="btn btn-warning" disabled="@(!canEdit)" asp-action="Edit" asp-controller="Prompts" asp-route-id="@Model.Id">Edit</a>
+				<a class="btn btn-outline-success" disabled="@(!canEdit)" asp-action="Edit" asp-controller="Prompts" asp-route-id="@Model.Id">Edit</a>
 			</div>
 		}
 		@if (canDelete)
 		{
 			<div class="@(canEdit ? "ml-2" : "ml-auto")">				
-				<button class="btn btn-danger btn-delete" asp-fragment="sub-scenarios" asp-action="Delete" asp-controller="Prompts" asp-route-id="@Model.Id">Delete</button>	
+				<button class="btn btn-outline-danger btn-delete" asp-fragment="sub-scenarios" asp-action="Delete" asp-controller="Prompts" asp-route-id="@Model.Id">Delete</button>	
 			</div>
 		}
 	</div>

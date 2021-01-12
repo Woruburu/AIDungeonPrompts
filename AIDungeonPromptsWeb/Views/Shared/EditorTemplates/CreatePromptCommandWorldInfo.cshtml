@@ -1,6 +1,16 @@
 @model AIDungeonPrompts.Application.Commands.CreatePrompt.CreatePromptCommandWorldInfo
+@{
+	var prefix = ViewData.TemplateInfo.HtmlFieldPrefix;
+	var m = System.Text.RegularExpressions.Regex.Match(prefix, @".+\[(\d+)\]");
+	var index = m.Groups[1].Value;
+	var fragment = int.TryParse(index, out var intIndex)
+		? intIndex < 1
+			? "world-info-card-0"
+			: $"world-info-card-{(intIndex - 1)}"
+		: "upload-wi";
+}
 
-<div class="card mb-4">
+<div id="world-info-card-@index" class="card mb-4">
 	<div class="card-body">
 		<div class="form-group">
 			@Html.LabelFor(m => m.Keys)
@@ -11,6 +21,9 @@
 			@Html.LabelFor(m => m.Entry)
 			<textarea asp-for="Entry" class="form-control"></textarea>
 			<span asp-validation-for="Entry"></span>
+		</div>
+		<div class="d-flex">
+			<button asp-fragment="@fragment" asp-route-wiDelete="@index" class="world-info-delete-btn ml-auto btn btn-outline-danger">Delete</button>
 		</div>
 	</div>
 </div>

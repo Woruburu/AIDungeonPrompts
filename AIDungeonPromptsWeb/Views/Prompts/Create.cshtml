@@ -5,11 +5,10 @@
 	<div class="alert alert-primary">
 		You are creating a sub scenario. <a asp-action="Edit" asp-route-id="@Model.Command.ParentId">Click here to return to the parent without saving.</a>
 	</div>
-	<br />
 }
 <h2>Create Prompt</h2>
 <br />
-<form asp-controller="Prompts" asp-action="Create" method="post">
+<form asp-controller="Prompts" asp-action="Create" enctype="multipart/form-data" method="post">
 	<input class="honey" name="Honey" />
 	@Html.HiddenFor(e => e.Command.ParentId)
 	<div class="form-group required">
@@ -63,10 +62,18 @@
 	<br />
 	<div>
 		@Html.LabelFor(m => m.Command.WorldInfos)
+		<br />
+			<div>
+				<input type="file" asp-for="WorldInfoFile" />
+			</div>
+			<div class="mt-3">
+				<button id="upload-wi" asp-route-uploadWi="@true" asp-fragment="upload-wi" class="btn btn-secondary">Upload JSON</button>
+			</div>
+		<br />
+		<p>Any World Info left blank will be automatically removed on submission.</p>
 		@Html.EditorFor(m => m.Command.WorldInfos)
-		<button id="add-wi" asp-route-addWi="@true" asp-fragment="world-infos" class="btn btn-secondary">Add Another</button>
+		<button id="add-wi" asp-route-addWi="@true" asp-fragment="add-wi" class="btn btn-secondary">Add Another</button>
 	</div>
-	<div id="world-infos"></div>
 	<br />
 	<div>
 		<label>Sub Scenarios</label>

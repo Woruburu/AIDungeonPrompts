@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using AIDungeonPrompts.Application.Queries.GetAllTags;
 using AIDungeonPrompts.Application.Queries.RandomPrompt;
 using AIDungeonPrompts.Application.Queries.SearchPrompts;
 using AIDungeonPrompts.Web.ColorScheme;
@@ -96,6 +97,13 @@ namespace AIDungeonPrompts.Web.Controllers
 				return RedirectToAction("Index");
 			}
 			return RedirectToAction("View", "Prompts", new { result.Id });
+		}
+
+		[HttpGet("/tags")]
+		public async Task<IActionResult> Tags()
+		{
+			var result = await _mediator.Send(new GetAllTagsQuery());
+			return View(result);
 		}
 
 		[HttpGet("/whats-new")]

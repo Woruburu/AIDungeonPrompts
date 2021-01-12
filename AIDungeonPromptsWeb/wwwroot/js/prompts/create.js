@@ -1,10 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
 	const addWiButton = document.getElementById('add-wi');
-	const saveDraft = document.getElementById('save-draft');
-	const addSub = document.getElementById('add-sub-scenario');
+	const uploadWiButton = document.getElementById('upload-wi');
+	const wiDeleteBtns = document.getElementsByClassName('world-info-delete-btn');
 	ignoreSettingsOnClick(addWiButton);
 	ignoreSettingsOnClick(saveDraft);
-	//ignoreSettingsOnClick(addSub);
+	ignoreSettingsOnClick(uploadWiButton);
+	for (var i = 0; i < wiDeleteBtns.length; i++) {
+		ignoreSettingsOnClick(wiDeleteBtns[i]);
+	};
 });
 
 function ignoreSettingsOnClick(element) {
