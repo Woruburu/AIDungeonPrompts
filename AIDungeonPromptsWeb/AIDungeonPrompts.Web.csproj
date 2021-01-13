@@ -54,6 +54,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Folder Include="Controllers\Api\" />
 		<Folder Include="Cookies\" />
 	</ItemGroup>
 </Project>

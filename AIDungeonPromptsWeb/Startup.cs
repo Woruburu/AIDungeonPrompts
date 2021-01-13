@@ -94,6 +94,7 @@ namespace AIDungeonPrompts.Web
 
 			app.UseRouting();
 
+			app.UseCors();
 			app.UseAuthentication();
 			app.UseAuthorization();
 
@@ -111,6 +112,16 @@ namespace AIDungeonPrompts.Web
 		// This method gets called by the runtime. Use this method to add services to the container.
 		public void ConfigureServices(IServiceCollection services)
 		{
+			services.AddCors(options =>
+			{
+				options.AddPolicy("AiDungeon",
+					builder =>
+					{
+						builder
+							.WithOrigins("https://play.aidungeon.io")
+							.WithMethods("GET");
+					});
+			});
 			services.Configure<ForwardedHeadersOptions>(options =>
 			{
 				options.ForwardedHeaders =
