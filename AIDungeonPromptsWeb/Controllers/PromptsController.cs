@@ -19,6 +19,7 @@ using AIDungeonPrompts.Web.Extensions;
 using AIDungeonPrompts.Web.Models.Prompts;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -88,7 +89,7 @@ namespace AIDungeonPrompts.Web.Controllers
 			{
 				ModelState.Clear();
 				model.Command.WorldInfos.RemoveAt(wiDelete.Value);
-				if(model.Command.WorldInfos.Count < 1)
+				if (model.Command.WorldInfos.Count < 1)
 				{
 					model.Command.WorldInfos.Add(new CreatePromptCommandWorldInfo());
 				}
@@ -230,7 +231,7 @@ namespace AIDungeonPrompts.Web.Controllers
 					var worldInfos = await ReadWorldInfoFromFileAsync(model.WorldInfoFile);
 					if (worldInfos != null && worldInfos.Count > 0)
 					{
-						if(model.Command.WorldInfos.Count == 1
+						if (model.Command.WorldInfos.Count == 1
 							&& string.IsNullOrWhiteSpace(model.Command.WorldInfos[0].Entry)
 							&& string.IsNullOrWhiteSpace(model.Command.WorldInfos[0].Keys))
 						{
@@ -241,7 +242,7 @@ namespace AIDungeonPrompts.Web.Controllers
 							}).ToList();
 						}
 						else
-						{  
+						{
 							model.Command.WorldInfos.AddRange(worldInfos.Select(wi => new UpdatePromptCommandWorldInfo
 							{
 								Keys = wi.Keys,
@@ -344,6 +345,21 @@ namespace AIDungeonPrompts.Web.Controllers
 						}
 				}
 			});
+		}
+
+		[EnableCors("AiDungeon"), HttpGet("/api/{id}")]
+		public async Task<ActionResult<GetPromptViewModel>> Get(int? id)
+		{
+			if (id == null || id == default)
+			{
+				return NotFound();
+			}
+			var prompt = await _mediator.Send(new GetPromptQuery(id.Value));
+			if (prompt == null)
+			{
+				return NotFound();
+			}
+			return prompt;
 		}
 
 		[HttpGet("{id}/report")]
