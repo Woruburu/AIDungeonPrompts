@@ -12,7 +12,7 @@ function onLoadClick() {
 	if (!value) {
 		return;
 	}
-	fetch(`https://localhost:5001/api/${value}`).then((response) => {
+	fetch(`https://prompts.aidg.club/api/${value}`).then((response) => {
 		return response.json()
 	}).then((json) => {
 		const allInputs = document.querySelectorAll('input');
