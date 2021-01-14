@@ -3,15 +3,13 @@
 // @namespace   prompts.aidg.club/aidg.user.js
 // @match       https://play.aidungeon.io/*
 // @grant       none
-// @version     1.2
+// @version     1.3
 // @author      Worble
 // @description 13/01/2021, 17:58:05
 // ==/UserScript==
 
 function setReactInputValue(input, value) {
 	const previousValue = input.value;
-
-	// eslint-disable-next-line no-param-reassign
 	input.value = value;
 
 	const tracker = input._valueTracker;
@@ -31,21 +29,19 @@ function onLoadClick() {
 	fetch(`https://prompts.aidg.club/api/${value}`).then((response) => {
 		return response.json()
 	}).then((json) => {
-		const allInputs = document.querySelectorAll('input');
-		const allTextAreas = document.querySelectorAll('textarea');
-		const titleInput = allInputs[1];
-		const descriptionTextArea = allTextAreas[0];
-		const promptTextArea = allTextAreas[1];
-		const memoryTextArea = allTextAreas[2];
-		const authorsNoteInput = allInputs[2];
-		const questTextArea = allTextAreas[3];
+		const titleInput = document.querySelector('input[placeholder="Larry Saves The Princess"]');;
+		const descriptionTextArea = document.querySelector('textarea[placeholder="Provide a brief description to help others get an idea of what to expect when playing your scenario."]');
+		const promptTextArea = document.querySelector('textarea[placeholder*="Enter the starting prompt for this scenario.]');
+		const memoryTextArea = document.querySelector('textarea[placeholder*="Enter anything you want the AI to remember during the adventure, but don\'t want to show the player."]');
+		const authorsNoteInput = document.querySelector('input[placeholder*="Style hint:"]');;
+		const questTextArea = document.querySelector('textarea[placeholder*="Add quests to be completed by the user."]');
 
-		setReactInputValue(titleInput, json.title);
-		setReactInputValue(descriptionTextArea, json.description);
-		setReactInputValue(promptTextArea, json.promptContent);
-		setReactInputValue(memoryTextArea, json.memory);
-		setReactInputValue(authorsNoteInput, json.authorsNote);
-		setReactInputValue(questTextArea, json.quests);
+		setReactInputValue(titleInput, json.title ?? "");
+		setReactInputValue(descriptionTextArea, json.description ?? "");
+		setReactInputValue(promptTextArea, json.promptContent ?? "");
+		setReactInputValue(memoryTextArea, json.memory ?? "");
+		setReactInputValue(authorsNoteInput, json.authorsNote ?? "");
+		setReactInputValue(questTextArea, json.quests ?? "");
 	});
 }
 
