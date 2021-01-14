@@ -3,7 +3,7 @@
 // @namespace   https://prompts.aidg.club
 // @match       https://play.aidungeon.io/*
 // @grant       none
-// @version     1.5
+// @version     1.6
 // @author      Worble
 // @description Enables users to automatically import cluib prompts into AI Dungeon
 // @downloadURL https://prompts.aidg.club/aidg.user.js
@@ -62,17 +62,17 @@ let timeoutVal = null;
 
 function timeOut() {
 	if (document.getElementById('aidg-import-button')) {
-		console.log("Button already exists, stopping...");
+		console.debug("Button already exists, stopping...");
 		return;
 	}
 	timeoutVal = setTimeout(function () {
 		const menubar = getLastQuerySelector('div[style="display: flex; margin-right: 16px; margin-top: 4px;"]');
 		if (!menubar) {
-			console.log("Menu bar does not exist, restarting...");
+			console.debug("Menu bar does not exist, restarting...");
 			timeOut();
 			return;
 		}
-		console.log("Menu bar found, adding button.");
+		console.debug("Menu bar found, adding button.");
 		const clone = menubar.lastChild.cloneNode();
 		const clone2 = menubar.lastChild.lastChild.cloneNode();
 		const clone3 = menubar.lastChild.lastChild.lastChild.cloneNode();
@@ -86,12 +86,12 @@ function timeOut() {
 };
 
 function handleHistoryChange(location) {
-	console.log("In handle history, location is: " + location);
+	console.debug("In handle history, location is: " + location);
 	if (locationIsEditPage(location) && timeoutVal === null) {
-		console.log("On edit page, starting timeout");
+		console.debug("On edit page, starting timeout.");
 		timeOut();
 	} else if (!locationIsEditPage(location) && timeoutVal !== null) {
-		console.log("Leaving page, clearing timeout and button");
+		console.debug("Leaving page, clearing timeout and button.");
 		clearTimeout(timeoutVal);
 		timeoutVal = null;
 		const button = document.getElementById('aidg-import-button');
