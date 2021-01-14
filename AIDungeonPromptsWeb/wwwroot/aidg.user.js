@@ -71,6 +71,7 @@ const uploadButtonQuerySelector = 'div[data-aidg-import-button]';
 
 /**
 * The text inside the upload button.
+ * I just copied this from the World Info download button, some users have reported this doesn't show correctly.
 */
 const uploadButtonText = ''
 
@@ -213,7 +214,7 @@ function timeOut() {
 		const clone = menubar.lastChild.cloneNode();
 		const clone2 = menubar.lastChild.lastChild.cloneNode();
 		const clone3 = menubar.lastChild.lastChild.lastChild.cloneNode();
-		clone3.innerText = '';
+		clone3.innerText = uploadButtonText;
 		clone3.onclick = onLoadClick;
 		clone2.append(clone3);
 		clone.append(clone2);
