@@ -187,7 +187,8 @@ namespace AIDungeonPrompts.Web.Controllers
 			var worldInfos = prompt.WorldInfos.Select(wi => new WorldInfoJson
 			{
 				Entry = wi.Entry,
-				Keys = wi.Keys
+				Keys = wi.Keys,
+				IsNotHidden = true
 			});
 			var worldInfosString = JsonSerializer.Serialize(worldInfos, new JsonSerializerOptions
 			{
