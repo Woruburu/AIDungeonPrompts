@@ -6,6 +6,42 @@
 	<div class="col-12 mb-4">
 		<div class="card">
 			<div class="card-body">
+				<h5 class="card-title mb-3">2021/01/14 - Release 2.2</h5>
+				<ul>
+					<li class="mb-3">
+						World Info exports now have IsNotHidden set to true automatically (since it's publically available anyway)
+					</li>
+				</ul>
+				<ul>
+					<li class="mb-3">
+						We now have a userscript you can use to quickly import prompts into AI dungeon. This can, and probably will, break when Mormon makes updates to the site, so please be patient if this happens.
+					</li>
+					<li class="mb-3">
+						To use the userscript, please install a userscript manager into your browser. My personal recommendation is  <a rel="noopener noreferrer nofollow" target="_blank" href="https://violentmonkey.github.io/">ViolentMonkey</a>.
+					</li>
+					<li class="mb-3">
+						Once you have a userscript extension installed, navigate to: <a target="_blank" href="https://prompts.aidg.club/aidg.user.js">https://prompts.aidg.club/aidg.user.js</a>. Your userscript manager should show you the code. <strong>Make sure you read it, this code will be executed on your browser, and could be malicious.</strong> Once you're happy, install it (usually a button in the top right).
+					</li>
+					<li class="mb-3">
+						Once installed, navigating to the Edit Scenario page in AI Dungeon should cause an extra download icon to appear in the top right (this may take a second or two to appear). Click it, and it'll prompt for an ID. Enter any prompt ID from here. For example, <a target="_blank" href="https://prompts.aidg.club/471">https://prompts.aidg.club/471</a> would be ID 471. This should now populate the prompt.
+					</li>
+					<li class="mb-3">
+						It will not automatically import sub scenarios, although you can create one in AID, and find the relevant ID on the club site to repeat the same process as above.
+					</li>
+					<li class="mb-3">
+						It will not automatically import world info, this is already supported officially by the JSON export/import, which will require much less maintanence on our end.
+					</li>
+					<li class="mb-3">
+						Please report any bugs or issues to the thread, or <a rel="noopener noreferrer nofollow" target="_blank" href="https://github.com/Woruburu/AIDungeonPrompts/issues">https://github.com/Woruburu/AIDungeonPrompts/issues</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-12 mb-4">
+		<div class="card">
+			<div class="card-body">
 				<h5 class="card-title mb-3">2021/01/12 - Release 2.1</h5>
 				<ul>
 					<li class="mb-3">
@@ -35,7 +71,7 @@
 						Sub scenarios are now in. This was a bigger piece of work than I originally thought, so there will probably be bugs and UI issues. You can add sub scenarios from the Create or Edit pages, just below WI. Sub scenario visibility is controlled by the top level parent - all are visible or nothing is.
 					</li>
 					<li class="mb-3">
-						In terms of reporting bugs, you can post them in the thread as usual, but for obvious reasons these might get missed, so open a GitHub issue here for maximum visibility if you want - <a target="_blank" href="https://github.com/Woruburu/AIDungeonPrompts/issues">https://github.com/Woruburu/AIDungeonPrompts/issues</a>
+						In terms of reporting bugs, you can post them in the thread as usual, but for obvious reasons these might get missed, so open a GitHub issue here for maximum visibility if you want - <a rel="noopener noreferrer nofollow"  target="_blank" href="https://github.com/Woruburu/AIDungeonPrompts/issues">https://github.com/Woruburu/AIDungeonPrompts/issues</a>
 					</li>
 					<li class="mb-3">
 						Bumping the version number because why not.
