@@ -3,7 +3,7 @@
 // @namespace   https://prompts.aidg.club
 // @match       https://play.aidungeon.io/*
 // @grant       none
-// @version     1.7
+// @version     1.8
 // @author      /aidg/
 // @description Enables users to automatically import club prompts into AI Dungeon
 // @downloadURL https://prompts.aidg.club/aidg.user.js
@@ -71,6 +71,7 @@ const uploadButtonQuerySelector = 'div[data-aidg-import-button]';
 
 /**
 * The text inside the upload button.
+ * I just copied this from the World Info download button, some users have reported this doesn't show correctly.
 */
 const uploadButtonText = ''
 
@@ -87,7 +88,7 @@ const fetchBadStatusMessage = (statusCode) => `Unexpected status returned from s
 /**
 * The alert text when the prompt is not found.
 */
-const somethingWentWrongMessage = (message) => `Something when wrong: ${statusCode}`;
+const somethingWentWrongMessage = (message) => `Something went wrong, exception message is: ${message}`;
 
 // Mutable Variables
 
@@ -129,7 +130,7 @@ function setReactInputValue(input, value) {
 
 /**
  * Like querySelector, but only returns the last element in the list.
- * This is necessary because for some reason, if you load the edit page first, navigate away, and then come back, every element is duplicated (??? what the FUCK Mormon) and we only want the latest one).
+ * This is necessary because for some reason, if you load the edit scenario page first, navigate away, and then come back, every element is duplicated (??? what the FUCK Mormon) and we only want the latest one).
  * @param {string} selectors - The query selectors.
  * @returns {Element|null}
  */
@@ -182,7 +183,7 @@ function onLoadClick() {
 		const questTextArea = getLastQuerySelector(questsTextAreaSelector);
 
 		setReactInputValue(titleInput, json.title === null ? "" : json.title);
-		// apparently leaving description blank just reverts it to a previous one (??? wtf mormon) so we put an blank space instead
+		// apparently leaving description blank just reverts it to a previous one (??? wtf mormon) so we put a blank space instead
 		setReactInputValue(descriptionTextArea, json.description === null || json.description === "" ? " " : json.description);
 		setReactInputValue(promptTextArea, json.promptContent === null ? "" : json.promptContent);
 		setReactInputValue(memoryTextArea, json.memory === null ? "" : json.memory);
@@ -210,14 +211,19 @@ function timeOut() {
 			consoleLog("Button already exists, stopping.");
 			return;
 		}
+		// this is a really lazy way to make sure it looks right
 		const clone = menubar.lastChild.cloneNode();
 		const clone2 = menubar.lastChild.lastChild.cloneNode();
 		const clone3 = menubar.lastChild.lastChild.lastChild.cloneNode();
-		clone3.innerText = '';
+
+		clone3.innerText = uploadButtonText;
 		clone3.onclick = onLoadClick;
+
 		clone2.append(clone3);
+
 		clone.append(clone2);
 		clone.dataset.aidgImportButton = true;
+
 		menubar.append(clone);
 	}, 1000)
 };
