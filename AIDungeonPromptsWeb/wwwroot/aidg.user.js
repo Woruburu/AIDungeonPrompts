@@ -3,7 +3,7 @@
 // @namespace   prompts.aidg.club/aidg.user.js
 // @match       https://play.aidungeon.io/*
 // @grant       none
-// @version     1.1
+// @version     1.2
 // @author      Worble
 // @description 13/01/2021, 17:58:05
 // ==/UserScript==
@@ -33,7 +33,7 @@ function onLoadClick() {
 	}).then((json) => {
 		const allInputs = document.querySelectorAll('input');
 		const allTextAreas = document.querySelectorAll('textarea');
-		const titleInput = allInputs[0];
+		const titleInput = allInputs[1];
 		const descriptionTextArea = allTextAreas[0];
 		const promptTextArea = allTextAreas[1];
 		const memoryTextArea = allTextAreas[2];
