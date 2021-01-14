@@ -3,7 +3,7 @@
 // @namespace   prompts.aidg.club/aidg.user.js
 // @match       https://play.aidungeon.io/*
 // @grant       none
-// @version     1.3
+// @version     1.4
 // @author      Worble
 // @description 13/01/2021, 17:58:05
 // ==/UserScript==
@@ -31,17 +31,17 @@ function onLoadClick() {
 	}).then((json) => {
 		const titleInput = document.querySelector('input[placeholder="Larry Saves The Princess"]');;
 		const descriptionTextArea = document.querySelector('textarea[placeholder="Provide a brief description to help others get an idea of what to expect when playing your scenario."]');
-		const promptTextArea = document.querySelector('textarea[placeholder*="Enter the starting prompt for this scenario.]');
+		const promptTextArea = document.querySelector('textarea[placeholder*="Enter the starting prompt for this scenario"]');
 		const memoryTextArea = document.querySelector('textarea[placeholder*="Enter anything you want the AI to remember during the adventure, but don\'t want to show the player."]');
 		const authorsNoteInput = document.querySelector('input[placeholder*="Style hint:"]');;
 		const questTextArea = document.querySelector('textarea[placeholder*="Add quests to be completed by the user."]');
 
-		setReactInputValue(titleInput, json.title ?? "");
-		setReactInputValue(descriptionTextArea, json.description ?? "");
-		setReactInputValue(promptTextArea, json.promptContent ?? "");
-		setReactInputValue(memoryTextArea, json.memory ?? "");
-		setReactInputValue(authorsNoteInput, json.authorsNote ?? "");
-		setReactInputValue(questTextArea, json.quests ?? "");
+		setReactInputValue(titleInput, json.title === null ? "" : json.title);
+		setReactInputValue(descriptionTextArea, json.description === null ? " " : json.description);
+		setReactInputValue(promptTextArea, json.promptContent === null ? "" : json.promptContent);
+		setReactInputValue(memoryTextArea, json.memory === null ? "" : json.memory);
+		setReactInputValue(authorsNoteInput, json.authorsNote === null ? "" : json.authorsNote);
+		setReactInputValue(questTextArea, json.quests === null ? "" : json.quests);
 	});
 }
 
@@ -71,6 +71,7 @@ function timeOut() {
 		clone2.append(clone3);
 		clone.append(clone2);
 		menubar.append(clone);
+		timeoutVal = null;
 		buttonExists = true;
 	}, 1000)
 };
