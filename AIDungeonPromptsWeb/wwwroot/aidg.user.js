@@ -183,7 +183,7 @@ function onLoadClick() {
 		const questTextArea = getLastQuerySelector(questsTextAreaSelector);
 
 		setReactInputValue(titleInput, json.title === null ? "" : json.title);
-		// apparently leaving description blank just reverts it to a previous one (??? wtf mormon) so we put an blank space instead
+		// apparently leaving description blank just reverts it to a previous one (??? wtf mormon) so we put a blank space instead
 		setReactInputValue(descriptionTextArea, json.description === null || json.description === "" ? " " : json.description);
 		setReactInputValue(promptTextArea, json.promptContent === null ? "" : json.promptContent);
 		setReactInputValue(memoryTextArea, json.memory === null ? "" : json.memory);
