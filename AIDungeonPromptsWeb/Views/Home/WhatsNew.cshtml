@@ -3,6 +3,25 @@
 <h2>What's New?</h2>
 <br/>
 <div class="row">
+	@*<div class="col-12 mb-4">
+		<div class="card">
+			<div class="card-body">
+				<h5 class="card-title mb-3">2021/01/17 - Release 2.2</h5>
+				<ul>
+					<li class="mb-3">
+						Database backups are now available! Visit <a target="_blank" href="/backup.db">@Context.Request.Host.Value/backup.db</a> to download it. Backups are created nightly.
+					</li>
+					<li>
+						This is a SQLite database, you'll need a viewer to see any data. I personally use <a rel="noopener noreferrer nofollow" target="_blank" href="https://dbeaver.io/">Dbeaver</a>, but there are plenty of others available.
+					</li>
+					<li class="mb-3">
+						These is <strong>not</strong> an actual representation of the database - all users are stripped, and any prompts that are in draft status are not included. 
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>*@
+
 	<div class="col-12 mb-4">
 		<div class="card">
 			<div class="card-body">
@@ -10,9 +29,7 @@
 				<ul>
 					<li class="mb-3">
 						World Info exports now have IsNotHidden set to true automatically (since it's publically available anyway)
-					</li>
-				</ul>
-				<ul>
+					</li>				
 					<li class="mb-3">
 						We now have a userscript you can use to quickly import prompts into AI dungeon. This can, and probably will, break when Mormon makes updates to the site, so please be patient if this happens.
 					</li>
@@ -46,14 +63,10 @@
 				<ul>
 					<li class="mb-3">
 						Added a page where you can view all tags and the amount of prompts associated with that tag. Click on "All Tags" on the top nav or navigate to <a href="/tags">@Context.Request.Host.Value/tags</a>.
-					</li>
-				</ul>
-				<ul>
+					</li>				
 					<li class="mb-3">
 						You can now export and import worldInfo.json from AI Dungeon.
-					</li>
-				</ul>
-				<ul>
+					</li>				
 					<li class="mb-3">
 						You can now manually delete World Info (leaving it blank will also still delete it when submitted).
 					</li>
@@ -71,7 +84,7 @@
 						Sub scenarios are now in. This was a bigger piece of work than I originally thought, so there will probably be bugs and UI issues. You can add sub scenarios from the Create or Edit pages, just below WI. Sub scenario visibility is controlled by the top level parent - all are visible or nothing is.
 					</li>
 					<li class="mb-3">
-						In terms of reporting bugs, you can post them in the thread as usual, but for obvious reasons these might get missed, so open a GitHub issue here for maximum visibility if you want - <a rel="noopener noreferrer nofollow"  target="_blank" href="https://github.com/Woruburu/AIDungeonPrompts/issues">https://github.com/Woruburu/AIDungeonPrompts/issues</a>
+						In terms of reporting bugs, you can post them in the thread as usual, but for obvious reasons these might get missed, so open a GitHub issue here for maximum visibility if you want - <a rel="noopener noreferrer nofollow" target="_blank" href="https://github.com/Woruburu/AIDungeonPrompts/issues">https://github.com/Woruburu/AIDungeonPrompts/issues</a>
 					</li>
 					<li class="mb-3">
 						Bumping the version number because why not.
