@@ -198,6 +198,6 @@ namespace AIDungeonPrompts.Web
 			services.AddHostedService<DatabaseBackupHostedService>();
 		}
 
-		private string BackupDatabaseConnectionName() => $"Data Source={Path.Combine(Environment.WebRootPath, "backup.db")};Journal Mode=Off;";
+		private string BackupDatabaseConnectionName() => $"Data Source={Path.Combine(Environment.WebRootPath, "backup.db")};";
 	}
 }
