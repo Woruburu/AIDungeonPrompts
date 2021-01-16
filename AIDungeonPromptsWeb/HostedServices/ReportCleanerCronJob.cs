@@ -10,13 +10,13 @@ using Microsoft.Extensions.Logging;
 
 namespace AIDungeonPrompts.Web.HostedServices
 {
-	public class ReportCleanerHostedService : CronJobHostedService
+	public class ReportCleanerCronJob : CronJobHostedService
 	{
-		private readonly ILogger<ReportCleanerHostedService> _logger;
+		private readonly ILogger<ReportCleanerCronJob> _logger;
 		private readonly IServiceScopeFactory _serviceScopeFactory;
 
-		public ReportCleanerHostedService(
-			ILogger<ReportCleanerHostedService> logger,
+		public ReportCleanerCronJob(
+			ILogger<ReportCleanerCronJob> logger,
 			IServiceScopeFactory serviceScopeFactory
 		) : base("0 0 * * *", TimeZoneInfo.Local, logger)
 		{
@@ -26,12 +26,12 @@ namespace AIDungeonPrompts.Web.HostedServices
 
 		public override async Task DoWork(CancellationToken cancellationToken)
 		{
-			_logger.LogInformation($"{nameof(ReportCleanerHostedService)} Running Job");
+			_logger.LogInformation($"{nameof(ReportCleanerCronJob)} Running Job");
 			using var services = _serviceScopeFactory.CreateScope();
 			using var dbContext = services.ServiceProvider.GetRequiredService<IAIDungeonPromptsDbContext>();
 			if (dbContext == null)
 			{
-				_logger.LogWarning($"{nameof(ReportCleanerHostedService)}: Could not get DbContext from services");
+				_logger.LogWarning($"{nameof(ReportCleanerCronJob)}: Could not get DbContext from services");
 				return;
 			}
 
@@ -43,22 +43,22 @@ namespace AIDungeonPrompts.Web.HostedServices
 			dbContext.Reports.RemoveRange(reportsToRemove);
 			await dbContext.SaveChangesAsync(cancellationToken);
 
-			_logger.LogInformation($"{nameof(ReportCleanerHostedService)} Job Complete");
+			_logger.LogInformation($"{nameof(ReportCleanerCronJob)} Job Complete");
 			return;
 		}
 
 		public async override Task StartAsync(CancellationToken cancellationToken)
 		{
-			_logger.LogInformation($"{nameof(ReportCleanerHostedService)} Starting");
+			_logger.LogInformation($"{nameof(ReportCleanerCronJob)} Starting");
 			await base.StartAsync(cancellationToken);
-			_logger.LogInformation($"{nameof(ReportCleanerHostedService)} Started");
+			_logger.LogInformation($"{nameof(ReportCleanerCronJob)} Started");
 		}
 
 		public async override Task StopAsync(CancellationToken cancellationToken)
 		{
-			_logger.LogInformation($"{nameof(ReportCleanerHostedService)} Stopping");
+			_logger.LogInformation($"{nameof(ReportCleanerCronJob)} Stopping");
 			await base.StopAsync(cancellationToken);
-			_logger.LogInformation($"{nameof(ReportCleanerHostedService)} Stopped");
+			_logger.LogInformation($"{nameof(ReportCleanerCronJob)} Stopped");
 		}
 	}
 }

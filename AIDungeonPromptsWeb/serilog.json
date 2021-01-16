@@ -4,7 +4,7 @@
 			"Serilog.Sinks.Console"
 		],
 		"MinimumLevel": {
-			"Default": "Warning",
+			"Default": "Information",
 			"Override": {
 				"Microsoft.EntityFrameworkCore": "Warning",
 				"Microsoft.EntityFrameworkCore.Migrations": "Information",

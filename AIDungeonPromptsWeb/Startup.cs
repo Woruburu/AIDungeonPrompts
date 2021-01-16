@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Linq;
 using AIDungeonPrompts.Application;
 using AIDungeonPrompts.Backup.Persistence;
@@ -23,6 +24,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -36,7 +38,6 @@ namespace AIDungeonPrompts.Web
 {
 	public class Startup
 	{
-		private const string BackupDatabaseConnectionName = "Backup";
 		private const string DatabaseConnectionName = "AIDungeonPrompt";
 
 		public Startup(IConfiguration configuration, IWebHostEnvironment environment)
@@ -84,8 +85,11 @@ namespace AIDungeonPrompts.Web
 			app.UseCorrelationId();
 			app.UseSerilogRequestLogging();
 
+			var provider = new FileExtensionContentTypeProvider();
+			provider.Mappings[".db"] = "application/octet-stream";
 			app.UseStaticFiles(new StaticFileOptions()
 			{
+				ContentTypeProvider = provider,
 				OnPrepareResponse = (context) =>
 				{
 					var headers = context.Context.Response.GetTypedHeaders();
@@ -95,6 +99,7 @@ namespace AIDungeonPrompts.Web
 					};
 				}
 			});
+			;
 
 			app.UseRouting();
 
@@ -147,7 +152,7 @@ namespace AIDungeonPrompts.Web
 
 			services
 				.AddPersistenceLayer(Configuration.GetConnectionString(DatabaseConnectionName))
-				.AddBackupPersistenceLayer(Configuration.GetConnectionString(BackupDatabaseConnectionName))
+				.AddBackupPersistenceLayer(BackupDatabaseConnectionName())
 				.AddInfrastructureLayer()
 				.AddHttpContextAccessor()
 				.AddDefaultCorrelationId()
@@ -187,9 +192,12 @@ namespace AIDungeonPrompts.Web
 				);
 			});
 
-			services.AddHostedService<ApplicationLogCleanerHostedService>();
-			services.AddHostedService<ReportCleanerHostedService>();
+			services.AddHostedService<ApplicationLogCleanerCronJob>();
+			services.AddHostedService<ReportCleanerCronJob>();
+			services.AddHostedService<DatabaseBackupCronJob>();
 			services.AddHostedService<DatabaseBackupHostedService>();
 		}
+
+		private string BackupDatabaseConnectionName() => $"Data Source={Path.Combine(Environment.WebRootPath, "Backup.db")};";
 	}
 }
