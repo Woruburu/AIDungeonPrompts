@@ -10,13 +10,13 @@ using Microsoft.Extensions.Logging;
 
 namespace AIDungeonPrompts.Web.HostedServices
 {
-	public class ApplicationLogCleanerHostedService : CronJobHostedService
+	public class ApplicationLogCleanerCronJob : CronJobHostedService
 	{
-		private readonly ILogger<ApplicationLogCleanerHostedService> _logger;
+		private readonly ILogger<ApplicationLogCleanerCronJob> _logger;
 		private readonly IServiceScopeFactory _serviceScopeFactory;
 
-		public ApplicationLogCleanerHostedService(
-			ILogger<ApplicationLogCleanerHostedService> logger,
+		public ApplicationLogCleanerCronJob(
+			ILogger<ApplicationLogCleanerCronJob> logger,
 			IServiceScopeFactory serviceScopeFactory
 		) : base("0 0 * * *", TimeZoneInfo.Local, logger)
 		{
@@ -26,12 +26,12 @@ namespace AIDungeonPrompts.Web.HostedServices
 
 		public override async Task DoWork(CancellationToken cancellationToken)
 		{
-			_logger.LogInformation($"{nameof(ApplicationLogCleanerHostedService)} Running Job");
+			_logger.LogInformation($"{nameof(ApplicationLogCleanerCronJob)} Running Job");
 			using var services = _serviceScopeFactory.CreateScope();
 			using var dbContext = services.ServiceProvider.GetRequiredService<IAIDungeonPromptsDbContext>();
 			if (dbContext == null)
 			{
-				_logger.LogWarning($"{nameof(ApplicationLogCleanerHostedService)}: Could not get DbContext from services");
+				_logger.LogWarning($"{nameof(ApplicationLogCleanerCronJob)}: Could not get DbContext from services");
 				return;
 			}
 
@@ -43,22 +43,22 @@ namespace AIDungeonPrompts.Web.HostedServices
 			dbContext.ApplicationLogs.RemoveRange(logsToRemove);
 			await dbContext.SaveChangesAsync(cancellationToken);
 
-			_logger.LogInformation($"{nameof(ApplicationLogCleanerHostedService)} Job Complete");
+			_logger.LogInformation($"{nameof(ApplicationLogCleanerCronJob)} Job Complete");
 			return;
 		}
 
 		public async override Task StartAsync(CancellationToken cancellationToken)
 		{
-			_logger.LogInformation($"{nameof(ApplicationLogCleanerHostedService)} Starting");
+			_logger.LogInformation($"{nameof(ApplicationLogCleanerCronJob)} Starting");
 			await base.StartAsync(cancellationToken);
-			_logger.LogInformation($"{nameof(ApplicationLogCleanerHostedService)} Started");
+			_logger.LogInformation($"{nameof(ApplicationLogCleanerCronJob)} Started");
 		}
 
 		public async override Task StopAsync(CancellationToken cancellationToken)
 		{
-			_logger.LogInformation($"{nameof(ApplicationLogCleanerHostedService)} Stopping");
+			_logger.LogInformation($"{nameof(ApplicationLogCleanerCronJob)} Stopping");
 			await base.StopAsync(cancellationToken);
-			_logger.LogInformation($"{nameof(ApplicationLogCleanerHostedService)} Stopped");
+			_logger.LogInformation($"{nameof(ApplicationLogCleanerCronJob)} Stopped");
 		}
 	}
 }
