@@ -78,7 +78,7 @@ namespace AIDungeonPrompts.Web.HostedServices.DatabaseBackups
 		private static async Task CleanBackup(BackupDbContext context)
 		{
 			await context.Database.EnsureDeletedAsync();
-			await context.Database.EnsureCreatedAsync();
+			await context.Database.MigrateAsync();
 			using (var command = context.Database.GetDbConnection().CreateCommand())
 			{
 				command.CommandText = "DELETE FROM Prompts;VACUUM;";
