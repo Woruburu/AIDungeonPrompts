@@ -18,7 +18,7 @@ namespace AIDungeonPrompts.Web.HostedServices
 		public ReportCleanerHostedService(
 			ILogger<ReportCleanerHostedService> logger,
 			IServiceScopeFactory serviceScopeFactory
-		) : base("0 0 * * *", TimeZoneInfo.Local)
+		) : base("0 0 * * *", TimeZoneInfo.Local, logger)
 		{
 			_logger = logger;
 			_serviceScopeFactory = serviceScopeFactory;
@@ -28,7 +28,7 @@ namespace AIDungeonPrompts.Web.HostedServices
 		{
 			_logger.LogInformation($"{nameof(ReportCleanerHostedService)} Running Job");
 			using var services = _serviceScopeFactory.CreateScope();
-			var dbContext = services.ServiceProvider.GetRequiredService<IAIDungeonPromptsDbContext>();
+			using var dbContext = services.ServiceProvider.GetRequiredService<IAIDungeonPromptsDbContext>();
 			if (dbContext == null)
 			{
 				_logger.LogWarning($"{nameof(ReportCleanerHostedService)}: Could not get DbContext from services");
