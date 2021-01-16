@@ -28,9 +28,9 @@ namespace AIDungeonPrompts.Web.HostedServices.DatabaseBackups
 					.Include(e => e.PromptTags)
 					.ThenInclude(e => e.Tag)
 					.Include(e => e.WorldInfos)
+					.OrderBy(e => e.Id)
 					.Skip(page * pageSize)
 					.Take(pageSize)
-					.OrderBy(e => e.Id)
 					.AsNoTracking()
 					.ToListAsync(cancellationToken);
 				foreach (var prompt in allPrompts)
