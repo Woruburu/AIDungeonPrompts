@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using AIDungeonPrompts.Application.Abstractions.DbContexts;
@@ -25,26 +26,33 @@ namespace AIDungeonPrompts.Web.HostedServices
 
 		public async Task StartAsync(CancellationToken cancellationToken)
 		{
-			_logger.LogInformation($"{nameof(DatabaseBackupHostedService)} Running Job");
-			using var services = _serviceScopeFactory.CreateScope();
-
-			using var dbContext = services.ServiceProvider.GetRequiredService<IAIDungeonPromptsDbContext>();
-			if (dbContext == null)
+			try
 			{
-				_logger.LogWarning($"{nameof(DatabaseBackupHostedService)}: Could not get DbContext from services");
-				return;
-			}
+				_logger.LogInformation($"{nameof(DatabaseBackupHostedService)} Running Job");
+				using var services = _serviceScopeFactory.CreateScope();
 
-			using var backupContext = services.ServiceProvider.GetRequiredService<BackupDbContext>();
-			if (backupContext == null)
+				using var dbContext = services.ServiceProvider.GetRequiredService<IAIDungeonPromptsDbContext>();
+				if (dbContext == null)
+				{
+					_logger.LogWarning($"{nameof(DatabaseBackupHostedService)}: Could not get DbContext from services");
+					return;
+				}
+
+				using var backupContext = services.ServiceProvider.GetRequiredService<BackupDbContext>();
+				if (backupContext == null)
+				{
+					_logger.LogWarning($"{nameof(DatabaseBackupHostedService)}: Could not get Backup DbContext from services");
+					return;
+				}
+
+				await DatabaseBackup.BackupDatabase(dbContext, backupContext, cancellationToken);
+
+				_logger.LogInformation($"{nameof(DatabaseBackupHostedService)} Job Complete");
+			}
+			catch (Exception e)
 			{
-				_logger.LogWarning($"{nameof(DatabaseBackupHostedService)}: Could not get Backup DbContext from services");
-				return;
+				_logger.LogError(e, $"{nameof(DatabaseBackupHostedService)} Job Failed");
 			}
-
-			await DatabaseBackup.BackupDatabase(dbContext, backupContext, cancellationToken);
-
-			_logger.LogInformation($"{nameof(DatabaseBackupHostedService)} Job Complete");
 		}
 
 		public Task StopAsync(CancellationToken cancellationToken)
