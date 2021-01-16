@@ -16,7 +16,7 @@ namespace AIDungeonPrompts.Backup.Persistence
 				conn.Open();
 
 				var command = conn.CreateCommand();
-				command.CommandText = "PRAGMA journal_mode = OFF";
+				command.CommandText = "PRAGMA journal_mode = TRUNCATE";
 				command.ExecuteNonQuery();
 
 				options.UseSqlite(conn);
