@@ -30,6 +30,7 @@ namespace AIDungeonPrompts.Web.HostedServices.DatabaseBackups
 					.Include(e => e.WorldInfos)
 					.Skip(page * pageSize)
 					.Take(pageSize)
+					.OrderBy(e => e.Id)
 					.AsNoTracking()
 					.ToListAsync(cancellationToken);
 				foreach (var prompt in allPrompts)
@@ -77,7 +78,7 @@ namespace AIDungeonPrompts.Web.HostedServices.DatabaseBackups
 		private static async Task CleanBackup(BackupDbContext context)
 		{
 			await context.Database.EnsureDeletedAsync();
-			context.Database.Migrate();
+			await context.Database.EnsureCreatedAsync();
 			using (var command = context.Database.GetDbConnection().CreateCommand())
 			{
 				command.CommandText = "DELETE FROM Prompts;VACUUM;";
