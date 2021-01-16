@@ -3,20 +3,23 @@ using System.Threading;
 using System.Threading.Tasks;
 using Cronos;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace AIDungeonPrompts.Web.HostedServices.Abstracts
 {
 	public abstract class CronJobHostedService : IHostedService, IDisposable
 	{
 		private readonly CronExpression _expression;
+		private readonly ILogger<CronJobHostedService> _logger;
 		private readonly TimeZoneInfo _timeZoneInfo;
 		private bool _disposedValue;
 		private System.Timers.Timer? _timer;
 
-		protected CronJobHostedService(string cronExpression, TimeZoneInfo timeZoneInfo)
+		protected CronJobHostedService(string cronExpression, TimeZoneInfo timeZoneInfo, ILogger<CronJobHostedService> logger)
 		{
 			_expression = CronExpression.Parse(cronExpression);
 			_timeZoneInfo = timeZoneInfo;
+			_logger = logger;
 		}
 
 		public void Dispose()
@@ -68,7 +71,14 @@ namespace AIDungeonPrompts.Web.HostedServices.Abstracts
 
 					if (!cancellationToken.IsCancellationRequested)
 					{
-						await DoWork(cancellationToken);
+						try
+						{
+							await DoWork(cancellationToken);
+						}
+						catch (Exception e)
+						{
+							_logger.LogError(e, "Cronjob failed.");
+						}
 					}
 
 					if (!cancellationToken.IsCancellationRequested)

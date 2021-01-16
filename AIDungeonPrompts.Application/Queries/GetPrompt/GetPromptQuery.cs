@@ -33,24 +33,28 @@ namespace AIDungeonPrompts.Application.Queries.GetPrompt
 		public async Task<GetPromptViewModel?> Handle(GetPromptQuery request, CancellationToken cancellationToken = default)
 		{
 			var isDraft = true;
-			if (_dbContext is DbContext dbContext)
-			{
-				var findParent = await _dbContext.Prompts.Include(e => e.Parent).FirstOrDefaultAsync(e => e.Id == request.Id);
-				if (findParent == null)
-				{
-					return null;
-				}
-				while (findParent!.ParentId != null)
-				{
-					await dbContext.Entry(findParent).Reference(e => e.Parent).LoadAsync();
-					findParent = findParent.Parent;
-				}
-				isDraft = findParent.IsDraft;
-			}
-			else
+			if (!(_dbContext is DbContext dbContext))
 			{
 				throw new Exception($"{nameof(_dbContext)} was not a DbContext");
 			}
+
+			var findParent = await _dbContext
+				.Prompts
+				.Include(e => e.Parent)
+				.FirstOrDefaultAsync(e => e.Id == request.Id);
+			if (findParent == null)
+			{
+				return null;
+			}
+			while (findParent!.ParentId != null)
+			{
+				await dbContext
+					.Entry(findParent)
+					.Reference(e => e.Parent)
+					.LoadAsync();
+				findParent = findParent.Parent;
+			}
+			isDraft = findParent.IsDraft;
 
 			var prompt = await _dbContext.Prompts
 				.Include(e => e.WorldInfos)

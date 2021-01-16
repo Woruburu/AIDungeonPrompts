@@ -24,6 +24,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AIDungeonPrompts.Infrastruc
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AIDungeonPrompts.Test", "AIDungeonPrompts.Test\AIDungeonPrompts.Test.csproj", "{A15197F5-0BAA-4F0C-868C-6B112A71AE00}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIDungeonPrompts.Backup.Persistence", "AIDungeonPrompts.Backup.Persistence\AIDungeonPrompts.Backup.Persistence.csproj", "{27AF0392-3C0C-4FFA-A532-4AE57E16D878}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -54,6 +56,10 @@ Global
 		{A15197F5-0BAA-4F0C-868C-6B112A71AE00}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A15197F5-0BAA-4F0C-868C-6B112A71AE00}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A15197F5-0BAA-4F0C-868C-6B112A71AE00}.Release|Any CPU.Build.0 = Release|Any CPU
+		{27AF0392-3C0C-4FFA-A532-4AE57E16D878}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{27AF0392-3C0C-4FFA-A532-4AE57E16D878}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{27AF0392-3C0C-4FFA-A532-4AE57E16D878}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{27AF0392-3C0C-4FFA-A532-4AE57E16D878}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

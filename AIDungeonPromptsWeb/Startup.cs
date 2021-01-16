@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using AIDungeonPrompts.Application;
+using AIDungeonPrompts.Backup.Persistence;
 using AIDungeonPrompts.Domain;
 using AIDungeonPrompts.Infrastructure;
 using AIDungeonPrompts.Infrastructure.Identity;
@@ -35,14 +36,17 @@ namespace AIDungeonPrompts.Web
 {
 	public class Startup
 	{
+		private const string BackupDatabaseConnectionName = "Backup";
 		private const string DatabaseConnectionName = "AIDungeonPrompt";
 
-		public Startup(IConfiguration configuration)
+		public Startup(IConfiguration configuration, IWebHostEnvironment environment)
 		{
 			Configuration = configuration;
+			Environment = environment;
 		}
 
 		public IConfiguration Configuration { get; }
+		public IWebHostEnvironment Environment { get; }
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
 		public void Configure(IApplicationBuilder app, IWebHostEnvironment env, AIDungeonPromptsDbContext context)
@@ -143,6 +147,7 @@ namespace AIDungeonPrompts.Web
 
 			services
 				.AddPersistenceLayer(Configuration.GetConnectionString(DatabaseConnectionName))
+				.AddBackupPersistenceLayer(Configuration.GetConnectionString(BackupDatabaseConnectionName))
 				.AddInfrastructureLayer()
 				.AddHttpContextAccessor()
 				.AddDefaultCorrelationId()
@@ -184,9 +189,7 @@ namespace AIDungeonPrompts.Web
 
 			services.AddHostedService<ApplicationLogCleanerHostedService>();
 			services.AddHostedService<ReportCleanerHostedService>();
-
-			// This shouldn't ever need to be enabled again
-			//services.AddHostedService<NewlineFixerHostedService>();
+			services.AddHostedService<DatabaseBackupHostedService>();
 		}
 	}
 }

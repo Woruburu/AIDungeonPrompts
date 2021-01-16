@@ -26,6 +26,7 @@ namespace AIDungeonPrompts.Application.Queries.GetAllTags
 			return _dbContext.PromptTags
 				.Include(promptTag => promptTag.Tag)
 				.Where(promptTag => !promptTag.Prompt!.IsDraft)
+				.AsNoTracking()
 				.Select(promptTag => new GetTagViewModel
 				{
 					Id = promptTag.Tag!.Id,

@@ -20,6 +20,7 @@ using AIDungeonPrompts.Web.Models.Prompts;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -31,12 +32,28 @@ namespace AIDungeonPrompts.Web.Controllers
 		private readonly ICurrentUserService _currentUserService;
 		private readonly ILogger<PromptsController> _logger;
 		private readonly IMediator _mediator;
+		private readonly IWebHostEnvironment _webHostEnvironment;
 
-		public PromptsController(IMediator mediator, ICurrentUserService currentUserService, ILogger<PromptsController> logger)
+		public PromptsController(IMediator mediator, ICurrentUserService currentUserService, ILogger<PromptsController> logger, IWebHostEnvironment webHostEnvironment)
 		{
 			_mediator = mediator;
 			_currentUserService = currentUserService;
 			_logger = logger;
+			_webHostEnvironment = webHostEnvironment;
+		}
+
+		[HttpGet("[controller]/[action]")]
+		public async Task<ActionResult> Backup()
+		{
+			var file = Path.Combine(_webHostEnvironment.ContentRootPath, "Backup.db");
+			if (!System.IO.File.Exists(file))
+			{
+				return NotFound();
+			}
+			var content = new MemoryStream(await System.IO.File.ReadAllBytesAsync(file));
+			var contentType = "application/octet-stream";
+			var fileName = "aidg_Backup.db";
+			return File(content, contentType, fileName);
 		}
 
 		[HttpGet("[controller]/create")]

@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using AIDungeonPrompts.Application.Abstractions.DbContexts;
@@ -8,6 +9,7 @@ using Microsoft.Extensions.Logging;
 
 namespace AIDungeonPrompts.Web.HostedServices
 {
+	[Obsolete("This shouldn't ever need to be run again")]
 	public class NewlineFixerHostedService : IHostedService
 	{
 		private readonly ILogger<NewlineFixerHostedService> _logger;
