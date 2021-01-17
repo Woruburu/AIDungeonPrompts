@@ -12,19 +12,19 @@ namespace AIDungeonPrompts.Test.Collections.Database
 
 		public DatabaseFixture()
 		{
-			DbContextOptions = new DbContextOptionsBuilder<AIDungeonPromptsDbContext>()
+			var dbContextOptions = new DbContextOptionsBuilder<AIDungeonPromptsDbContext>()
 					.UseNpgsql(ConfigHelper.GetConfiguration().GetConnectionString(DatabaseConnectionName))
 					.Options;
-			using var dbContext = new AIDungeonPromptsDbContext(DbContextOptions);
-			dbContext.Database.EnsureCreated();
+			DbContext = new AIDungeonPromptsDbContext(dbContextOptions);
+			DbContext.Database.Migrate();
 		}
 
-		public DbContextOptions<AIDungeonPromptsDbContext> DbContextOptions { get; }
+		public AIDungeonPromptsDbContext DbContext { get; }
 
 		public void Dispose()
 		{
-			using var dbContext = new AIDungeonPromptsDbContext(DbContextOptions);
-			dbContext.Database.EnsureDeleted();
+			DbContext.Database.EnsureDeleted();
+			DbContext.Dispose();
 		}
 	}
 }

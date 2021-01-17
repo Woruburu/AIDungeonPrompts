@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using AIDungeonPrompts.Application.Abstractions.DbContexts;
 using AIDungeonPrompts.Backup.Persistence.DbContexts;
 using AIDungeonPrompts.Web.HostedServices.DatabaseBackups;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -45,6 +46,7 @@ namespace AIDungeonPrompts.Web.HostedServices
 					return;
 				}
 
+				await dbContext.Database.MigrateAsync(cancellationToken);
 				await DatabaseBackup.BackupDatabase(dbContext, backupContext, cancellationToken);
 
 				_logger.LogInformation($"{nameof(DatabaseBackupHostedService)} Job Complete");

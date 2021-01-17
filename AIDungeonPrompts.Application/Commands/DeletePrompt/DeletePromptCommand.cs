@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -63,16 +62,8 @@ namespace AIDungeonPrompts.Application.Commands.DeletePrompt
 		{
 			foreach (var child in children)
 			{
-				if (_dbContext is DbContext dbContext)
-				{
-					_dbContext.Prompts.Remove(child);
-					await dbContext.Entry(child).Collection(e => e.Children).LoadAsync();
-					await RemoveAllChildren(child.Children);
-				}
-				else
-				{
-					throw new Exception($"{nameof(_dbContext)} was not a DbContext");
-				}
+				await _dbContext.Entry(child).Collection(e => e.Children).LoadAsync();
+				await RemoveAllChildren(child.Children);
 				_dbContext.Prompts.Remove(child);
 			}
 		}

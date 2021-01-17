@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -32,29 +31,7 @@ namespace AIDungeonPrompts.Application.Queries.GetPrompt
 
 		public async Task<GetPromptViewModel?> Handle(GetPromptQuery request, CancellationToken cancellationToken = default)
 		{
-			var isDraft = true;
-			if (!(_dbContext is DbContext dbContext))
-			{
-				throw new Exception($"{nameof(_dbContext)} was not a DbContext");
-			}
-
-			var findParent = await _dbContext
-				.Prompts
-				.Include(e => e.Parent)
-				.FirstOrDefaultAsync(e => e.Id == request.Id);
-			if (findParent == null)
-			{
-				return null;
-			}
-			while (findParent!.ParentId != null)
-			{
-				await dbContext
-					.Entry(findParent)
-					.Reference(e => e.Parent)
-					.LoadAsync();
-				findParent = findParent.Parent;
-			}
-			isDraft = findParent.IsDraft;
+			var nonDrafts = await _dbContext.NonDraftPrompts.FirstOrDefaultAsync(e => e.Id == request.Id);
 
 			var prompt = await _dbContext.Prompts
 				.Include(e => e.WorldInfos)
@@ -94,7 +71,7 @@ namespace AIDungeonPrompts.Application.Queries.GetPrompt
 					})
 				}).FirstOrDefaultAsync(prompt => prompt.Id == request.Id);
 
-			if (prompt == null || (isDraft && (!_userService.TryGetCurrentUser(out var user) || prompt.OwnerId != user!.Id)))
+			if (prompt == null || (nonDrafts == null && (!_userService.TryGetCurrentUser(out var user) || prompt.OwnerId != user!.Id)))
 			{
 				return null;
 			}
