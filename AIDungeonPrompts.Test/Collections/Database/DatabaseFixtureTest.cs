@@ -10,26 +10,28 @@ namespace AIDungeonPrompts.Test.Collections.Database
 	{
 		protected DatabaseFixtureTest(DatabaseFixture fixture)
 		{
-			DbContext = new AIDungeonPromptsDbContext(fixture.DbContextOptions);
-			DbContextOptions = fixture.DbContextOptions;
+			DbContext = fixture.DbContext;
 		}
 
 		public AIDungeonPromptsDbContext DbContext { get; }
-		public DbContextOptions<AIDungeonPromptsDbContext> DbContextOptions { get; }
 
 		public void Dispose()
 		{
-			var dbContext = new AIDungeonPromptsDbContext(DbContextOptions);
-			dbContext.ApplicationLogs.RemoveRange(DbContext.ApplicationLogs);
-			dbContext.WorldInfos.RemoveRange(DbContext.WorldInfos);
-			dbContext.Reports.RemoveRange(DbContext.Reports);
-			dbContext.PromptTags.RemoveRange(DbContext.PromptTags);
-			dbContext.Prompts.RemoveRange(DbContext.Prompts);
-			dbContext.Tags.RemoveRange(DbContext.Tags);
-			dbContext.AuditPrompts.RemoveRange(DbContext.AuditPrompts);
-			dbContext.Users.RemoveRange(DbContext.Users);
-			dbContext.SaveChanges();
-			DbContext.Dispose();
+			foreach (var dbEntityEntry in DbContext.ChangeTracker.Entries())
+			{
+				if (dbEntityEntry.Entity != null)
+				{
+					dbEntityEntry.State = EntityState.Detached;
+				}
+			}
+			DbContext.AuditPrompts.RemoveRange(DbContext.AuditPrompts);
+			DbContext.WorldInfos.RemoveRange(DbContext.WorldInfos);
+			DbContext.Reports.RemoveRange(DbContext.Reports);
+			DbContext.PromptTags.RemoveRange(DbContext.PromptTags);
+			DbContext.Prompts.RemoveRange(DbContext.Prompts);
+			DbContext.Tags.RemoveRange(DbContext.Tags);
+			DbContext.Users.RemoveRange(DbContext.Users);
+			DbContext.SaveChanges();
 		}
 	}
 }
