@@ -78,6 +78,10 @@ namespace AIDungeonPrompts.Application.Commands.UpdatePrompt
 
 			if (canEditField)
 			{
+				var isDraft = !prompt.ParentId.HasValue
+					&& (isOwner
+						? request.SaveDraft
+						: prompt.IsDraft);
 				prompt.AuthorsNote = request.AuthorsNote?.Replace("\r\n", "\n");
 				prompt.DateEdited = DateTime.UtcNow;
 				prompt.Memory = request.Memory?.Replace("\r\n", "\n");
@@ -87,11 +91,8 @@ namespace AIDungeonPrompts.Application.Commands.UpdatePrompt
 				prompt.Title = request.Title.Replace("\r\n", "\n");
 				prompt.Description = request.Description?.Replace("\r\n", "\n");
 				prompt.WorldInfos = new List<WorldInfo>();
-				prompt.IsDraft = prompt.ParentId.HasValue
-					? false
-					: isOwner
-						? request.SaveDraft
-						: prompt.IsDraft;
+				prompt.IsDraft = isDraft;
+				prompt.PublishDate ??= (isDraft ? null : (DateTime?)DateTime.UtcNow);
 
 				foreach (var worldInfo in request.WorldInfos)
 				{

@@ -168,6 +168,107 @@ namespace AIDungeonPrompts.Test.Application.Queries.SearchPrompts
 		}
 
 		[Fact]
+		public async Task Handle_ReturnsInDateAscendingOrder_WhenOrderByIsSetToNewest_AndReverseIsSetToTrue()
+		{
+			//arrange
+			var latestPrompt = new Prompt
+			{
+				DateCreated = DateTime.UtcNow
+			};
+			var midPrompt = new Prompt
+			{
+				DateCreated = DateTime.UtcNow.AddDays(-1)
+			};
+			var earliestPrompt = new Prompt
+			{
+				DateCreated = DateTime.UtcNow.AddDays(-2)
+			};
+
+			DbContext.Prompts.AddRange(latestPrompt, midPrompt, earliestPrompt);
+			await DbContext.SaveChangesAsync();
+			var query = new SearchPromptsQuery()
+			{
+				OrderBy = SearchOrderBy.Newest,
+				Reverse = true
+			};
+
+			//act
+			var actual = await _handler.Handle(query);
+
+			//assert
+			Assert.Equal(latestPrompt.Id, actual.Results[2].Id);
+			Assert.Equal(midPrompt.Id, actual.Results[1].Id);
+			Assert.Equal(earliestPrompt.Id, actual.Results[0].Id);
+		}
+
+		[Fact]
+		public async Task Handle_ReturnsInDateAscendingOrder_WhenOrderByIsSetToNewest_AndReverseIsSetToTrue_AndPromptsHaveBothDateCreatedAndDatePublished()
+		{
+			//arrange
+			var midPrompt = new Prompt
+			{
+				DateCreated = DateTime.UtcNow
+			};
+			var earliestPrompt = new Prompt
+			{
+				DateCreated = DateTime.UtcNow.AddDays(-1)
+			};
+			var latestPrompt = new Prompt
+			{
+				PublishDate = DateTime.UtcNow.AddDays(1),
+				DateCreated = DateTime.UtcNow.AddDays(-2)
+			};
+			DbContext.Prompts.AddRange(latestPrompt, midPrompt, earliestPrompt);
+			await DbContext.SaveChangesAsync();
+			var query = new SearchPromptsQuery()
+			{
+				OrderBy = SearchOrderBy.Newest,
+				Reverse = true
+			};
+
+			//act
+			var actual = await _handler.Handle(query);
+
+			//assert
+			Assert.Equal(latestPrompt.Id, actual.Results[2].Id);
+			Assert.Equal(midPrompt.Id, actual.Results[1].Id);
+			Assert.Equal(earliestPrompt.Id, actual.Results[0].Id);
+		}
+
+		[Fact]
+		public async Task Handle_ReturnsInDateDescendingOrder_WhenOrderByIsSetToNewest()
+		{
+			//arrange
+			var latestPrompt = new Prompt
+			{
+				DateCreated = DateTime.UtcNow
+			};
+			var midPrompt = new Prompt
+			{
+				DateCreated = DateTime.UtcNow.AddDays(-1)
+			};
+			var earliestPrompt = new Prompt
+			{
+				DateCreated = DateTime.UtcNow.AddDays(-2)
+			};
+
+			DbContext.Prompts.AddRange(latestPrompt, midPrompt, earliestPrompt);
+			await DbContext.SaveChangesAsync();
+			var query = new SearchPromptsQuery()
+			{
+				OrderBy = SearchOrderBy.Newest
+			};
+
+			//act
+			var actual = await _handler.Handle(query);
+
+			//assert
+			Assert.Equal(latestPrompt.Id, actual.Results[0].Id);
+			Assert.Equal(midPrompt.Id, actual.Results[1].Id);
+			Assert.Equal(earliestPrompt.Id, actual.Results[2].Id);
+		}
+
+		[Fact]
 		public async Task Handle_ReturnsNoDrafts_WhenIncludesDraftsIsFalse()
 		{
 			//arrange
@@ -575,7 +676,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.SearchPrompts
 				{
 					Title = $"BasicTitle{i}",
 					PromptContent = $"BasicContent{i}",
-					DateCreated = DateTime.Now.AddDays(-i),
+					DateCreated = DateTime.UtcNow.AddDays(-i),
 					PromptTags = tags[..(i + 1)].Select(tag => new PromptTag
 					{
 						Tag = tag
@@ -594,7 +695,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.SearchPrompts
 				{
 					Title = $"UserTitle{i}",
 					PromptContent = $"UserContent{i}",
-					DateCreated = DateTime.Now.AddDays(-i),
+					DateCreated = DateTime.UtcNow.AddDays(-i),
 					Owner = owner,
 					PromptTags = tags[..(i + 1)].Select(tag => new PromptTag
 					{
@@ -611,7 +712,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.SearchPrompts
 					Title = $"NsfwTitle{i}",
 					PromptContent = $"NsfwContent{i}",
 					Nsfw = true,
-					DateCreated = DateTime.Now.AddDays(-i),
+					DateCreated = DateTime.UtcNow.AddDays(-i),
 					PromptTags = tags[..(i + 1)].Select(tag => new PromptTag
 					{
 						Tag = tag

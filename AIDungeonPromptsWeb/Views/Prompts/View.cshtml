@@ -38,8 +38,9 @@
 			@Model.Prompt.Title
 		</h3>
 		@if (!isChild)
-		{ 
-			<p>Created on @Model.Prompt.DateCreated.ToString("yyyy/MM/dd")</p>
+		{			
+			var date = Model.Prompt.PublishDate ?? Model.Prompt.DateCreated;			
+			<p>Published on @date.ToString("yyyy/MM/dd")</p>
 		}
 	</div>
 	<div class="ml-auto d-flex">

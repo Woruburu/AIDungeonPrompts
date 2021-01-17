@@ -11,13 +11,13 @@ using Microsoft.Extensions.Logging;
 
 namespace AIDungeonPrompts.Web.HostedServices
 {
-	public class DatabaseBackupHostedService : IHostedService
+	public class DatabaseMigrationAndBackupHostedService : IHostedService
 	{
-		private readonly ILogger<DatabaseBackupHostedService> _logger;
+		private readonly ILogger<DatabaseMigrationAndBackupHostedService> _logger;
 		private readonly IServiceScopeFactory _serviceScopeFactory;
 
-		public DatabaseBackupHostedService(
-			ILogger<DatabaseBackupHostedService> logger,
+		public DatabaseMigrationAndBackupHostedService(
+			ILogger<DatabaseMigrationAndBackupHostedService> logger,
 			IServiceScopeFactory serviceScopeFactory
 		)
 		{
@@ -29,31 +29,31 @@ namespace AIDungeonPrompts.Web.HostedServices
 		{
 			try
 			{
-				_logger.LogInformation($"{nameof(DatabaseBackupHostedService)} Running Job");
+				_logger.LogInformation($"{nameof(DatabaseMigrationAndBackupHostedService)} Running Job");
 				using var services = _serviceScopeFactory.CreateScope();
 
 				using var dbContext = services.ServiceProvider.GetRequiredService<IAIDungeonPromptsDbContext>();
 				if (dbContext == null)
 				{
-					_logger.LogWarning($"{nameof(DatabaseBackupHostedService)}: Could not get DbContext from services");
+					_logger.LogWarning($"{nameof(DatabaseMigrationAndBackupHostedService)}: Could not get DbContext from services");
 					return;
 				}
 
 				using var backupContext = services.ServiceProvider.GetRequiredService<BackupDbContext>();
 				if (backupContext == null)
 				{
-					_logger.LogWarning($"{nameof(DatabaseBackupHostedService)}: Could not get Backup DbContext from services");
+					_logger.LogWarning($"{nameof(DatabaseMigrationAndBackupHostedService)}: Could not get Backup DbContext from services");
 					return;
 				}
 
 				await dbContext.Database.MigrateAsync(cancellationToken);
 				await DatabaseBackup.BackupDatabase(dbContext, backupContext, cancellationToken);
 
-				_logger.LogInformation($"{nameof(DatabaseBackupHostedService)} Job Complete");
+				_logger.LogInformation($"{nameof(DatabaseMigrationAndBackupHostedService)} Job Complete");
 			}
 			catch (Exception e)
 			{
-				_logger.LogError(e, $"{nameof(DatabaseBackupHostedService)} Job Failed");
+				_logger.LogError(e, $"{nameof(DatabaseMigrationAndBackupHostedService)} Job Failed");
 			}
 		}
 

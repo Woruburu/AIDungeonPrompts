@@ -34,6 +34,7 @@ namespace AIDungeonPrompts.Application.Queries.GetPrompt
 		[Display(Name = "Tags")]
 		public IEnumerable<GetPromptPromptTagViewModel> PromptTags { get; set; } = new List<GetPromptPromptTagViewModel>();
 
+		public DateTime? PublishDate { get; set; }
 		public string? Quests { get; set; }
 		public string Title { get; set; } = string.Empty;
 

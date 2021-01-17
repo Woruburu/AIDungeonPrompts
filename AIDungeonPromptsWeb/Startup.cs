@@ -190,10 +190,11 @@ namespace AIDungeonPrompts.Web
 				);
 			});
 
+			services.AddHostedService<DatabaseMigrationAndBackupHostedService>();
+
 			services.AddHostedService<ApplicationLogCleanerCronJob>();
 			services.AddHostedService<ReportCleanerCronJob>();
 			services.AddHostedService<DatabaseBackupCronJob>();
-			services.AddHostedService<DatabaseBackupHostedService>();
 		}
 
 		private string BackupDatabaseConnectionName() => $"Data Source={Path.Combine(Environment.WebRootPath, "backup.db")};";

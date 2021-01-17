@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using AIDungeonPrompts.Domain.Entities.Abstract;
 
@@ -17,6 +18,7 @@ namespace AIDungeonPrompts.Domain.Entities
 		public int? ParentId { get; set; }
 		public string PromptContent { get; set; } = string.Empty;
 		public List<PromptTag> PromptTags { get; set; } = new List<PromptTag>();
+		public DateTime? PublishDate { get; set; }
 		public string? Quests { get; set; }
 		public List<Report> Reports { get; set; } = new List<Report>();
 		public string Title { get; set; } = string.Empty;
