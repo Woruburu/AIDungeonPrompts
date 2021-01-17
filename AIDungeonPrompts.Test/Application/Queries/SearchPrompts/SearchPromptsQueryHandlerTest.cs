@@ -173,15 +173,15 @@ namespace AIDungeonPrompts.Test.Application.Queries.SearchPrompts
 			//arrange
 			var latestPrompt = new Prompt
 			{
-				DateCreated = DateTime.Now
+				DateCreated = DateTime.UtcNow
 			};
 			var midPrompt = new Prompt
 			{
-				DateCreated = DateTime.Now.AddDays(-1)
+				DateCreated = DateTime.UtcNow.AddDays(-1)
 			};
 			var earliestPrompt = new Prompt
 			{
-				DateCreated = DateTime.Now.AddDays(-2)
+				DateCreated = DateTime.UtcNow.AddDays(-2)
 			};
 
 			DbContext.Prompts.AddRange(latestPrompt, midPrompt, earliestPrompt);
@@ -207,16 +207,16 @@ namespace AIDungeonPrompts.Test.Application.Queries.SearchPrompts
 			//arrange
 			var midPrompt = new Prompt
 			{
-				DateCreated = DateTime.Now
+				DateCreated = DateTime.UtcNow
 			};
 			var earliestPrompt = new Prompt
 			{
-				DateCreated = DateTime.Now.AddDays(-1)
+				DateCreated = DateTime.UtcNow.AddDays(-1)
 			};
 			var latestPrompt = new Prompt
 			{
-				PublishDate = DateTime.Now.AddDays(1),
-				DateCreated = DateTime.Now.AddDays(-2)
+				PublishDate = DateTime.UtcNow.AddDays(1),
+				DateCreated = DateTime.UtcNow.AddDays(-2)
 			};
 			DbContext.Prompts.AddRange(latestPrompt, midPrompt, earliestPrompt);
 			await DbContext.SaveChangesAsync();
@@ -241,15 +241,15 @@ namespace AIDungeonPrompts.Test.Application.Queries.SearchPrompts
 			//arrange
 			var latestPrompt = new Prompt
 			{
-				DateCreated = DateTime.Now
+				DateCreated = DateTime.UtcNow
 			};
 			var midPrompt = new Prompt
 			{
-				DateCreated = DateTime.Now.AddDays(-1)
+				DateCreated = DateTime.UtcNow.AddDays(-1)
 			};
 			var earliestPrompt = new Prompt
 			{
-				DateCreated = DateTime.Now.AddDays(-2)
+				DateCreated = DateTime.UtcNow.AddDays(-2)
 			};
 
 			DbContext.Prompts.AddRange(latestPrompt, midPrompt, earliestPrompt);
@@ -676,7 +676,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.SearchPrompts
 				{
 					Title = $"BasicTitle{i}",
 					PromptContent = $"BasicContent{i}",
-					DateCreated = DateTime.Now.AddDays(-i),
+					DateCreated = DateTime.UtcNow.AddDays(-i),
 					PromptTags = tags[..(i + 1)].Select(tag => new PromptTag
 					{
 						Tag = tag
@@ -695,7 +695,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.SearchPrompts
 				{
 					Title = $"UserTitle{i}",
 					PromptContent = $"UserContent{i}",
-					DateCreated = DateTime.Now.AddDays(-i),
+					DateCreated = DateTime.UtcNow.AddDays(-i),
 					Owner = owner,
 					PromptTags = tags[..(i + 1)].Select(tag => new PromptTag
 					{
@@ -712,7 +712,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.SearchPrompts
 					Title = $"NsfwTitle{i}",
 					PromptContent = $"NsfwContent{i}",
 					Nsfw = true,
-					DateCreated = DateTime.Now.AddDays(-i),
+					DateCreated = DateTime.UtcNow.AddDays(-i),
 					PromptTags = tags[..(i + 1)].Select(tag => new PromptTag
 					{
 						Tag = tag

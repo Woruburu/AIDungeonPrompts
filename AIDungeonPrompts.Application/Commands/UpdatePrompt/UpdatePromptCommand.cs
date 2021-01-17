@@ -92,7 +92,7 @@ namespace AIDungeonPrompts.Application.Commands.UpdatePrompt
 				prompt.Description = request.Description?.Replace("\r\n", "\n");
 				prompt.WorldInfos = new List<WorldInfo>();
 				prompt.IsDraft = isDraft;
-				prompt.PublishDate ??= (isDraft ? null : (DateTime?)DateTime.Now);
+				prompt.PublishDate ??= (isDraft ? null : (DateTime?)DateTime.UtcNow);
 
 				foreach (var worldInfo in request.WorldInfos)
 				{

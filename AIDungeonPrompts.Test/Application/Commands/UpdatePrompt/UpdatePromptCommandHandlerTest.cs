@@ -52,7 +52,7 @@ namespace AIDungeonPrompts.Test.Application.Commands.UpdatePrompt
 		public async Task Handle_DoesNotChangePublishDate_WhenItHasValue(bool initialDraftStatus, bool updatedDraftStatus)
 		{
 			//arrange
-			var expectedDate = DateTime.Now;
+			var expectedDate = DateTime.UtcNow;
 			var owner = new User { Username = "TestUser" };
 			var prompt = new Prompt { IsDraft = initialDraftStatus, Owner = owner, PublishDate = expectedDate };
 			DbContext.Prompts.Add(prompt);

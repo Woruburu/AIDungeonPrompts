@@ -90,7 +90,7 @@ namespace AIDungeonPrompts.Application.Commands.CreatePrompt
 				Upvote = 0,
 				Views = 0,
 				IsDraft = isDraft,
-				PublishDate = isDraft ? null : (DateTime?)DateTime.Now,
+				PublishDate = isDraft ? null : (DateTime?)DateTime.UtcNow,
 				ParentId = request.ParentId
 			};
 
