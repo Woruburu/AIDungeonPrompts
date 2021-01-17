@@ -39,6 +39,48 @@ namespace AIDungeonPrompts.Test.Application.Commands.CreatePrompt
 		}
 
 		[Fact]
+		public async Task Handle_CreatesAPromptWithANullPublishDate_WhenItIsDraft()
+		{
+			//arrange
+			var user = new User { Username = "TestUser" };
+			DbContext.Users.Add(user);
+			await DbContext.SaveChangesAsync();
+			var command = new CreatePromptCommand
+			{
+				OwnerId = user.Id,
+				SaveDraft = true
+			};
+
+			//act
+			var actual = await _handler.Handle(command);
+
+			//assert
+			var actualPrompt = await DbContext.Prompts.FindAsync(actual);
+			Assert.Null(actualPrompt.PublishDate);
+		}
+
+		[Fact]
+		public async Task Handle_CreatesAPromptWithAPublishDate_WhenItIsNotADraft()
+		{
+			//arrange
+			var user = new User { Username = "TestUser" };
+			DbContext.Users.Add(user);
+			await DbContext.SaveChangesAsync();
+			var command = new CreatePromptCommand
+			{
+				OwnerId = user.Id,
+				SaveDraft = false
+			};
+
+			//act
+			var actual = await _handler.Handle(command);
+
+			//assert
+			var actualPrompt = await DbContext.Prompts.FindAsync(actual);
+			Assert.NotNull(actualPrompt.PublishDate);
+		}
+
+		[Fact]
 		public async Task Handle_CreatesAPromptWithTheParentId_WhenParentIdIsGiven_AndTheCurrentUserIsTheSameId()
 		{
 			//arrange

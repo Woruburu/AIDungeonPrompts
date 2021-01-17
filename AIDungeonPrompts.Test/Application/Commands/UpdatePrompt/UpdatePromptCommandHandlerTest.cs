@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using AIDungeonPrompts.Application.Abstractions.Identity;
 using AIDungeonPrompts.Application.Commands.UpdatePrompt;
@@ -41,6 +42,71 @@ namespace AIDungeonPrompts.Test.Application.Commands.UpdatePrompt
 			//assert
 			var actual = DbContext.Prompts.Find(prompt.Id);
 			Assert.Equal(expectedDraftStatus, actual.IsDraft);
+		}
+
+		[Theory]
+		[InlineData(true, true)]
+		[InlineData(true, false)]
+		[InlineData(false, true)]
+		[InlineData(false, false)]
+		public async Task Handle_DoesNotChangePublishDate_WhenItHasValue(bool initialDraftStatus, bool updatedDraftStatus)
+		{
+			//arrange
+			var expectedDate = DateTime.Now;
+			var owner = new User { Username = "TestUser" };
+			var prompt = new Prompt { IsDraft = initialDraftStatus, Owner = owner, PublishDate = expectedDate };
+			DbContext.Prompts.Add(prompt);
+			await DbContext.SaveChangesAsync();
+			var user = new GetUserViewModel { Id = owner.Id, Role = RoleEnum.FieldEdit };
+			_mockUserService.Setup(e => e.TryGetCurrentUser(out user)).Returns(true);
+			var command = new UpdatePromptCommand { Id = prompt.Id, SaveDraft = updatedDraftStatus };
+
+			//act
+			await _handler.Handle(command);
+
+			//assert
+			var actual = DbContext.Prompts.Find(prompt.Id);
+			Assert.Equal(expectedDate, actual.PublishDate);
+		}
+
+		[Fact]
+		public async Task Handle_LeavesPublishNull_WhenSaveDraftIsTrue_AndPromptHasNoPublishDate_AndWasDraft()
+		{
+			//arrange
+			var owner = new User { Username = "TestUser" };
+			var prompt = new Prompt { IsDraft = true, Owner = owner };
+			DbContext.Prompts.Add(prompt);
+			await DbContext.SaveChangesAsync();
+			var user = new GetUserViewModel { Id = owner.Id, Role = RoleEnum.FieldEdit };
+			_mockUserService.Setup(e => e.TryGetCurrentUser(out user)).Returns(true);
+			var command = new UpdatePromptCommand { Id = prompt.Id, SaveDraft = true };
+
+			//act
+			await _handler.Handle(command);
+
+			//assert
+			var actual = DbContext.Prompts.Find(prompt.Id);
+			Assert.Null(actual.PublishDate);
+		}
+
+		[Fact]
+		public async Task Handle_SetsAPublishDate_WhenSaveDraftIsFalse_AndPromptHasNoPublishDate_AndWasDraft()
+		{
+			//arrange
+			var owner = new User { Username = "TestUser" };
+			var prompt = new Prompt { IsDraft = true, Owner = owner };
+			DbContext.Prompts.Add(prompt);
+			await DbContext.SaveChangesAsync();
+			var user = new GetUserViewModel { Id = owner.Id };
+			_mockUserService.Setup(e => e.TryGetCurrentUser(out user)).Returns(true);
+			var command = new UpdatePromptCommand { Id = prompt.Id, SaveDraft = false };
+
+			//act
+			await _handler.Handle(command);
+
+			//assert
+			var actual = DbContext.Prompts.Find(prompt.Id);
+			Assert.NotNull(actual.PublishDate);
 		}
 
 		[Theory]
