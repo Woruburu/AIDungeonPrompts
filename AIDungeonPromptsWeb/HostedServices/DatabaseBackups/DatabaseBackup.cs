@@ -43,7 +43,7 @@ namespace AIDungeonPrompts.Web.HostedServices.DatabaseBackups
 
 		private static async Task CleanBackup(BackupDbContext context, CancellationToken cancellationToken)
 		{
-			await context.Database.EnsureCreatedAsync(cancellationToken);
+			await context.Database.MigrateAsync(cancellationToken);
 
 			var promptTableName = context.Model.FindEntityType(typeof(BackupPrompt)).GetTableName();
 			var worldInfoTableName = context.Model.FindEntityType(typeof(BackupWorldInfo)).GetTableName();
@@ -74,6 +74,7 @@ namespace AIDungeonPrompts.Web.HostedServices.DatabaseBackups
 				PromptContent = prompt.PromptContent,
 				Quests = prompt.Quests,
 				Title = prompt.Title,
+				PublishDate = prompt.PublishDate,
 				Tags = string.Join(", ", prompt.PromptTags.Select(e => e.Tag!.Name)),
 				WorldInfos = prompt.WorldInfos.Select(worldInfo => new BackupWorldInfo
 				{

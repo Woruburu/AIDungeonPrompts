@@ -73,6 +73,8 @@ namespace AIDungeonPrompts.Application.Commands.CreatePrompt
 				}
 			}
 
+			var isDraft = request.ParentId.HasValue ? false : request.SaveDraft;
+
 			var prompt = new Prompt
 			{
 				AuthorsNote = request.AuthorsNote?.Replace("\r\n", "\n"),
@@ -87,7 +89,8 @@ namespace AIDungeonPrompts.Application.Commands.CreatePrompt
 				OwnerId = request.OwnerId,
 				Upvote = 0,
 				Views = 0,
-				IsDraft = request.ParentId.HasValue ? false : request.SaveDraft,
+				IsDraft = isDraft,
+				PublishDate = isDraft ? null : (DateTime?)DateTime.Now,
 				ParentId = request.ParentId
 			};
 

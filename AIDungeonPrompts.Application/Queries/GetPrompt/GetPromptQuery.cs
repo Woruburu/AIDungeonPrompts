@@ -52,6 +52,7 @@ namespace AIDungeonPrompts.Application.Queries.GetPrompt
 					DateCreated = prompt.DateCreated,
 					ParentId = prompt.ParentId,
 					OwnerId = prompt.OwnerId,
+					PublishDate = prompt.PublishDate,
 					WorldInfos = prompt.WorldInfos.Select(worldInfo => new GetPromptWorldInfoViewModel
 					{
 						Id = worldInfo.Id,

@@ -189,9 +189,9 @@ namespace AIDungeonPrompts.Application.Queries.SearchPrompts
 				case SearchOrderBy.Newest:
 					if (!request.Reverse)
 					{
-						return query.OrderByDescending(prompt => prompt.DateCreated);
+						return query.OrderByDescending(prompt => prompt.PublishDate ?? prompt.DateCreated);
 					}
-					return query.OrderBy(prompt => prompt.DateCreated);
+					return query.OrderBy(prompt => prompt.PublishDate ?? prompt.DateCreated);
 
 				case SearchOrderBy.Views:
 					if (!request.Reverse)
