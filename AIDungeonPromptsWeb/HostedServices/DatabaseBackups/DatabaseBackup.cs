@@ -6,7 +6,6 @@ using AIDungeonPrompts.Application.Abstractions.DbContexts;
 using AIDungeonPrompts.Backup.Persistence.DbContexts;
 using AIDungeonPrompts.Backup.Persistence.Entities;
 using AIDungeonPrompts.Domain.Entities;
-using EFCore.BulkExtensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace AIDungeonPrompts.Web.HostedServices.DatabaseBackups
@@ -36,7 +35,8 @@ namespace AIDungeonPrompts.Web.HostedServices.DatabaseBackups
 					.AsNoTracking()
 					.ToListAsync(cancellationToken);
 				var backups = allPrompts.Where(e => nonDrafts.Contains(e.Id)).Select(prompt => CreateBackupPrompt(prompt)).ToList();
-				await backupContext.BulkInsertAsync(backups, cancellationToken: cancellationToken);
+				backupContext.Prompts.AddRange(backups);
+				await backupContext.SaveChangesAsync(cancellationToken);
 				page++;
 			}
 		}
