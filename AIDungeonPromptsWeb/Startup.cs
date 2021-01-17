@@ -63,8 +63,6 @@ namespace AIDungeonPrompts.Web
 				app.UseExceptionHandler("/Home/Error");
 			}
 
-			context.Database.Migrate();
-
 			// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
 			app.UseHsts();
 			app.UseXContentTypeOptions();
