@@ -47,6 +47,7 @@ namespace AIDungeonPrompts.Web.HostedServices
 				}
 
 				await dbContext.Database.MigrateAsync(cancellationToken);
+				await backupContext.Database.MigrateAsync(cancellationToken);
 				await DatabaseBackup.BackupDatabase(dbContext, backupContext, cancellationToken);
 
 				_logger.LogInformation($"{nameof(DatabaseMigrationAndBackupHostedService)} Job Complete");

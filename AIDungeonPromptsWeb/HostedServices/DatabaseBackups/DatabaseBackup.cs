@@ -43,8 +43,6 @@ namespace AIDungeonPrompts.Web.HostedServices.DatabaseBackups
 
 		private static async Task CleanBackup(BackupDbContext context, CancellationToken cancellationToken)
 		{
-			await context.Database.MigrateAsync(cancellationToken);
-
 			var promptTableName = context.Model.FindEntityType(typeof(BackupPrompt)).GetTableName();
 			var worldInfoTableName = context.Model.FindEntityType(typeof(BackupWorldInfo)).GetTableName();
 
@@ -55,6 +53,7 @@ namespace AIDungeonPrompts.Web.HostedServices.DatabaseBackups
 
 				await context.Database.OpenConnectionAsync(cancellationToken);
 				await command.ExecuteNonQueryAsync(cancellationToken);
+				await context.Database.CloseConnectionAsync();
 			}
 		}
 
