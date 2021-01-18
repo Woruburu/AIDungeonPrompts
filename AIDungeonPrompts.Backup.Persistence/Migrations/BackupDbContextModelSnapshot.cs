@@ -37,9 +37,6 @@ namespace AIDungeonPrompts.Backup.Persistence.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("TEXT");
 
-                    b.Property<bool>("IsDraft")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("Memory")
                         .HasColumnType("TEXT");
 

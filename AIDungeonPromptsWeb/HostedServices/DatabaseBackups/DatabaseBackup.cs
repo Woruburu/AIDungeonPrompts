@@ -67,7 +67,6 @@ namespace AIDungeonPrompts.Web.HostedServices.DatabaseBackups
 				DateEdited = prompt.DateEdited,
 				Description = prompt.Description,
 				CorrelationId = prompt.Id,
-				IsDraft = false,
 				Memory = prompt.Memory,
 				Nsfw = prompt.Nsfw,
 				ParentId = prompt.ParentId,

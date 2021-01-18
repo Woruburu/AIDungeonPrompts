@@ -15,7 +15,6 @@ namespace AIDungeonPrompts.Backup.Persistence.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     AuthorsNote = table.Column<string>(type: "TEXT", nullable: true),
                     Description = table.Column<string>(type: "TEXT", nullable: true),
-                    IsDraft = table.Column<bool>(type: "INTEGER", nullable: false),
                     Memory = table.Column<string>(type: "TEXT", nullable: true),
                     Nsfw = table.Column<bool>(type: "INTEGER", nullable: false),
                     ParentId = table.Column<int>(type: "INTEGER", nullable: true),
