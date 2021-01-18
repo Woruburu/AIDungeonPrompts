@@ -11,6 +11,7 @@ namespace AIDungeonPrompts.Persistence.Configurations
 			builder.HasKey(e => e.Id);
 			builder.Property(e => e.Title).IsRequired();
 			builder.Property(e => e.PromptContent).IsRequired();
+			builder.Property(e => e.ScriptZip).HasMaxLength(5000000);
 			builder.HasIndex(e => e.Title);
 			builder.HasOne(e => e.Owner)
 				.WithMany(e => e.Prompts)

@@ -40,6 +40,7 @@ namespace AIDungeonPrompts.Application.Commands.UpdatePrompt
 
 		public bool SaveDraft { get; set; }
 
+		public byte[] ScriptZip { get; set; }
 		public string Title { get; set; } = string.Empty;
 
 		[Display(Name = "World Info")]
@@ -93,6 +94,7 @@ namespace AIDungeonPrompts.Application.Commands.UpdatePrompt
 				prompt.WorldInfos = new List<WorldInfo>();
 				prompt.IsDraft = isDraft;
 				prompt.PublishDate ??= (isDraft ? null : (DateTime?)DateTime.UtcNow);
+				prompt.ScriptZip = request.ScriptZip;
 
 				foreach (var worldInfo in request.WorldInfos)
 				{

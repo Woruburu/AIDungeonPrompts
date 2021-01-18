@@ -21,6 +21,7 @@ namespace AIDungeonPrompts.Domain.Entities
 		public DateTime? PublishDate { get; set; }
 		public string? Quests { get; set; }
 		public List<Report> Reports { get; set; } = new List<Report>();
+		public byte[]? ScriptZip { get; set; }
 		public string Title { get; set; } = string.Empty;
 		public int Upvote { get; set; }
 		public int Views { get; set; }

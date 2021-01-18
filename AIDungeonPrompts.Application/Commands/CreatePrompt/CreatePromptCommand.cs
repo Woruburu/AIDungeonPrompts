@@ -38,6 +38,8 @@ namespace AIDungeonPrompts.Application.Commands.CreatePrompt
 
 		public bool SaveDraft { get; set; }
 
+		public byte[]? ScriptZip { get; set; }
+
 		public string Title { get; set; } = string.Empty;
 
 		[Display(Name = "World Info")]
@@ -73,7 +75,7 @@ namespace AIDungeonPrompts.Application.Commands.CreatePrompt
 				}
 			}
 
-			var isDraft = request.ParentId.HasValue ? false : request.SaveDraft;
+			var isDraft = !request.ParentId.HasValue && request.SaveDraft;
 
 			var prompt = new Prompt
 			{
@@ -91,7 +93,8 @@ namespace AIDungeonPrompts.Application.Commands.CreatePrompt
 				Views = 0,
 				IsDraft = isDraft,
 				PublishDate = isDraft ? null : (DateTime?)DateTime.UtcNow,
-				ParentId = request.ParentId
+				ParentId = request.ParentId,
+				ScriptZip = request.ScriptZip
 			};
 
 			foreach (var worldInfo in request.WorldInfos)

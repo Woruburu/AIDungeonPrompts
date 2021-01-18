@@ -50,7 +50,7 @@ namespace AIDungeonPrompts.Web
 		public IWebHostEnvironment Environment { get; }
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-		public void Configure(IApplicationBuilder app, IWebHostEnvironment env, AIDungeonPromptsDbContext context)
+		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 		{
 			app.UseForwardedHeaders();
 
@@ -97,7 +97,6 @@ namespace AIDungeonPrompts.Web
 					};
 				}
 			});
-			;
 
 			app.UseRouting();
 
@@ -190,11 +189,10 @@ namespace AIDungeonPrompts.Web
 				);
 			});
 
-			services.AddHostedService<DatabaseMigrationAndBackupHostedService>();
-
+			//services.AddHostedService<DatabaseMigrationAndBackupHostedService>();
+			//services.AddHostedService<DatabaseBackupCronJob>();
 			services.AddHostedService<ApplicationLogCleanerCronJob>();
 			services.AddHostedService<ReportCleanerCronJob>();
-			services.AddHostedService<DatabaseBackupCronJob>();
 		}
 
 		private string BackupDatabaseConnectionName() => $"Data Source={Path.Combine(Environment.WebRootPath, "backup.db")};";

@@ -19,7 +19,7 @@ namespace AIDungeonPrompts.Web.HostedServices.DatabaseBackups
 			var nonDrafts = await dbContext.NonDraftPrompts.Select(e => e.Id).ToListAsync(cancellationToken);
 
 			var page = 0;
-			var pageSize = 100;
+			const int pageSize = 100;
 			var totalCount = await dbContext.Prompts.CountAsync(cancellationToken);
 
 			while (page * pageSize < totalCount)

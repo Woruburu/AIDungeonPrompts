@@ -7,6 +7,7 @@ namespace AIDungeonPrompts.Web.Models.Prompts
 	public class CreatePromptViewModel
 	{
 		public CreatePromptCommand Command { get; set; } = new CreatePromptCommand();
+		public IFormFile? ScriptZip { get; set; }
 		public SimilarPromptViewModel SimilarPromptQuery { get; set; } = new SimilarPromptViewModel();
 		public IFormFile? WorldInfoFile { get; set; }
 	}

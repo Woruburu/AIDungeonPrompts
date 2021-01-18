@@ -17,6 +17,7 @@ using AIDungeonPrompts.Application.Queries.SimilarPrompt;
 using AIDungeonPrompts.Domain.Enums;
 using AIDungeonPrompts.Web.Extensions;
 using AIDungeonPrompts.Web.Models.Prompts;
+using FluentValidation.AspNetCore;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
@@ -60,7 +61,7 @@ namespace AIDungeonPrompts.Web.Controllers
 				if (model.WorldInfoFile != null)
 				{
 					var worldInfos = await ReadWorldInfoFromFileAsync(model.WorldInfoFile);
-					if (worldInfos != null && worldInfos.Count > 0)
+					if (worldInfos?.Count > 0)
 					{
 						if (model.Command.WorldInfos.Count == 1
 							&& string.IsNullOrWhiteSpace(model.Command.WorldInfos[0].Entry)
@@ -96,13 +97,25 @@ namespace AIDungeonPrompts.Web.Controllers
 				return View(model);
 			}
 
-			model.Command.SaveDraft = saveDraft || addChild;
-
 			if (addWi)
 			{
 				ModelState.Clear();
 				model.Command.WorldInfos.Add(new CreatePromptCommandWorldInfo());
 				return View(model);
+			}
+
+			model.Command.SaveDraft = saveDraft || addChild;
+
+			if (model.ScriptZip != null)
+			{
+				using var stream = new MemoryStream();
+				await model.ScriptZip.CopyToAsync(stream);
+				model.Command.ScriptZip = stream.ToArray();
+
+				var validator = new CreatePromptCommandValidator();
+				var results = validator.Validate(model.Command);
+
+				results.AddToModelState(ModelState, nameof(model.Command));
 			}
 
 			if (!ModelState.IsValid)
@@ -196,7 +209,7 @@ namespace AIDungeonPrompts.Web.Controllers
 				PropertyNamingPolicy = JsonNamingPolicy.CamelCase
 			});
 			Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(worldInfosString));
-			var mimeType = "application/json";
+			const string? mimeType = "application/json";
 			return new FileStreamResult(stream, mimeType)
 			{
 				FileDownloadName = "worldInfo.json"
@@ -230,7 +243,7 @@ namespace AIDungeonPrompts.Web.Controllers
 				if (model.WorldInfoFile != null)
 				{
 					var worldInfos = await ReadWorldInfoFromFileAsync(model.WorldInfoFile);
-					if (worldInfos != null && worldInfos.Count > 0)
+					if (worldInfos?.Count > 0)
 					{
 						if (model.Command.WorldInfos.Count == 1
 							&& string.IsNullOrWhiteSpace(model.Command.WorldInfos[0].Entry)
@@ -356,11 +369,7 @@ namespace AIDungeonPrompts.Web.Controllers
 				return NotFound();
 			}
 			var prompt = await _mediator.Send(new GetPromptQuery(id.Value));
-			if (prompt == null)
-			{
-				return NotFound();
-			}
-			return prompt;
+			return prompt ?? (ActionResult<GetPromptViewModel>)NotFound();
 		}
 
 		[HttpGet("{id}/report")]

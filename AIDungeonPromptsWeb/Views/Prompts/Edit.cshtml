@@ -79,22 +79,29 @@
 	}
 	<br />
 	<div>
-		@Html.LabelFor(m => m.Command.WorldInfos)
-		<br />
-		<input type="file" disabled="@(!canEditField)" asp-for="WorldInfoFile" />
-		<button disabled="@(!canEditField)" id="upload-wi" asp-route-uploadWi="@true" asp-fragment="upload-wi" class="btn btn-secondary">Upload JSON</button>
-		<br />
-		<br />
-		<p>Any World Info left blank will be automatically removed on submission.</p>
-		@Html.EditorFor(m => m.Command.WorldInfos, new { Disabled = !canEditField })
-		<button disabled="@(!canEditField)" id="add-wi" asp-route-addWi="@true" asp-fragment="add-wi" class="btn btn-secondary">Add Another</button>
+		<div class="card">
+			<div aria-expanded="true" aria-controls="world-info-body" data-toggle="collapse" data-target="#world-info-body" class="card-header"><h4>World Info</h4></div>
+			<div id="world-info-body" class="collapse show card-body">
+				<div>
+					<input type="file" disabled="@(!canEditField)" asp-for="WorldInfoFile" />
+				</div>
+				<div class="mt-3">
+					<button disabled="@(!canEditField)" id="upload-wi" asp-route-uploadWi="@true" asp-fragment="upload-wi" class="btn btn-secondary">Upload JSON</button>
+				</div>
+				<br />
+				<p>Any World Info left blank will be automatically removed on submission.</p>
+				@Html.EditorFor(m => m.Command.WorldInfos, new { Disabled = !canEditField })
+				<button disabled="@(!canEditField)" id="add-wi" asp-route-addWi="@true" asp-fragment="add-wi" class="btn btn-secondary">Add Another</button>
+			</div>
+		</div>
 	</div>
 	<br />
-	<div id="sub-scenario-container">
-		<label>Sub Scenarios</label>
-		@Html.EditorFor(m => m.Children, new { CanEdit = canEditField, CanDelete = canDelete })
-		<br />
-		<button id="add-sub-scenario" disabled="@(!canEditField)" asp-route-addChild="@true" class="btn btn-secondary">Add Scenario</button>
+	<div class="card" id="sub-scenario-container">
+		<div aria-expanded="true" aria-controls="sub-scenario-body" data-toggle="collapse" data-target="#sub-scenario-body" class="card-header"><h4>Sub Scenarios</h4></div>
+		<div id="sub-scenario-body" class="collapse show card-body">
+			@Html.EditorFor(m => m.Children, new { CanEdit = canEditField, CanDelete = canDelete })
+			<button id="add-sub-scenario" disabled="@(!canEditField)" asp-route-addChild="@true" class="btn btn-secondary">Add Scenario</button>
+		</div>
 	</div>
 	<div id="sub-scenarios"></div>
 	<br />
