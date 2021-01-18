@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AIDungeonPrompts.Backup.Persistence.Migrations
 {
     [DbContext(typeof(BackupDbContext))]
-    [Migration("20210117163635_init")]
+    [Migration("20210118000846_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -38,9 +38,6 @@ namespace AIDungeonPrompts.Backup.Persistence.Migrations
 
                     b.Property<string>("Description")
                         .HasColumnType("TEXT");
-
-                    b.Property<bool>("IsDraft")
-                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Memory")
                         .HasColumnType("TEXT");

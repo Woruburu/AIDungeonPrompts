@@ -8,7 +8,6 @@ namespace AIDungeonPrompts.Backup.Persistence.Entities
 	{
 		public string? AuthorsNote { get; set; }
 		public string? Description { get; set; }
-		public bool IsDraft { get; set; }
 		public string? Memory { get; set; }
 		public bool Nsfw { get; set; }
 		public int? ParentId { get; set; }
