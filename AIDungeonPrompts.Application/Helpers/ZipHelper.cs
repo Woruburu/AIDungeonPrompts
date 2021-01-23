@@ -1,10 +1,29 @@
+using System.IO;
+using System.IO.Compression;
+using System.Linq;
+
 namespace AIDungeonPrompts.Application.Helpers
 {
 	public static class ZipHelper
 	{
+		private static readonly string[] ExpectedFiles = new string[] { "contextModifier.js", "inputModifier.js", "outputModifier.js", "shared.js" };
 		private static readonly byte[] ZipBytes1 = { 0x50, 0x4b, 0x03, 0x04 };
 		private static readonly byte[] ZipBytes2 = { 0x50, 0x4b, 0x05, 0x06 };
 		private static readonly byte[] ZipBytes3 = { 0x50, 0x4b, 0x07, 0x08 };
+
+		public static bool CheckFileContents(byte[] bytes)
+		{
+			try
+			{
+				using var memoryStream = new MemoryStream(bytes);
+				using var zip = new ZipArchive(memoryStream);
+				return zip.Entries.Any(e => ExpectedFiles.Contains(e.Name));
+			}
+			catch
+			{
+				return false;
+			}
+		}
 
 		public static bool IsCompressedData(byte[] data)
 		{
@@ -24,8 +43,6 @@ namespace AIDungeonPrompts.Application.Helpers
 			if (dataBytes.Length < headerBytes.Length)
 			{
 				return false;
-				//throw new ArgumentOutOfRangeException(nameof(dataBytes),
-				//	$"Passed databytes length ({dataBytes.Length}) is shorter than the headerbytes ({headerBytes.Length})");
 			}
 
 			for (var i = 0; i < headerBytes.Length; i++)

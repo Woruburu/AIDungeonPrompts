@@ -148,6 +148,7 @@ namespace AIDungeonPrompts.Web
 				.PersistKeysToDbContext<AIDungeonPromptsDbContext>();
 
 			services
+				.AddApplicationLayer()
 				.AddPersistenceLayer(Configuration.GetConnectionString(DatabaseConnectionName))
 				.AddBackupPersistenceLayer(BackupDatabaseConnectionName())
 				.AddInfrastructureLayer()
@@ -189,8 +190,9 @@ namespace AIDungeonPrompts.Web
 				);
 			});
 
-			//services.AddHostedService<DatabaseMigrationAndBackupHostedService>();
-			//services.AddHostedService<DatabaseBackupCronJob>();
+			services.AddHostedService<DatabaseMigrationHostedService>();
+			services.AddHostedService<DatabaseBackupHostedService>();
+			services.AddHostedService<DatabaseBackupCronJob>();
 			services.AddHostedService<ApplicationLogCleanerCronJob>();
 			services.AddHostedService<ReportCleanerCronJob>();
 		}

@@ -81,6 +81,41 @@ namespace AIDungeonPrompts.Test.Application.Commands.CreatePrompt
 		}
 
 		[Fact]
+		public async Task Handle_CreatesAPromptWithSCriptZipSetToExpectedBytes()
+		{
+			//arrange
+			var expectedBytes = new byte[] { };
+			var user = new User { Username = "TestUser" };
+			DbContext.Users.Add(user);
+			await DbContext.SaveChangesAsync();
+			var command = new CreatePromptCommand { OwnerId = user.Id, ScriptZip = expectedBytes };
+
+			//act
+			var actualId = await _handler.Handle(command);
+
+			//assert
+			var actualPrompt = await DbContext.Prompts.FindAsync(actualId);
+			Assert.Equal(expectedBytes, actualPrompt.ScriptZip);
+		}
+
+		[Fact]
+		public async Task Handle_CreatesAPromptWithScriptZipSetToNull()
+		{
+			//arrange
+			var user = new User { Username = "TestUser" };
+			DbContext.Users.Add(user);
+			await DbContext.SaveChangesAsync();
+			var command = new CreatePromptCommand { OwnerId = user.Id, ScriptZip = null };
+
+			//act
+			var actualId = await _handler.Handle(command);
+
+			//assert
+			var actualPrompt = await DbContext.Prompts.FindAsync(actualId);
+			Assert.Null(actualPrompt.ScriptZip);
+		}
+
+		[Fact]
 		public async Task Handle_CreatesAPromptWithTheParentId_WhenParentIdIsGiven_AndTheCurrentUserIsTheSameId()
 		{
 			//arrange

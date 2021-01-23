@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using AIDungeonPrompts.Application.Abstractions.Identity;
 using AIDungeonPrompts.Application.Commands.CreatePrompt;
@@ -12,6 +13,7 @@ using AIDungeonPrompts.Application.Commands.DeletePrompt;
 using AIDungeonPrompts.Application.Commands.UpdatePrompt;
 using AIDungeonPrompts.Application.Helpers;
 using AIDungeonPrompts.Application.Queries.GetPrompt;
+using AIDungeonPrompts.Application.Queries.GetScript;
 using AIDungeonPrompts.Application.Queries.GetUser;
 using AIDungeonPrompts.Application.Queries.SimilarPrompt;
 using AIDungeonPrompts.Domain.Enums;
@@ -53,7 +55,7 @@ namespace AIDungeonPrompts.Web.Controllers
 		}
 
 		[HttpPost, ValidateAntiForgeryToken]
-		public async Task<IActionResult> Create(bool addWi, bool confirm, bool saveDraft, bool addChild, bool uploadWi, int? wiDelete, CreatePromptViewModel model)
+		public async Task<IActionResult> Create(bool addWi, bool confirm, bool saveDraft, bool addChild, bool uploadWi, int? wiDelete, CreatePromptViewModel model, CancellationToken cancellationToken)
 		{
 			if (uploadWi)
 			{
@@ -109,11 +111,11 @@ namespace AIDungeonPrompts.Web.Controllers
 			if (model.ScriptZip != null)
 			{
 				using var stream = new MemoryStream();
-				await model.ScriptZip.CopyToAsync(stream);
+				await model.ScriptZip.CopyToAsync(stream, cancellationToken);
 				model.Command.ScriptZip = stream.ToArray();
 
 				var validator = new CreatePromptCommandValidator();
-				var results = validator.Validate(model.Command);
+				var results = await validator.ValidateAsync(model.Command, cancellationToken);
 
 				results.AddToModelState(ModelState, nameof(model.Command));
 			}
@@ -125,7 +127,7 @@ namespace AIDungeonPrompts.Web.Controllers
 
 			if (!model.Command.SaveDraft && !addChild && !model.Command.ParentId.HasValue)
 			{
-				var duplicate = await _mediator.Send(new SimilarPromptQuery(model.Command.Title));
+				var duplicate = await _mediator.Send(new SimilarPromptQuery(model.Command.Title), cancellationToken);
 				if (duplicate.Matched && !confirm)
 				{
 					model.SimilarPromptQuery = duplicate;
@@ -135,8 +137,8 @@ namespace AIDungeonPrompts.Web.Controllers
 
 			if (!_currentUserService.TryGetCurrentUser(out var user))
 			{
-				var userId = await _mediator.Send(new CreateTransientUserCommand());
-				user = await _mediator.Send(new GetUserQuery(userId));
+				var userId = await _mediator.Send(new CreateTransientUserCommand(), cancellationToken);
+				user = await _mediator.Send(new GetUserQuery(userId), cancellationToken);
 				await HttpContext.SignInUserAsync(user);
 				model.Command.OwnerId = userId;
 			}
@@ -145,7 +147,7 @@ namespace AIDungeonPrompts.Web.Controllers
 				model.Command.OwnerId = user!.Id;
 			}
 
-			var id = await _mediator.Send(model.Command);
+			var id = await _mediator.Send(model.Command, cancellationToken);
 
 			if (addChild)
 			{
@@ -161,21 +163,21 @@ namespace AIDungeonPrompts.Web.Controllers
 		}
 
 		[HttpPost("/{id}/delete"), ValidateAntiForgeryToken, Authorize]
-		public async Task<ActionResult> Delete(int? id)
+		public async Task<ActionResult> Delete(int? id, CancellationToken cancellationToken)
 		{
 			if (id == null || !_currentUserService.TryGetCurrentUser(out var user))
 			{
 				return NotFound();
 			}
 
-			var prompt = await _mediator.Send(new GetPromptQuery(id.Value));
+			var prompt = await _mediator.Send(new GetPromptQuery(id.Value), cancellationToken);
 
 			if (prompt == null || (prompt.OwnerId != user!.Id && (user.Role & RoleEnum.Delete) == 0))
 			{
 				return NotFound();
 			}
 
-			await _mediator.Send(new DeletePromptCommand(prompt.Id));
+			await _mediator.Send(new DeletePromptCommand(prompt.Id), cancellationToken);
 
 			if (prompt.ParentId.HasValue)
 			{
@@ -186,13 +188,13 @@ namespace AIDungeonPrompts.Web.Controllers
 		}
 
 		[HttpGet("/{id}/world-info")]
-		public async Task<IActionResult> DownloadWorldInfo(int? id)
+		public async Task<IActionResult> DownloadWorldInfo(int? id, CancellationToken cancellationToken)
 		{
 			if (id == null || id == default)
 			{
 				return NotFound();
 			}
-			var prompt = await _mediator.Send(new GetPromptQuery(id.Value));
+			var prompt = await _mediator.Send(new GetPromptQuery(id.Value), cancellationToken);
 			if (prompt == null)
 			{
 				return NotFound();
@@ -217,7 +219,7 @@ namespace AIDungeonPrompts.Web.Controllers
 		}
 
 		[HttpPost("/{id}/edit"), ValidateAntiForgeryToken, Authorize]
-		public async Task<IActionResult> Edit(int? id, bool addWi, bool saveDraft, bool confirm, bool addChild, bool uploadWi, int? wiDelete, UpdatePromptViewModel model)
+		public async Task<IActionResult> Edit(int? id, bool addWi, bool saveDraft, bool confirm, bool addChild, bool uploadWi, int? wiDelete, UpdatePromptViewModel model, CancellationToken cancellationToken)
 		{
 			model.Command.SaveDraft = saveDraft;
 
@@ -226,7 +228,7 @@ namespace AIDungeonPrompts.Web.Controllers
 				return NotFound();
 			}
 
-			var prompt = await _mediator.Send(new GetPromptQuery(id.Value));
+			var prompt = await _mediator.Send(new GetPromptQuery(id.Value), cancellationToken);
 
 			if (prompt == null || (prompt.OwnerId != user!.Id && !RoleHelper.CanEdit(user.Role)))
 			{
@@ -286,6 +288,18 @@ namespace AIDungeonPrompts.Web.Controllers
 				return View(model);
 			}
 
+			if (model.ScriptZip != null)
+			{
+				using var stream = new MemoryStream();
+				await model.ScriptZip.CopyToAsync(stream, cancellationToken);
+				model.Command.ScriptZip = stream.ToArray();
+
+				var validator = new UpdatePromptCommandValidator();
+				var results = await validator.ValidateAsync(model.Command, cancellationToken);
+
+				results.AddToModelState(ModelState, nameof(model.Command));
+			}
+
 			if (!ModelState.IsValid)
 			{
 				return View(model);
@@ -293,7 +307,7 @@ namespace AIDungeonPrompts.Web.Controllers
 
 			if (!model.Command.SaveDraft && !addChild && !model.Command.ParentId.HasValue)
 			{
-				var duplicate = await _mediator.Send(new SimilarPromptQuery(model.Command.Title, model.Command.Id));
+				var duplicate = await _mediator.Send(new SimilarPromptQuery(model.Command.Title, model.Command.Id), cancellationToken);
 				if (duplicate.Matched && !confirm)
 				{
 					model.SimilarPromptQuery = duplicate;
@@ -301,7 +315,7 @@ namespace AIDungeonPrompts.Web.Controllers
 				}
 			}
 
-			await _mediator.Send(model.Command);
+			await _mediator.Send(model.Command, cancellationToken);
 
 			if (addChild)
 			{
@@ -317,14 +331,14 @@ namespace AIDungeonPrompts.Web.Controllers
 		}
 
 		[HttpGet("/{id}/edit"), Authorize]
-		public async Task<IActionResult> Edit(int? id)
+		public async Task<IActionResult> Edit(int? id, CancellationToken cancellationToken)
 		{
 			if (id == null || !_currentUserService.TryGetCurrentUser(out var user))
 			{
 				return NotFound();
 			}
 
-			var prompt = await _mediator.Send(new GetPromptQuery(id.Value));
+			var prompt = await _mediator.Send(new GetPromptQuery(id.Value), cancellationToken);
 
 			if (prompt == null || (prompt.OwnerId != user!.Id && !RoleHelper.CanEdit(user.Role)))
 			{
@@ -362,24 +376,24 @@ namespace AIDungeonPrompts.Web.Controllers
 		}
 
 		[EnableCors("AiDungeon"), HttpGet("/api/{id}")]
-		public async Task<ActionResult<GetPromptViewModel>> Get(int? id)
+		public async Task<ActionResult<GetPromptViewModel>> Get(int? id, CancellationToken cancellationToken)
 		{
 			if (id == null || id == default)
 			{
 				return NotFound();
 			}
-			var prompt = await _mediator.Send(new GetPromptQuery(id.Value));
+			var prompt = await _mediator.Send(new GetPromptQuery(id.Value), cancellationToken);
 			return prompt ?? (ActionResult<GetPromptViewModel>)NotFound();
 		}
 
 		[HttpGet("{id}/report")]
-		public async Task<IActionResult> Report(int? id)
+		public async Task<IActionResult> Report(int? id, CancellationToken cancellationToken)
 		{
 			if (id == null || id == default)
 			{
 				return NotFound();
 			}
-			var prompt = await _mediator.Send(new GetPromptQuery(id.Value));
+			var prompt = await _mediator.Send(new GetPromptQuery(id.Value), cancellationToken);
 			if (prompt == null)
 			{
 				return NotFound();
@@ -388,13 +402,13 @@ namespace AIDungeonPrompts.Web.Controllers
 		}
 
 		[HttpPost("{id}/report"), ValidateAntiForgeryToken]
-		public async Task<IActionResult> Report(int? id, CreateReportViewModel viewModel)
+		public async Task<IActionResult> Report(int? id, CreateReportViewModel viewModel, CancellationToken cancellationToken)
 		{
 			if (id == null || id == default)
 			{
 				return NotFound();
 			}
-			var prompt = await _mediator.Send(new GetPromptQuery(id.Value));
+			var prompt = await _mediator.Send(new GetPromptQuery(id.Value), cancellationToken);
 			if (prompt == null)
 			{
 				return NotFound();
@@ -405,18 +419,41 @@ namespace AIDungeonPrompts.Web.Controllers
 				return View(viewModel);
 			}
 			viewModel.Command.PromptId = id.Value;
-			await _mediator.Send(viewModel.Command);
+			await _mediator.Send(viewModel.Command, cancellationToken);
 			return RedirectToAction("View", new { id, reported = true });
 		}
 
+		[HttpGet("{id}/script")]
+		public async Task<ActionResult> Script(int? id, CancellationToken cancellationToken)
+		{
+			if (id == null)
+			{
+				return BadRequest();
+			}
+
+			var file = await _mediator.Send(new GetScriptQuery(id.Value), cancellationToken);
+
+			if (file == null)
+			{
+				return NotFound();
+			}
+
+			Stream stream = new MemoryStream(file);
+			const string? mimeType = "application/zip";
+			return new FileStreamResult(stream, mimeType)
+			{
+				FileDownloadName = $"{id}-scripts.zip"
+			};
+		}
+
 		[HttpGet("/{id}")]
-		public async Task<IActionResult> View(int? id, bool? reported)
+		public async Task<IActionResult> View(int? id, bool? reported, CancellationToken cancellationToken)
 		{
 			if (id == null || id == default)
 			{
 				return NotFound();
 			}
-			var prompt = await _mediator.Send(new GetPromptQuery(id.Value));
+			var prompt = await _mediator.Send(new GetPromptQuery(id.Value), cancellationToken);
 			if (prompt == null)
 			{
 				return NotFound();

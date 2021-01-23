@@ -18,6 +18,8 @@ namespace AIDungeonPrompts.Application.Queries.GetPrompt
 		public IEnumerable<GetPromptChild> Children { get; set; } = new List<GetPromptChild>();
 		public DateTime DateCreated { get; set; }
 		public string? Description { get; set; }
+		[Display(Name = "Script File")]
+		public bool HasScriptFile { get; set; }
 		public int Id { get; set; }
 		public bool IsDraft { get; set; }
 		public string? Memory { get; set; }

@@ -1,3 +1,4 @@
+using System.Threading;
 using System.Threading.Tasks;
 using AIDungeonPrompts.Application.Abstractions.Identity;
 using AIDungeonPrompts.Application.Commands.CreateUser;
@@ -42,7 +43,7 @@ namespace AIDungeonPrompts.Web.Controllers
 		}
 
 		[Authorize, HttpPost("[controller]/[action]"), ValidateAntiForgeryToken]
-		public async Task<IActionResult> Edit(EditUserModel model)
+		public async Task<IActionResult> Edit(EditUserModel model, CancellationToken cancellationToken)
 		{
 			if (!_currentUserService.TryGetCurrentUser(out var user))
 			{
@@ -66,7 +67,7 @@ namespace AIDungeonPrompts.Web.Controllers
 					Username = model.Username,
 					Password = model.Password,
 					Id = user!.Id
-				});
+				}, cancellationToken);
 			}
 			catch (UsernameNotUniqueException)
 			{
@@ -78,7 +79,7 @@ namespace AIDungeonPrompts.Web.Controllers
 		}
 
 		[Authorize, HttpGet("[controller]")]
-		public async Task<IActionResult> Index(int? page)
+		public async Task<IActionResult> Index(int? page, CancellationToken cancellationToken)
 		{
 			if (!_currentUserService.TryGetCurrentUser(out var user))
 			{
@@ -91,7 +92,7 @@ namespace AIDungeonPrompts.Web.Controllers
 				Page = page ?? 1,
 				PageSize = 6,
 				IncludeDrafts = true
-			});
+			}, cancellationToken);
 
 			return View(new IndexUserModel
 			{
@@ -109,7 +110,7 @@ namespace AIDungeonPrompts.Web.Controllers
 		}
 
 		[HttpPost, ValidateAntiForgeryToken]
-		public async Task<IActionResult> LogIn(LogInModel model)
+		public async Task<IActionResult> LogIn(LogInModel model, CancellationToken cancellationToken)
 		{
 			if (!ModelState.IsValid)
 			{
@@ -118,7 +119,7 @@ namespace AIDungeonPrompts.Web.Controllers
 
 			try
 			{
-				var user = await _mediator.Send(new LogInQuery(model.Username, model.Password));
+				var user = await _mediator.Send(new LogInQuery(model.Username, model.Password), cancellationToken);
 				await HttpContext.SignInUserAsync(user);
 			}
 			catch (LoginFailedException)
@@ -150,7 +151,7 @@ namespace AIDungeonPrompts.Web.Controllers
 		}
 
 		[HttpPost, ValidateAntiForgeryToken]
-		public async Task<IActionResult> Register(RegisterUserModel model)
+		public async Task<IActionResult> Register(RegisterUserModel model, CancellationToken cancellationToken)
 		{
 			if (!string.Equals(model.Password, model.PasswordConfirm))
 			{
@@ -171,7 +172,7 @@ namespace AIDungeonPrompts.Web.Controllers
 						Username = model.Username,
 						Password = model.Password,
 						Id = user!.Id
-					});
+					}, cancellationToken);
 				}
 				else
 				{
@@ -179,8 +180,8 @@ namespace AIDungeonPrompts.Web.Controllers
 					{
 						Username = model.Username,
 						Password = model.Password
-					});
-					user = await _mediator.Send(new GetUserQuery(userId));
+					}, cancellationToken);
+					user = await _mediator.Send(new GetUserQuery(userId), cancellationToken);
 					await HttpContext.SignInUserAsync(user);
 				}
 			}

@@ -38,8 +38,8 @@
 			@Model.Prompt.Title
 		</h3>
 		@if (!isChild)
-		{			
-			var date = Model.Prompt.PublishDate ?? Model.Prompt.DateCreated;			
+		{
+			var date = Model.Prompt.PublishDate ?? Model.Prompt.DateCreated;
 			<p>Published on @date.ToString("yyyy/MM/dd")</p>
 		}
 	</div>
@@ -103,6 +103,16 @@
 	</div>
 }
 
+@if (!string.IsNullOrWhiteSpace(Model.Prompt.Quests))
+{
+	<h5>@Html.DisplayNameFor(m => m.Prompt.Quests)</h5>
+	<div class="card mb-4">
+		<div class="card-body">
+			<code class="card-text pre-line">@Html.DisplayFor(m => m.Prompt.Quests)</code>
+		</div>
+	</div>
+}
+
 @if (!string.IsNullOrWhiteSpace(Model.Prompt.AuthorsNote))
 {
 	<h5>@Html.DisplayNameFor(m => m.Prompt.AuthorsNote)</h5>
@@ -113,12 +123,13 @@
 	</div>
 }
 
-@if (!string.IsNullOrWhiteSpace(Model.Prompt.Quests))
+@if (Model.Prompt.HasScriptFile)
 {
-	<h5>@Html.DisplayNameFor(m => m.Prompt.Quests)</h5>
+	<h5>@Html.DisplayNameFor(m => m.Prompt.HasScriptFile)</h5>
 	<div class="card mb-4">
 		<div class="card-body">
-			<code class="card-text pre-line">@Html.DisplayFor(m => m.Prompt.Quests)</code>
+			<p class="text-danger">This file has <strong>not</strong> been scanned for viruses, use at your own risk.</p>
+			<a asp-action="script" asp-route-id="@Model.Prompt.Id" class="btn btn-primary">Download</a>
 		</div>
 	</div>
 }
@@ -149,7 +160,7 @@
 
 @if (Model.Prompt.Children.Any())
 {
-	<h5>Sub Scenarios</h5>
-	@Html.DisplayFor(m => m.Prompt.Children)
+<h5>Sub Scenarios</h5>
+@Html.DisplayFor(m => m.Prompt.Children)
 }
 

@@ -46,15 +46,12 @@ namespace AIDungeonPrompts.Web.HostedServices.DatabaseBackups
 			var promptTableName = context.Model.FindEntityType(typeof(BackupPrompt)).GetTableName();
 			var worldInfoTableName = context.Model.FindEntityType(typeof(BackupWorldInfo)).GetTableName();
 
-			using (var command = context.Database.GetDbConnection().CreateCommand())
-			{
-				command.CommandText = $"DELETE FROM {worldInfoTableName};DELETE FROM sqlite_sequence WHERE name='{worldInfoTableName}';DELETE FROM {promptTableName};DELETE FROM sqlite_sequence WHERE name='{promptTableName}';VACUUM";
-				command.CommandType = CommandType.Text;
-
-				await context.Database.OpenConnectionAsync(cancellationToken);
-				await command.ExecuteNonQueryAsync(cancellationToken);
-				await context.Database.CloseConnectionAsync();
-			}
+			await using var command = context.Database.GetDbConnection().CreateCommand();
+			command.CommandText = $"PRAGMA journal_mode = NONE;DELETE FROM {worldInfoTableName};DELETE FROM sqlite_sequence WHERE name='{worldInfoTableName}';DELETE FROM {promptTableName};DELETE FROM sqlite_sequence WHERE name='{promptTableName}';VACUUM";
+			command.CommandType = CommandType.Text;
+			await context.Database.OpenConnectionAsync(cancellationToken);
+			await command.ExecuteNonQueryAsync(cancellationToken);
+			await context.Database.CloseConnectionAsync();
 		}
 
 		private static BackupPrompt CreateBackupPrompt(Prompt prompt)

@@ -1,5 +1,4 @@
 using AIDungeonPrompts.Backup.Persistence.DbContexts;
-using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -10,17 +9,18 @@ namespace AIDungeonPrompts.Backup.Persistence
 		public static IServiceCollection AddBackupPersistenceLayer(this IServiceCollection services,
 			string databaseConnection)
 		{
-			services.AddDbContext<BackupDbContext>(options =>
-			{
-				var conn = new SqliteConnection(databaseConnection);
-				conn.Open();
+			//services.AddDbContext<BackupDbContext>(options =>
+			//{
+			//	var conn = new SqliteConnection(databaseConnection);
+			//	conn.Open();
 
-				var command = conn.CreateCommand();
-				command.CommandText = "PRAGMA journal_mode = NONE";
-				command.ExecuteNonQuery();
+			//	var command = conn.CreateCommand();
+			//	command.CommandText = "PRAGMA journal_mode = NONE";
+			//	command.ExecuteNonQuery();
 
-				options.UseSqlite(conn);
-			});
+			//	options.UseSqlite(conn);
+			//});
+			services.AddDbContext<BackupDbContext>(options => options.UseSqlite(databaseConnection));
 			return services;
 		}
 	}

@@ -17,7 +17,7 @@
 		<span class="invalid-feedback" asp-validation-for="Command.Title"></span>
 	</div>
 	@if (!Model.Command.ParentId.HasValue)
-	{ 
+	{
 		<div class="form-group">
 			@Html.LabelFor(m => m.Command.Description)
 			<textarea asp-for="Command.Description" class="form-control"></textarea>
@@ -60,6 +60,12 @@
 		</div>
 	}
 	<br />
+	<div>
+		<h4>Script Zip</h4>
+		<input type="file" asp-for="ScriptZip" />
+		<span class="invalid-feedback" asp-validation-for="Command.ScriptZip"></span>
+	</div>
+	<br />
 	<div class="card">
 		<div aria-expanded="true" aria-controls="world-info-body" data-toggle="collapse" data-target="#world-info-body" class="card-header"><h4>World Info</h4></div>
 		<div id="world-info-body" class="collapse show card-body">
@@ -85,14 +91,6 @@
 		</div>
 	</div>
 	<br />
-	<div>
-		<label>
-			Script Zip
-			<input type="file" asp-for="ScriptZip" />
-			<span class="invalid-feedback" asp-validation-for="Command.ScriptZip"></span>
-		</label>
-	</div>
-	<br/>
 	@{
 		var showDraftButton = !Model.Command.ParentId.HasValue;
 	}
@@ -115,13 +113,13 @@
 	}
 	<div class="d-flex">
 		@if (showDraftButton)
-		{ 
+		{
 			<button id="save-draft" type="submit" asp-route-saveDraft="@true" class="ml-auto btn btn-lg btn-outline-warning">Save Draft</button>
 		}
-		<button autofocus="@Model.SimilarPromptQuery.Matched" asp-route-confirm="@Model.SimilarPromptQuery.Matched" type="submit"  asp-fragment="@(Model.Command.ParentId.HasValue ? "sub-scenarios" : string.Empty)" class="@(!showDraftButton ? "ml-auto" : string.Empty) ml-3 btn btn-lg btn-primary">
+		<button autofocus="@Model.SimilarPromptQuery.Matched" asp-route-confirm="@Model.SimilarPromptQuery.Matched" type="submit" asp-fragment="@(Model.Command.ParentId.HasValue ? "sub-scenarios" : string.Empty)" class="@(!showDraftButton ? "ml-auto" : string.Empty) ml-3 btn btn-lg btn-primary">
 			@(Model.Command.ParentId.HasValue ? "Save" : "Submit")
 		</button>
-	</div>	
+	</div>
 </form>
 
 @section Scripts {

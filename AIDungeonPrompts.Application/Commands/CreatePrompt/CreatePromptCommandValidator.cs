@@ -5,6 +5,8 @@ namespace AIDungeonPrompts.Application.Commands.CreatePrompt
 {
 	public class CreatePromptCommandValidator : AbstractValidator<CreatePromptCommand>
 	{
+		private const int MAX_SIZE = 500001;
+
 		public CreatePromptCommandValidator()
 		{
 			RuleFor(e => e.PromptContent)
@@ -18,13 +20,20 @@ namespace AIDungeonPrompts.Application.Commands.CreatePrompt
 				.NotEmpty()
 				.WithMessage("Please supply a Title");
 			RuleFor(e => e.ScriptZip)
-				.Must(scriptZip => scriptZip!.Length < 5000000)
+				.Must(scriptZip => scriptZip!.Length < MAX_SIZE)
 				.WithMessage("File size too large (max 500kb)")
 				.When(e => e.ScriptZip != null);
 			RuleFor(e => e.ScriptZip)
 				.Must(scriptZip => ZipHelper.IsCompressedData(scriptZip!))
 				.WithMessage("Please only upload .zip files")
-				.When(e => e.ScriptZip != null);
+				.DependentRules(() =>
+				{
+					RuleFor(e => e.ScriptZip)
+					.Must(scriptZip => ZipHelper.CheckFileContents(scriptZip!))
+					.WithMessage("File was not in the expected format. Please re-export and try again.")
+					.When(e => e.ScriptZip != null);
+				})
+				.When(e => e.ScriptZip?.Length < MAX_SIZE);
 		}
 	}
 }

@@ -169,9 +169,9 @@ namespace AIDungeonPrompts.Application.Queries.SearchPrompts
 							Name = promptTag!.Tag!.Name
 						})
 				})
-				.ToListAsync();
+				.ToListAsync(cancellationToken);
 
-			var count = await query.CountAsync();
+			var count = await query.CountAsync(cancellationToken);
 			var pageAdd = count % request.PageSize == 0 ? 0 : 1;
 			var totalPages = count < 1 ? 1 : (count / request.PageSize) + pageAdd;
 

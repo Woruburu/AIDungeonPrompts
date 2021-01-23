@@ -90,6 +90,47 @@ namespace AIDungeonPrompts.Test.Application.Commands.UpdatePrompt
 		}
 
 		[Fact]
+		public async Task Handle_SetsAPromptWithSCriptZipSetToExpectedBytes()
+		{
+			//arrange
+			var expectedBytes = new byte[] { };
+			var owner = new User { Username = "TestUser" };
+			var prompt = new Prompt { Owner = owner };
+			DbContext.Prompts.Add(prompt);
+			await DbContext.SaveChangesAsync();
+			var user = new GetUserViewModel { Id = owner.Id };
+			_mockUserService.Setup(e => e.TryGetCurrentUser(out user)).Returns(true);
+			var command = new UpdatePromptCommand { Id = prompt.Id, OwnerId = user.Id, ScriptZip = expectedBytes };
+
+			//act
+			await _handler.Handle(command);
+
+			//assert
+			var actualPrompt = await DbContext.Prompts.FindAsync(prompt.Id);
+			Assert.Equal(expectedBytes, actualPrompt.ScriptZip);
+		}
+
+		[Fact]
+		public async Task Handle_SetsAPromptWithScriptZipSetToNull()
+		{
+			//arrange
+			var owner = new User { Username = "TestUser" };
+			var prompt = new Prompt { Owner = owner };
+			DbContext.Prompts.Add(prompt);
+			await DbContext.SaveChangesAsync();
+			var user = new GetUserViewModel { Id = owner.Id };
+			_mockUserService.Setup(e => e.TryGetCurrentUser(out user)).Returns(true);
+			var command = new UpdatePromptCommand { Id = prompt.Id, OwnerId = user.Id, ScriptZip = null };
+
+			//act
+			await _handler.Handle(command);
+
+			//assert
+			var actualPrompt = await DbContext.Prompts.FindAsync(prompt.Id);
+			Assert.Null(actualPrompt.ScriptZip);
+		}
+
+		[Fact]
 		public async Task Handle_SetsAPublishDate_WhenSaveDraftIsFalse_AndPromptHasNoPublishDate_AndWasDraft()
 		{
 			//arrange

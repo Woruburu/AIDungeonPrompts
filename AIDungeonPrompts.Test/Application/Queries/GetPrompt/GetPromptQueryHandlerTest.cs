@@ -98,6 +98,49 @@ namespace AIDungeonPrompts.Test.Application.Queries.GetPrompt
 		}
 
 		[Fact]
+		public async Task Handle_ReturnsHasScriptFileFalse_WhenPromptDoesNotAnAssociatedScript()
+		{
+			//arrange
+			var owner = new User { Username = "TestUser" };
+			var prompt = new Prompt()
+			{
+				Owner = owner
+			};
+			DbContext.Prompts.Add(prompt);
+			await DbContext.SaveChangesAsync();
+			var query = new GetPromptQuery(prompt.Id);
+
+			//act
+			var result = await _handler.Handle(query);
+
+			//assert
+			Assert.NotNull(result);
+			Assert.False(result.HasScriptFile);
+		}
+
+		[Fact]
+		public async Task Handle_ReturnsHasScriptFileTrue_WhenPromptHasAnAssociatedScript()
+		{
+			//arrange
+			var owner = new User { Username = "TestUser" };
+			var prompt = new Prompt()
+			{
+				Owner = owner,
+				ScriptZip = new byte[] { }
+			};
+			DbContext.Prompts.Add(prompt);
+			await DbContext.SaveChangesAsync();
+			var query = new GetPromptQuery(prompt.Id);
+
+			//act
+			var result = await _handler.Handle(query);
+
+			//assert
+			Assert.NotNull(result);
+			Assert.True(result.HasScriptFile);
+		}
+
+		[Fact]
 		public async Task Handle_ReturnsNull_IfPromptIsDraft_AndUserServiceDoesNotReturnUser()
 		{
 			//arrange

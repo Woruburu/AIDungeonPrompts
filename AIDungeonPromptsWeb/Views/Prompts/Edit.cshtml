@@ -79,6 +79,12 @@
 	}
 	<br />
 	<div>
+		<h4>Script Zip</h4>
+		<input disabled="@(!isOwner)" type="file" asp-for="ScriptZip" />
+		<span class="invalid-feedback" asp-validation-for="Command.ScriptZip"></span>
+	</div>
+	<br/>
+	<div>
 		<div class="card">
 			<div aria-expanded="true" aria-controls="world-info-body" data-toggle="collapse" data-target="#world-info-body" class="card-header"><h4>World Info</h4></div>
 			<div id="world-info-body" class="collapse show card-body">
@@ -115,7 +121,8 @@
 				@for (int i = 0; i < Model.SimilarPromptQuery.SimilarPrompts.Count; i++)
 				{
 					var prompt = Model.SimilarPromptQuery.SimilarPrompts[i];
-					<a asp-action="View" asp-controller="Prompts" asp-route-id="@prompt.Id" target="_blank">@prompt.Title</a>@if (i != Model.SimilarPromptQuery.SimilarPrompts.Count - 1){<span>, </span>}
+					<a asp-action="View" asp-controller="Prompts" asp-route-id="@prompt.Id" target="_blank">@prompt.Title</a>@if (i != Model.SimilarPromptQuery.SimilarPrompts.Count - 1)
+					{<span>, </span>}
 				}
 				<br />
 				Please confirm this isn't a duplicate before creating a new prompt.
@@ -127,9 +134,9 @@
 		{
 			<button id="save-draft" type="submit" asp-route-saveDraft="@true" class="ml-auto btn btn-lg btn-outline-warning">Save Draft</button>
 		}
-	<button autofocus="@Model.SimilarPromptQuery.Matched" asp-route-confirm="@Model.SimilarPromptQuery.Matched" type="submit" class="@(!showDraftButton ? "ml-auto" : string.Empty) ml-3 btn btn-lg btn-primary">
-		@(Model.Command.ParentId.HasValue ? "Save" : "Submit")
-	</button>
+		<button autofocus="@Model.SimilarPromptQuery.Matched" asp-route-confirm="@Model.SimilarPromptQuery.Matched" type="submit" class="@(!showDraftButton ? "ml-auto" : string.Empty) ml-3 btn btn-lg btn-primary">
+			@(Model.Command.ParentId.HasValue ? "Save" : "Submit")
+		</button>
 	</div>
 </form>
 
