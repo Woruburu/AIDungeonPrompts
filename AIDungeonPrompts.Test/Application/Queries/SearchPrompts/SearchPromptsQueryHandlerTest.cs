@@ -641,7 +641,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.SearchPrompts
 			Assert.Equal(2, actual.TotalPages);
 		}
 
-		private List<Prompt> GeneratePromptData()
+		private static List<Prompt> GeneratePromptData()
 		{
 			var prompts = new List<Prompt>(15);
 
@@ -687,7 +687,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.SearchPrompts
 			//user
 			var owner = new User
 			{
-				Username = $"Username"
+				Username = "Username"
 			};
 			for (var i = 0; i < 5; i++)
 			{

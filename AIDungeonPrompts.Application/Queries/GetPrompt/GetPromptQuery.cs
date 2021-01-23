@@ -69,7 +69,8 @@ namespace AIDungeonPrompts.Application.Queries.GetPrompt
 					{
 						Id = child.Id,
 						Title = child.Title
-					})
+					}),
+					HasScriptFile = prompt.ScriptZip != null
 				}).FirstOrDefaultAsync(prompt => prompt.Id == request.Id);
 
 			if (prompt == null || (nonDrafts == null && (!_userService.TryGetCurrentUser(out var user) || prompt.OwnerId != user!.Id)))

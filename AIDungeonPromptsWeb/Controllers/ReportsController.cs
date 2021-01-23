@@ -1,3 +1,4 @@
+using System.Threading;
 using System.Threading.Tasks;
 using AIDungeonPrompts.Application.Abstractions.Identity;
 using AIDungeonPrompts.Application.Commands.ClearReport;
@@ -22,24 +23,24 @@ namespace AIDungeonPrompts.Web.Controllers
 		}
 
 		[HttpPost("[controller]/clear/{id}"), ValidateAntiForgeryToken]
-		public async Task<IActionResult> Clear(int? id)
+		public async Task<IActionResult> Clear(int? id, CancellationToken cancellationToken)
 		{
 			if (id == null)
 			{
 				return NotFound();
 			}
-			await _mediator.Send(new ClearReportCommand(id.Value));
+			await _mediator.Send(new ClearReportCommand(id.Value), cancellationToken);
 			return RedirectToAction("Index");
 		}
 
 		[HttpGet("[controller]")]
-		public async Task<IActionResult> Index()
+		public async Task<IActionResult> Index(CancellationToken cancellationToken)
 		{
 			if (!_currentUserService.TryGetCurrentUser(out var user))
 			{
 				return NotFound();
 			}
-			var reports = await _mediator.Send(new GetReportsQuery(user!.Role));
+			var reports = await _mediator.Send(new GetReportsQuery(user!.Role), cancellationToken);
 			return View(reports);
 		}
 	}

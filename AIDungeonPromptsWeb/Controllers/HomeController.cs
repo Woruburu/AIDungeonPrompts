@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using AIDungeonPrompts.Application.Queries.GetAllTags;
 using AIDungeonPrompts.Application.Queries.RandomPrompt;
@@ -51,7 +52,7 @@ namespace AIDungeonPrompts.Web.Controllers
 			return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
 		}
 
-		public async Task<IActionResult> Index(SearchRequestParameters request)
+		public async Task<IActionResult> Index(SearchRequestParameters request, CancellationToken cancellationToken)
 		{
 			var tags = new List<string>();
 			if (!string.IsNullOrWhiteSpace(request.Tags))
@@ -74,7 +75,7 @@ namespace AIDungeonPrompts.Web.Controllers
 				Nsfw = request.NsfwSetting,
 				TagJoin = request.TagJoin,
 				TagsFuzzy = !request.MatchExact
-			});
+			}, cancellationToken);
 
 			return View(new SearchViewModel
 			{

@@ -19,7 +19,7 @@ namespace AIDungeonPrompts.Web.HostedServices.DatabaseBackups
 			var nonDrafts = await dbContext.NonDraftPrompts.Select(e => e.Id).ToListAsync(cancellationToken);
 
 			var page = 0;
-			var pageSize = 100;
+			const int pageSize = 100;
 			var totalCount = await dbContext.Prompts.CountAsync(cancellationToken);
 
 			while (page * pageSize < totalCount)
@@ -46,15 +46,12 @@ namespace AIDungeonPrompts.Web.HostedServices.DatabaseBackups
 			var promptTableName = context.Model.FindEntityType(typeof(BackupPrompt)).GetTableName();
 			var worldInfoTableName = context.Model.FindEntityType(typeof(BackupWorldInfo)).GetTableName();
 
-			using (var command = context.Database.GetDbConnection().CreateCommand())
-			{
-				command.CommandText = $"DELETE FROM {worldInfoTableName};DELETE FROM sqlite_sequence WHERE name='{worldInfoTableName}';DELETE FROM {promptTableName};DELETE FROM sqlite_sequence WHERE name='{promptTableName}';VACUUM";
-				command.CommandType = CommandType.Text;
-
-				await context.Database.OpenConnectionAsync(cancellationToken);
-				await command.ExecuteNonQueryAsync(cancellationToken);
-				await context.Database.CloseConnectionAsync();
-			}
+			await using var command = context.Database.GetDbConnection().CreateCommand();
+			command.CommandText = $"PRAGMA journal_mode = NONE;DELETE FROM {worldInfoTableName};DELETE FROM sqlite_sequence WHERE name='{worldInfoTableName}';DELETE FROM {promptTableName};DELETE FROM sqlite_sequence WHERE name='{promptTableName}';VACUUM";
+			command.CommandType = CommandType.Text;
+			await context.Database.OpenConnectionAsync(cancellationToken);
+			await command.ExecuteNonQueryAsync(cancellationToken);
+			await context.Database.CloseConnectionAsync();
 		}
 
 		private static BackupPrompt CreateBackupPrompt(Prompt prompt)

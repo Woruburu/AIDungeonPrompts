@@ -4,20 +4,19 @@ using System.Threading.Tasks;
 using AIDungeonPrompts.Application.Abstractions.DbContexts;
 using AIDungeonPrompts.Backup.Persistence.DbContexts;
 using AIDungeonPrompts.Web.HostedServices.DatabaseBackups;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace AIDungeonPrompts.Web.HostedServices
 {
-	public class DatabaseMigrationAndBackupHostedService : IHostedService
+	public class DatabaseBackupHostedService : IHostedService
 	{
-		private readonly ILogger<DatabaseMigrationAndBackupHostedService> _logger;
+		private readonly ILogger<DatabaseBackupHostedService> _logger;
 		private readonly IServiceScopeFactory _serviceScopeFactory;
 
-		public DatabaseMigrationAndBackupHostedService(
-			ILogger<DatabaseMigrationAndBackupHostedService> logger,
+		public DatabaseBackupHostedService(
+			ILogger<DatabaseBackupHostedService> logger,
 			IServiceScopeFactory serviceScopeFactory
 		)
 		{
@@ -29,32 +28,30 @@ namespace AIDungeonPrompts.Web.HostedServices
 		{
 			try
 			{
-				_logger.LogInformation($"{nameof(DatabaseMigrationAndBackupHostedService)} Running Job");
+				_logger.LogInformation($"{nameof(DatabaseBackupHostedService)} Running Job");
 				using var services = _serviceScopeFactory.CreateScope();
 
 				using var dbContext = services.ServiceProvider.GetRequiredService<IAIDungeonPromptsDbContext>();
 				if (dbContext == null)
 				{
-					_logger.LogWarning($"{nameof(DatabaseMigrationAndBackupHostedService)}: Could not get DbContext from services");
+					_logger.LogWarning($"{nameof(DatabaseBackupHostedService)}: Could not get DbContext from services");
 					return;
 				}
 
 				using var backupContext = services.ServiceProvider.GetRequiredService<BackupDbContext>();
 				if (backupContext == null)
 				{
-					_logger.LogWarning($"{nameof(DatabaseMigrationAndBackupHostedService)}: Could not get Backup DbContext from services");
+					_logger.LogWarning($"{nameof(DatabaseBackupHostedService)}: Could not get Backup DbContext from services");
 					return;
 				}
 
-				await dbContext.Database.MigrateAsync(cancellationToken);
-				await backupContext.Database.MigrateAsync(cancellationToken);
 				await DatabaseBackup.BackupDatabase(dbContext, backupContext, cancellationToken);
 
-				_logger.LogInformation($"{nameof(DatabaseMigrationAndBackupHostedService)} Job Complete");
+				_logger.LogInformation($"{nameof(DatabaseBackupHostedService)} Job Complete");
 			}
 			catch (Exception e)
 			{
-				_logger.LogError(e, $"{nameof(DatabaseMigrationAndBackupHostedService)} Job Failed");
+				_logger.LogError(e, $"{nameof(DatabaseBackupHostedService)} Job Failed");
 			}
 		}
 

@@ -18,7 +18,7 @@ namespace AIDungeonPrompts.Web.HostedServices
 		public ApplicationLogCleanerCronJob(
 			ILogger<ApplicationLogCleanerCronJob> logger,
 			IServiceScopeFactory serviceScopeFactory
-		) : base("0 0 * * *", TimeZoneInfo.Local, logger)
+		) : base("0 1 * * *", TimeZoneInfo.Local, logger)
 		{
 			_logger = logger;
 			_serviceScopeFactory = serviceScopeFactory;
