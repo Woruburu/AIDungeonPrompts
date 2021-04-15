@@ -6,7 +6,7 @@ namespace AIDungeonPrompts.Application.Helpers
 	{
 		public static bool CanEdit(RoleEnum role)
 		{
-			const RoleEnum editRoles = RoleEnum.TagEdit | RoleEnum.FieldEdit;
+			const RoleEnum editRoles = RoleEnum.TagEdit | RoleEnum.FieldEdit | RoleEnum.Delete;
 			return (editRoles & role) != 0;
 		}
 
