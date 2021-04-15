@@ -21,6 +21,7 @@ namespace AIDungeonPrompts.Application.Abstractions.DbContexts
 		DbSet<Tag> Tags { get; set; }
 		DbSet<User> Users { get; set; }
 		DbSet<WorldInfo> WorldInfos { get; set; }
+		DbSet<ServerFlag> ServerFlags { get; set; }
 
 		EntityEntry<TEntity> Entry<TEntity>(TEntity entity) where TEntity : class;
 

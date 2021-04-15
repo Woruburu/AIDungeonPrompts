@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	const wiDeleteBtns = document.getElementsByClassName('world-info-delete-btn');
 	ignoreSettingsOnClick(addWiButton);
 	ignoreSettingsOnClick(uploadWiButton);
-	for (var i = 0; i < wiDeleteBtns.length; i++) {
+	for (let i = 0; i < wiDeleteBtns.length; i++) {
 		ignoreSettingsOnClick(wiDeleteBtns[i]);
 	};
 });
@@ -12,8 +12,8 @@ document.addEventListener('DOMContentLoaded', () => {
 function ignoreSettingsOnClick(element) {
 	if (element) {
 		element.addEventListener('click', function () {
-			const settngs = $.data($('form')[0], 'validator').settings;
-			settngs.ignore = "*";
+			const settings = $.data($('form')[0], 'validator').settings;
+			settings.ignore = "*";
 		});
 	}
 }

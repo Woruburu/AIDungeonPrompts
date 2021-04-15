@@ -6,12 +6,12 @@ document.addEventListener('DOMContentLoaded', () => {
 function showModel(element) {
 	if (element) {
 		element.addEventListener('click', function (event) {
-			var target = event.target;
+			const target = event.target;
 			if (target.classList.contains('btn-delete')) {
 				event.preventDefault();
 				$('#prompt-delete-modal').modal('show');
 				document.getElementById('prompt-delete-modal-confirm').formAction = target.formAction;
 			}
 		});
-	}	
+	}
 }

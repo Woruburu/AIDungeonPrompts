@@ -11,13 +11,13 @@
 		@if (canEdit)
 		{
 			<div class="ml-auto">
-				<a class="btn btn-outline-success" disabled="@(!canEdit)" asp-action="Edit" asp-controller="Prompts" asp-route-id="@Model.Id">Edit</a>
+				<a class="btn btn-outline-success" asp-action="Edit" asp-controller="Prompts" asp-route-id="@Model.Id">Edit</a>
 			</div>
 		}
 		@if (canDelete)
 		{
-			<div class="@(canEdit ? "ml-2" : "ml-auto")">				
-				<button class="btn btn-outline-danger btn-delete" asp-fragment="sub-scenarios" asp-action="Delete" asp-controller="Prompts" asp-route-id="@Model.Id">Delete</button>	
+			<div class="@(canEdit ? "ml-2" : "ml-auto")">
+				<button class="btn btn-outline-danger btn-delete" asp-fragment="sub-scenarios" asp-action="Delete" asp-controller="Prompts" asp-route-id="@Model.Id">Delete</button>
 			</div>
 		}
 	</div>

@@ -9,5 +9,11 @@ namespace AIDungeonPrompts.Application.Helpers
 			const RoleEnum editRoles = RoleEnum.TagEdit | RoleEnum.FieldEdit | RoleEnum.Delete;
 			return (editRoles & role) != 0;
 		}
+
+		public static bool CanDelete(RoleEnum role)
+		{
+			const RoleEnum deleteRoles = RoleEnum.Delete;
+			return (deleteRoles & role) != 0;
+		}
 	}
 }
