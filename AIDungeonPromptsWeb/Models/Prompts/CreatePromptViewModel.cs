@@ -10,5 +10,7 @@ namespace AIDungeonPrompts.Web.Models.Prompts
 		public IFormFile? ScriptZip { get; set; }
 		public SimilarPromptViewModel SimilarPromptQuery { get; set; } = new SimilarPromptViewModel();
 		public IFormFile? WorldInfoFile { get; set; }
+		public string? DisabledMessage { get; set; }
+		public bool CreationDisabled { get; set; }
 	}
 }

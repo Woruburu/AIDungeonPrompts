@@ -6,6 +6,25 @@
 	<div class="col-12 mb-4">
 		<div class="card">
 			<div class="card-body">
+				<h5 class="card-title mb-3">2021/04/15 - Release 2.4</h5>
+				<ul>
+					<li class="mb-3">
+						Database backups are now available! Visit <a target="_blank" href="/backup.db">@Context.Request.Host.Value/backup.db</a> to download it. Backups are created nightly so the very latest prompts may be missing.
+					</li>
+					<li class="mb-3">
+						This is a SQLite database, you'll need a viewer to see any data. I personally use <a rel="noopener noreferrer nofollow" target="_blank" href="https://dbeaver.io/">DBeaver</a>, but there are plenty of alternatives.
+					</li>
+					<li class="mb-3">
+						This is <strong>not</strong> a full representation of the database - all users are stripped, and any prompts that are in draft status are not included.
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-12 mb-4">
+		<div class="card">
+			<div class="card-body">
 				<h5 class="card-title mb-3">2021/01/22 - Release 2.3</h5>
 				<ul>
 					<li class="mb-3">
@@ -15,25 +34,6 @@
 			</div>
 		</div>
 	</div>
-
-	@*<div class="col-12 mb-4">
-		<div class="card">
-			<div class="card-body">
-				<h5 class="card-title mb-3">2021/01/17 - Release 2.3</h5>
-				<ul>
-					<li class="mb-3">
-						Database backups are now available! Visit <a target="_blank" href="/backup.db">@Context.Request.Host.Value/backup.db</a> to download it. Backups are created nightly so very latest prompts may be missing.
-					</li>
-					<li class="mb-3">
-						This is a SQLite database, you'll need a viewer to see any data. I personally use <a rel="noopener noreferrer nofollow" target="_blank" href="https://dbeaver.io/">DBeaver</a>, but there are plenty of others available.
-					</li>
-					<li class="mb-3">
-						This is <strong>not</strong> a full representation of the database - all users are stripped, and any prompts that are in draft status are not included.
-					</li>
-				</ul>
-			</div>
-		</div>
-	</div>*@
 
 	<div id="userscript-update" class="col-12 mb-4">
 		<div class="card">
@@ -47,7 +47,7 @@
 						We now have a userscript you can use to quickly import prompts into AI dungeon. This can, and probably will, break when Mormon makes updates to the site, so please be patient if this happens.
 					</li>
 					<li class="mb-3">
-						To use the userscript, please install a userscript manager into your browser. My personal recommendation is  <a rel="noopener noreferrer nofollow" target="_blank" href="https://violentmonkey.github.io/">ViolentMonkey</a>.
+						To use the userscript, please install a userscript manager into your browser. My personal recommendation is <a rel="noopener noreferrer nofollow" target="_blank" href="https://violentmonkey.github.io/">ViolentMonkey</a>.
 					</li>
 					<li class="mb-3">
 						Once you have a userscript extension installed, navigate to: <a target="_blank" href="https://prompts.aidg.club/aidg.user.js">https://prompts.aidg.club/aidg.user.js</a>. Your userscript manager should show you the code. <strong>Make sure you read it, this code will be executed on your browser, and could be malicious.</strong> Once you're happy, install it (usually a button in the top right).

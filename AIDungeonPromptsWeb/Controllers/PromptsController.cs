@@ -14,8 +14,10 @@ using AIDungeonPrompts.Application.Commands.UpdatePrompt;
 using AIDungeonPrompts.Application.Helpers;
 using AIDungeonPrompts.Application.Queries.GetPrompt;
 using AIDungeonPrompts.Application.Queries.GetScript;
+using AIDungeonPrompts.Application.Queries.GetServerFlag;
 using AIDungeonPrompts.Application.Queries.GetUser;
 using AIDungeonPrompts.Application.Queries.SimilarPrompt;
+using AIDungeonPrompts.Domain.Entities;
 using AIDungeonPrompts.Domain.Enums;
 using AIDungeonPrompts.Web.Extensions;
 using AIDungeonPrompts.Web.Models.Prompts;
@@ -43,20 +45,29 @@ namespace AIDungeonPrompts.Web.Controllers
 		}
 
 		[HttpGet("[controller]/create")]
-		public ActionResult Create(int? parentId)
+		public async Task<ActionResult> Create(int? parentId, CancellationToken cancellationToken)
 		{
+			var flag = await _mediator.Send(new GetServerFlagQuery(ServerFlagName.CreateDisabled), cancellationToken);
 			return View(new CreatePromptViewModel
 			{
 				Command = new CreatePromptCommand
 				{
 					ParentId = parentId
-				}
+				},
+				CreationDisabled = flag.Enabled,
+				DisabledMessage = flag.Message
 			});
 		}
 
 		[HttpPost, ValidateAntiForgeryToken]
 		public async Task<IActionResult> Create(bool addWi, bool confirm, bool saveDraft, bool addChild, bool uploadWi, int? wiDelete, CreatePromptViewModel model, CancellationToken cancellationToken)
 		{
+			var flag = await _mediator.Send(new GetServerFlagQuery(ServerFlagName.CreateDisabled), cancellationToken);
+			if (flag.Enabled)
+			{
+				return RedirectToAction("Create");
+			}
+
 			if (uploadWi)
 			{
 				ModelState.Clear();
@@ -184,7 +195,7 @@ namespace AIDungeonPrompts.Web.Controllers
 				return RedirectToAction("Edit", new { id = prompt.ParentId });
 			}
 
-			return RedirectToAction("Index");
+			return RedirectToAction("Index", "Home");
 		}
 
 		[HttpGet("/{id}/world-info")]
