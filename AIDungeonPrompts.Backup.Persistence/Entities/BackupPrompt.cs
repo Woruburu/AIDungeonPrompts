@@ -16,6 +16,7 @@ namespace AIDungeonPrompts.Backup.Persistence.Entities
 		public string? Quests { get; set; }
 		public string Tags { get; set; } = string.Empty;
 		public string Title { get; set; } = string.Empty;
+		public byte[]? ScriptZip { get; set; }
 		public List<BackupWorldInfo> WorldInfos { get; set; } = new List<BackupWorldInfo>();
 	}
 }

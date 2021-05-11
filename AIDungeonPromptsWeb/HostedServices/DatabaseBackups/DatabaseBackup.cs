@@ -71,6 +71,7 @@ namespace AIDungeonPrompts.Web.HostedServices.DatabaseBackups
 				Title = prompt.Title,
 				PublishDate = prompt.PublishDate,
 				Tags = string.Join(", ", prompt.PromptTags.Select(e => e.Tag!.Name)),
+				ScriptZip = prompt.ScriptZip,
 				WorldInfos = prompt.WorldInfos.Select(worldInfo => new BackupWorldInfo
 				{
 					DateCreated = worldInfo.DateCreated,
