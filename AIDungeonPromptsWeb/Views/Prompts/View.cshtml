@@ -90,20 +90,26 @@
 }
 
 <h5>@Html.DisplayNameFor(m => m.Prompt.PromptContent)</h5>
-<div class="card mb-4">
+<div class="card mb-1">
 	<div class="card-body">
 		<code class="card-text pre-line">@Html.DisplayFor(m => m.Prompt.PromptContent)</code>
 	</div>
+</div>
+<div class="d-flex mb-4">
+	<span class="ml-auto text-muted">@Model.Prompt.PromptContent.Length characters</span>
 </div>
 
 
 @if (!string.IsNullOrWhiteSpace(Model.Prompt.Memory))
 {
 	<h5>@Html.DisplayNameFor(m => m.Prompt.Memory)</h5>
-	<div class="card mb-4">
+	<div class="card mb-1">
 		<div class="card-body">
 			<code class="card-text pre-line">@Html.DisplayFor(m => m.Prompt.Memory)</code>
 		</div>
+	</div>
+	<div class="d-flex mb-4">
+		<span class="ml-auto text-muted">@Model.Prompt.Memory.Length characters</span>
 	</div>
 }
 
@@ -120,10 +126,13 @@
 @if (!string.IsNullOrWhiteSpace(Model.Prompt.AuthorsNote))
 {
 	<h5>@Html.DisplayNameFor(m => m.Prompt.AuthorsNote)</h5>
-	<div class="card mb-4">
+	<div class="card mb-1">
 		<div class="card-body">
 			<code class="card-text pre-line">@Html.DisplayFor(m => m.Prompt.AuthorsNote)</code>
 		</div>
+	</div>
+	<div class="d-flex mb-4">
+		<span class="ml-auto text-muted">@Model.Prompt.AuthorsNote.Length characters</span>
 	</div>
 }
 
@@ -155,6 +164,7 @@
 						<hr/>
 						<h5>@Html.DisplayNameFor(_ => worldInfo.Entry)</h5>
 						<code class="card-text pre-line">@Html.DisplayFor(_ => worldInfo.Entry)</code>
+
 					</div>
 				</div>
 			</div>
