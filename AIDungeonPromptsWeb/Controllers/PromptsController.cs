@@ -20,6 +20,7 @@ using AIDungeonPrompts.Application.Queries.SimilarPrompt;
 using AIDungeonPrompts.Domain.Entities;
 using AIDungeonPrompts.Domain.Enums;
 using AIDungeonPrompts.Web.Extensions;
+using AIDungeonPrompts.Web.Models.NovelAi;
 using AIDungeonPrompts.Web.Models.Prompts;
 using FluentValidation.AspNetCore;
 using MediatR;
@@ -28,6 +29,7 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace AIDungeonPrompts.Web.Controllers
 {
@@ -226,6 +228,30 @@ namespace AIDungeonPrompts.Web.Controllers
 			return new FileStreamResult(stream, mimeType)
 			{
 				FileDownloadName = "worldInfo.json"
+			};
+		}
+
+		[HttpGet("/{id}/nai-scenario")]
+		public async Task<IActionResult> NovelAiScenario(int? id, CancellationToken cancellationToken)
+		{
+			if (id == null || (int)id == default)
+			{
+				return NotFound();
+			}
+
+			var prompt = await _mediator.Send(new GetPromptQuery(id.Value), cancellationToken);
+			if (prompt == null)
+			{
+				return NotFound();
+			}
+
+			var scenario = new NovelAiScenario(prompt);
+			var scenarioString = JsonSerializer.Serialize(scenario);
+			Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(scenarioString));
+			const string? mimeType = "application/json";
+			return new FileStreamResult(stream, mimeType)
+			{
+				FileDownloadName = $"{prompt.Title.Trim()}.scenario"
 			};
 		}
 

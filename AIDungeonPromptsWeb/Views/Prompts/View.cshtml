@@ -1,5 +1,5 @@
-@model ViewPromptViewModel
 @using AIDungeonPrompts.Application.Helpers
+@model ViewPromptViewModel
 @{
 	ViewData["Title"] = Model.Prompt.Title;
 	var isChild = Model.Prompt.ParentId.HasValue;
@@ -8,7 +8,7 @@
 		user!.Id == Model.Prompt.OwnerId ||
 		RoleHelper.CanEdit(user.Role)
 		);
-	var showDelete = loggedIn && (RoleHelper.CanDelete(user!.Role));
+	var showDelete = loggedIn && RoleHelper.CanDelete(user!.Role);
 }
 @if (Model.Reported ?? false)
 {
@@ -60,24 +60,33 @@
 		</div>
 	</div>
 </div>
-@if (!isChild)
-{
-	<p>
-		Tags:
-		@if (Model.Prompt.Nsfw)
+<div class="d-flex">
+	<div class="mr-auto">
+		@if (!isChild)
 		{
-			<a class="badge badge-danger" asp-controller="Home" asp-action="Index" asp-route-NsfwSetting="2">
-				NSFW
-			</a>
+			<p>
+				Tags:
+				@if (Model.Prompt.Nsfw)
+				{
+					<a class="badge badge-danger" asp-controller="Home" asp-action="Index" asp-route-NsfwSetting="2">
+						NSFW
+					</a>
+				}
+				@foreach (var tag in Model.Prompt.PromptTags)
+				{
+					<a class="badge badge-primary" asp-controller="Home" asp-action="Index" asp-route-Tags="@tag.Name">
+						@tag.Name
+					</a>
+				}
+			</p>
 		}
-		@foreach (var tag in Model.Prompt.PromptTags)
-		{
-			<a class="badge badge-primary" asp-controller="Home" asp-action="Index" asp-route-Tags="@tag.Name">
-				@tag.Name
-			</a>
-		}
-	</p>
-}
+	</div>
+	<div>
+		<form method="get" asp-action="NovelAiScenario" asp-route-id="@Model.Prompt.Id">
+			<button class="btn btn-outline-light">Export as NAI Scenario</button>
+		</form>
+	</div>
+</div>
 
 @if (!string.IsNullOrWhiteSpace(Model.Prompt.Description))
 {
@@ -203,6 +212,14 @@
 	<h5>Sub Scenarios</h5>
 	@Html.DisplayFor(m => m.Prompt.Children)
 }
+
+<div class="d-flex">
+	<div class="ml-auto">
+		<form method="get" asp-action="NovelAiScenario" asp-route-id="@Model.Prompt.Id">
+			<button class="btn btn-outline-light">Export as NAI Scenario</button>
+		</form>
+	</div>
+</div>
 
 @section Scripts {
 	<script src="~/js/prompts/view.js" asp-append-version="true"></script>
