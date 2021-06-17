@@ -10,5 +10,8 @@ namespace AIDungeonPrompts.Web.Models.NovelAi
 
 		[JsonPropertyName("keys")]
 		public List<string> Keys { get; set; } = new();
+
+		[JsonPropertyName("displayName")]
+		public string DisplayName { get; set; } = string.Empty;
 	}
 }
