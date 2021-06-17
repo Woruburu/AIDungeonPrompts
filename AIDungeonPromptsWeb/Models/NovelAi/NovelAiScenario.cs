@@ -49,9 +49,15 @@ namespace AIDungeonPrompts.Web.Models.NovelAi
 			{
 				LorebookEntries =
 					prompt.WorldInfos.Select(
-						wi => new NovelAiLorebookEntry
+						wi =>
 						{
-							Keys = wi.Keys.Split(",").Select(key => key.Trim()).ToList(), Text = wi.Entry
+							var split = wi.Keys.Split(",");
+							return new NovelAiLorebookEntry
+							{
+								Keys = split.Select(key => key.Trim()).ToList(),
+								Text = wi.Entry,
+								DisplayName = split.FirstOrDefault()?.Trim() ?? string.Empty
+							};
 						}).ToList()
 			};
 		}
