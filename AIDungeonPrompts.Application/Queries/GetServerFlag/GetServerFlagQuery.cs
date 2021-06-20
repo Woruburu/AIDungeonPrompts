@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using AIDungeonPrompts.Application.Abstractions.DbContexts;
-using AIDungeonPrompts.Application.Queries.GetScript;
+using AIDungeonPrompts.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -26,10 +26,14 @@ namespace AIDungeonPrompts.Application.Queries.GetServerFlag
 			_dbContext = dbContext;
 		}
 
-		public async Task<GetServerFlagViewModel> Handle(GetServerFlagQuery request, CancellationToken cancellationToken)
+		public async Task<GetServerFlagViewModel> Handle(GetServerFlagQuery request,
+			CancellationToken cancellationToken)
 		{
-			var flag = await _dbContext.ServerFlags.FirstOrDefaultAsync(e => e.Name == request.Name, cancellationToken);
-			return flag == null ? new GetServerFlagViewModel() : new GetServerFlagViewModel{Enabled = flag.Enabled, Message = flag.AdditionalMessage};
+			ServerFlag? flag =
+				await _dbContext.ServerFlags.FirstOrDefaultAsync(e => e.Name == request.Name, cancellationToken);
+			return flag == null
+				? new GetServerFlagViewModel()
+				: new GetServerFlagViewModel {Enabled = flag.Enabled, Message = flag.AdditionalMessage};
 		}
 	}
 

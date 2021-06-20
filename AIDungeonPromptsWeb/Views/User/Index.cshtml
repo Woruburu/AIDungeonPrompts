@@ -1,5 +1,5 @@
+@using AIDungeonPrompts.Domain.Enums
 @model IndexUserModel
-@using AIDungeonPrompts.Application.Extensions
 @{
 	ViewData["Title"] = "My Profile";
 }
@@ -10,15 +10,15 @@
 		<a id="log-out-button" data-transient="@Model.IsTransient" class="btn btn-outline-danger" asp-action="logout">Log Out</a>
 	</div>
 </div>
-<br />
+<br/>
 <div class="row">
 	@if (Model.IsTransient)
 	{
 		<div class="col-12">
 			<p>
 				<strong>You are not registered. If your browser data is cleared you will lose access to your prompts!</strong>
-				<br />
-				<br />
+				<br/>
+				<br/>
 				<a class="btn btn-primary" asp-action="Register">Click here to register</a>
 			</p>
 		</div>
@@ -28,13 +28,13 @@
 		<div class="col-12">
 			<div class="form-group">
 				@Html.LabelFor(m => m.Username)
-				<input disabled asp-for="Username" class="form-control" />
+				<input disabled asp-for="Username" class="form-control"/>
 			</div>
-			@if (Model.UserRoles != AIDungeonPrompts.Domain.Enums.RoleEnum.None)
+			@if (Model.UserRoles != RoleEnum.None)
 			{
 				<div class="form-group">
 					<label>Roles</label>
-					<input disabled class="form-control" value="@Model.UserRoles" />
+					<input disabled class="form-control" value="@Model.UserRoles"/>
 				</div>
 			}
 			<div class="d-flex">
@@ -43,22 +43,22 @@
 		</div>
 	}
 </div>
-<br />
+<br/>
 <div class="row">
 	<div class="col-12">
 		<h3>My Prompts</h3>
-		<br />
+		<br/>
 	</div>
 	@if (Model.UserPrompts.Results.Count > 0)
 	{
-		@Html.DisplayFor(m => m.UserPrompts.Results, new { DisplayEdit = true })
+		@Html.DisplayFor(m => m.UserPrompts.Results, new {DisplayEdit = true})
 	}
 	else
 	{
 		<div class="col-12">
 			<strong>You haven't created any prompts!</strong>
-			<br />
-			<br />
+			<br/>
+			<br/>
 			<a class="btn btn-primary" asp-action="Create" asp-controller="Prompts">Click here to create one</a>
 		</div>
 	}
@@ -167,8 +167,8 @@
 			<div class="modal-body">
 				<p>
 					You are not registered. If you log out now you will lose access to all your previously created prompts.
-					<br />
-					<br />
+					<br/>
+					<br/>
 					Are you sure you want to continue?
 				</p>
 			</div>

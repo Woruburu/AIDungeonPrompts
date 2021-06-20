@@ -1,8 +1,10 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AIDungeonPrompts.Application.Abstractions.DbContexts;
 using AIDungeonPrompts.Application.Helpers;
+using AIDungeonPrompts.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -29,40 +31,31 @@ namespace AIDungeonPrompts.Application.Queries.SimilarPrompt
 			_dbContext = dbContext;
 		}
 
-		public async Task<SimilarPromptViewModel> Handle(SimilarPromptQuery request, CancellationToken cancellationToken = default)
+		public async Task<SimilarPromptViewModel> Handle(SimilarPromptQuery request,
+			CancellationToken cancellationToken = default)
 		{
-			var query = _dbContext
+			IQueryable<Prompt>? query = _dbContext
 				.Prompts
 				.Where(prompt => !prompt.IsDraft)
-				.Where(prompt => EF.Functions.ILike(prompt.Title, NpgsqlHelper.SafeIlike(request.Title), NpgsqlHelper.EscapeChar));
+				.Where(prompt =>
+					EF.Functions.ILike(prompt.Title, NpgsqlHelper.SafeIlike(request.Title), NpgsqlHelper.EscapeChar));
 
 			if (request.CurrentId.HasValue)
 			{
 				query = query.Where(e => e.Id != request.CurrentId.Value);
 			}
 
-			var similarPrompts = await query
+			List<SimilarPromptDetailsViewModel>? similarPrompts = await query
 				.AsNoTracking()
-				.Select(prompt => new SimilarPromptDetailsViewModel
-				{
-					Id = prompt.Id,
-					Title = prompt.Title
-				})
+				.Select(prompt => new SimilarPromptDetailsViewModel {Id = prompt.Id, Title = prompt.Title})
 				.ToListAsync();
 
 			if (similarPrompts.Count < 1)
 			{
-				return new SimilarPromptViewModel
-				{
-					Matched = false
-				};
+				return new SimilarPromptViewModel {Matched = false};
 			}
 
-			return new SimilarPromptViewModel
-			{
-				Matched = true,
-				SimilarPrompts = similarPrompts
-			};
+			return new SimilarPromptViewModel {Matched = true, SimilarPrompts = similarPrompts};
 		}
 	}
 }

@@ -6,11 +6,9 @@ namespace AIDungeonPrompts.Application.Extensions
 {
 	public static class EnumExtensions
 	{
-		public static string? GetEnumDisplayName(this Enum enumType)
-		{
-			return enumType.GetType().GetMember(enumType.ToString())[0]
+		public static string? GetEnumDisplayName(this Enum enumType) =>
+			enumType.GetType().GetMember(enumType.ToString())[0]
 				.GetCustomAttribute<DisplayAttribute>()
 				.Name;
-		}
 	}
 }

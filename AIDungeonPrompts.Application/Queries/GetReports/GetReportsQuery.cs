@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using AIDungeonPrompts.Application.Abstractions.DbContexts;
 using AIDungeonPrompts.Application.Helpers;
+using AIDungeonPrompts.Domain.Entities;
 using AIDungeonPrompts.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -29,20 +30,22 @@ namespace AIDungeonPrompts.Application.Queries.GetReports
 			_dbContext = dbContext;
 		}
 
-		public async Task<List<GetReportViewModel>> Handle(GetReportsQuery request, CancellationToken cancellationToken = default)
+		public async Task<List<GetReportViewModel>> Handle(GetReportsQuery request,
+			CancellationToken cancellationToken = default)
 		{
 			if (!RoleHelper.CanEdit(request.Role))
 			{
 				throw new GetReportUnauthorizedUserException();
 			}
 
-			var query = _dbContext.Reports.Include(e => e.Prompt).AsQueryable();
+			IQueryable<Report>? query = _dbContext.Reports.Include(e => e.Prompt).AsQueryable();
 			if (request.Role == RoleEnum.TagEdit)
 			{
 				query = query.Where(e =>
 					e.ReportReason == ReportReason.IncorrectTags ||
 					e.ReportReason == ReportReason.UntaggedNsfw);
 			}
+
 			return await query
 				.AsNoTracking()
 				.Select(report => new GetReportViewModel

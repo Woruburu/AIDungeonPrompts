@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using AIDungeonPrompts.Application.Queries.GetUser;
 using AIDungeonPrompts.Application.Queries.LogIn;
 using AIDungeonPrompts.Domain.Entities;
 using AIDungeonPrompts.Domain.Enums;
@@ -31,7 +32,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.Login
 			{
 				if (i == index)
 				{
-					user = new User()
+					user = new User
 					{
 						Username = expectedUsername,
 						Password = BCrypt.Net.BCrypt.EnhancedHashPassword(password, 4),
@@ -44,16 +45,16 @@ namespace AIDungeonPrompts.Test.Application.Queries.Login
 				{
 					DbContext.Users.Add(new User
 					{
-						Username = i.ToString(),
-						Password = BCrypt.Net.BCrypt.EnhancedHashPassword(i.ToString(), 4)
+						Username = i.ToString(), Password = BCrypt.Net.BCrypt.EnhancedHashPassword(i.ToString(), 4)
 					});
 				}
 			}
+
 			await DbContext.SaveChangesAsync();
 			var query = new LogInQuery(expectedUsername, password);
 
 			//act
-			var actual = await _handler.Handle(query);
+			GetUserViewModel? actual = await _handler.Handle(query);
 
 			//assert
 			Assert.Equal(user.Id, actual.Id);
@@ -79,7 +80,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.Login
 			var query = new LogInQuery(expectedUsername.ToUpper(), password);
 
 			//act
-			var actual = await _handler.Handle(query);
+			GetUserViewModel? actual = await _handler.Handle(query);
 
 			//assert
 			Assert.Equal(user.Id, actual.Id);
@@ -95,8 +96,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.Login
 			const string password = "TestPassword";
 			DbContext.Users.Add(new User
 			{
-				Username = username,
-				Password = BCrypt.Net.BCrypt.EnhancedHashPassword(password)
+				Username = username, Password = BCrypt.Net.BCrypt.EnhancedHashPassword(password)
 			});
 			await DbContext.SaveChangesAsync();
 			var query = new LogInQuery(username, "WrongPassword");
@@ -113,7 +113,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.Login
 		{
 			//arrange
 			const string username = "TestUsername";
-			DbContext.Users.Add(new User { Username = username });
+			DbContext.Users.Add(new User {Username = username});
 			await DbContext.SaveChangesAsync();
 			var query = new LogInQuery(username, "TestPassword");
 

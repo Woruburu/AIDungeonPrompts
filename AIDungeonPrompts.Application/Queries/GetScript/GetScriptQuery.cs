@@ -26,13 +26,11 @@ namespace AIDungeonPrompts.Application.Queries.GetScript
 			_dbContext = dbContext;
 		}
 
-		public async Task<byte[]?> Handle(GetScriptQuery request, CancellationToken cancellationToken = default)
-		{
-			return await _dbContext
+		public async Task<byte[]?> Handle(GetScriptQuery request, CancellationToken cancellationToken = default) =>
+			await _dbContext
 				.Prompts
 				.Where(e => e.Id == request.PromptId)
 				.Select(e => e.ScriptZip)
 				.FirstOrDefaultAsync(cancellationToken);
-		}
 	}
 }

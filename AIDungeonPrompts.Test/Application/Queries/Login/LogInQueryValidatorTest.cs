@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using AIDungeonPrompts.Application.Queries.LogIn;
+using FluentValidation.Results;
 using Xunit;
 
 namespace AIDungeonPrompts.Test.Application.Queries.Login
@@ -23,13 +24,14 @@ namespace AIDungeonPrompts.Test.Application.Queries.Login
 		[InlineData("Value", null)]
 		[InlineData("Value", "")]
 		[InlineData("Value", "	")]
-		public async Task ValidateAsync_ReturnsNotValid_WhenEitherPasswordOrUsernameAreEmpty(string username, string password)
+		public async Task ValidateAsync_ReturnsNotValid_WhenEitherPasswordOrUsernameAreEmpty(string username,
+			string password)
 		{
 			//arrange
 			var query = new LogInQuery(username, password);
 
 			//act
-			var actual = await _validator.ValidateAsync(query);
+			ValidationResult? actual = await _validator.ValidateAsync(query);
 
 			//assert
 			Assert.False(actual.IsValid);
@@ -42,7 +44,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.Login
 			var query = new LogInQuery("Value", "Value");
 
 			//act
-			var actual = await _validator.ValidateAsync(query);
+			ValidationResult? actual = await _validator.ValidateAsync(query);
 
 			//assert
 			Assert.True(actual.IsValid);

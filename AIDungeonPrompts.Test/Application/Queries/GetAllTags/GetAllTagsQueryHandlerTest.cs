@@ -22,38 +22,18 @@ namespace AIDungeonPrompts.Test.Application.Queries.GetAllTags
 			//arrange
 			var promptOne = new Prompt
 			{
-				PromptTags = new List<PromptTag>
-				{
-					new PromptTag
-					{
-						Tag = new Tag
-						{
-							Name = "PromptTagOne"
-						}
-					}
-				},
-				IsDraft = true
+				PromptTags = new List<PromptTag> {new() {Tag = new Tag {Name = "PromptTagOne"}}}, IsDraft = true
 			};
 			var promptTwo = new Prompt
 			{
-				PromptTags = new List<PromptTag>
-				{
-					new PromptTag
-					{
-						Tag = new Tag
-						{
-							Name = "PromptTagTwo"
-						}
-					}
-				},
-				IsDraft = true
+				PromptTags = new List<PromptTag> {new() {Tag = new Tag {Name = "PromptTagTwo"}}}, IsDraft = true
 			};
 			DbContext.Prompts.AddRange(promptOne, promptTwo);
 			await DbContext.SaveChangesAsync();
 			var query = new GetAllTagsQuery();
 
 			//act
-			var actual = await _handler.Handle(query);
+			List<GetTagViewModel>? actual = await _handler.Handle(query);
 
 			//assert
 			Assert.Empty(actual);
@@ -63,18 +43,12 @@ namespace AIDungeonPrompts.Test.Application.Queries.GetAllTags
 		public async Task Handle_ReturnsEmptyList_WhenAllTagsAreNotAssociatedToAPrompt()
 		{
 			//arrange
-			DbContext.Tags.AddRange(new Tag
-			{
-				Name = "TestTagOne"
-			}, new Tag
-			{
-				Name = "TestTagTwo"
-			});
+			DbContext.Tags.AddRange(new Tag {Name = "TestTagOne"}, new Tag {Name = "TestTagTwo"});
 			await DbContext.SaveChangesAsync();
 			var query = new GetAllTagsQuery();
 
 			//act
-			var actual = await _handler.Handle(query);
+			List<GetTagViewModel>? actual = await _handler.Handle(query);
 
 			//assert
 			Assert.Empty(actual);
@@ -87,7 +61,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.GetAllTags
 			var query = new GetAllTagsQuery();
 
 			//act
-			var actual = await _handler.Handle(query);
+			List<GetTagViewModel>? actual = await _handler.Handle(query);
 
 			//assert
 			Assert.Empty(actual);
@@ -98,36 +72,15 @@ namespace AIDungeonPrompts.Test.Application.Queries.GetAllTags
 		{
 			//arrange
 			const int expectedCount = 2;
-			var tag = new Tag
-			{
-				Name = "PromptTagOne"
-			};
-			var promptOne = new Prompt
-			{
-				PromptTags = new List<PromptTag>
-				{
-					new PromptTag
-					{
-						Tag = tag
-					}
-				}
-			};
-			var promptTwo = new Prompt
-			{
-				PromptTags = new List<PromptTag>
-				{
-					new PromptTag
-					{
-						Tag = tag
-					}
-				}
-			};
+			var tag = new Tag {Name = "PromptTagOne"};
+			var promptOne = new Prompt {PromptTags = new List<PromptTag> {new() {Tag = tag}}};
+			var promptTwo = new Prompt {PromptTags = new List<PromptTag> {new() {Tag = tag}}};
 			DbContext.Prompts.AddRange(promptOne, promptTwo);
 			await DbContext.SaveChangesAsync();
 			var query = new GetAllTagsQuery();
 
 			//act
-			var actual = await _handler.Handle(query);
+			List<GetTagViewModel>? actual = await _handler.Handle(query);
 
 			//assert
 			Assert.Single(actual);
@@ -139,25 +92,13 @@ namespace AIDungeonPrompts.Test.Application.Queries.GetAllTags
 		{
 			//arrange
 			const string expectedName = "PromptTagOne";
-			var promptOne = new Prompt
-			{
-				PromptTags = new List<PromptTag>
-				{
-					new PromptTag
-					{
-						Tag = new Tag
-						{
-							Name = expectedName
-						}
-					}
-				}
-			};
+			var promptOne = new Prompt {PromptTags = new List<PromptTag> {new() {Tag = new Tag {Name = expectedName}}}};
 			DbContext.Prompts.AddRange(promptOne);
 			await DbContext.SaveChangesAsync();
 			var query = new GetAllTagsQuery();
 
 			//act
-			var actual = await _handler.Handle(query);
+			List<GetTagViewModel>? actual = await _handler.Handle(query);
 
 			//assert
 			Assert.Single(actual);
@@ -171,36 +112,18 @@ namespace AIDungeonPrompts.Test.Application.Queries.GetAllTags
 			const int expectedCount = 2;
 			var promptOne = new Prompt
 			{
-				PromptTags = new List<PromptTag>
-				{
-					new PromptTag
-					{
-						Tag = new Tag
-						{
-							Name = "PromptTagOne"
-						}
-					}
-				}
+				PromptTags = new List<PromptTag> {new() {Tag = new Tag {Name = "PromptTagOne"}}}
 			};
 			var promptTwo = new Prompt
 			{
-				PromptTags = new List<PromptTag>
-				{
-					new PromptTag
-					{
-						Tag = new Tag
-						{
-							Name = "PromptTagTwo"
-						}
-					}
-				}
+				PromptTags = new List<PromptTag> {new() {Tag = new Tag {Name = "PromptTagTwo"}}}
 			};
 			DbContext.Prompts.AddRange(promptOne, promptTwo);
 			await DbContext.SaveChangesAsync();
 			var query = new GetAllTagsQuery();
 
 			//act
-			var actual = await _handler.Handle(query);
+			List<GetTagViewModel>? actual = await _handler.Handle(query);
 
 			//assert
 			Assert.Equal(expectedCount, actual.Count);

@@ -23,12 +23,13 @@ namespace AIDungeonPrompts.Test.Application.Commands.ClearReport
 		public async Task Handle_SetsReportToCleared_WhenTheReportIdIsFound(int extraReports)
 		{
 			//arrange
-			var report = new Report { Prompt = new Prompt() };
+			var report = new Report {Prompt = new Prompt()};
 			DbContext.Reports.Add(report);
 			for (var i = 0; i < extraReports; i++)
 			{
-				DbContext.Reports.Add(new Report { Prompt = new Prompt() });
+				DbContext.Reports.Add(new Report {Prompt = new Prompt()});
 			}
+
 			await DbContext.SaveChangesAsync();
 			var command = new ClearReportCommand(report.Id);
 
@@ -61,7 +62,7 @@ namespace AIDungeonPrompts.Test.Application.Commands.ClearReport
 		public async Task Handle_ThrowsClearReportNotFoundException_WhenTheReportIdIsNotFound(int id)
 		{
 			//arrange
-			DbContext.Reports.Add(new Report { Prompt = new Prompt() });
+			DbContext.Reports.Add(new Report {Prompt = new Prompt()});
 			await DbContext.SaveChangesAsync();
 			var command = new ClearReportCommand(id);
 

@@ -28,28 +28,28 @@ namespace AIDungeonPrompts.Test.Application.Commands.DeletePrompt
 		[InlineData(1, 10)]
 		[InlineData(12, 20)]
 		[InlineData(64, 64)]
-		public async Task Handle_RemovesPrompt_AndAllItsChildren_AndAllSubChildren_WhenUserHasDeletePermission(int expectedPromptCount, int childDepth)
+		public async Task Handle_RemovesPrompt_AndAllItsChildren_AndAllSubChildren_WhenUserHasDeletePermission(
+			int expectedPromptCount, int childDepth)
 		{
 			//arrange
 			var child = new Prompt();
-			var prompt = new Prompt
-			{
-				Children = new List<Prompt> { child }
-			};
+			var prompt = new Prompt {Children = new List<Prompt> {child}};
 			for (var i = 0; i < childDepth; i++)
 			{
 				var newChild = new Prompt();
 				child.Children.Add(newChild);
 				child = newChild;
 			}
+
 			DbContext.Add(prompt);
 			for (var i = 0; i < expectedPromptCount; i++)
 			{
 				DbContext.Add(new Prompt());
 			}
+
 			await DbContext.SaveChangesAsync();
 
-			var user = new GetUserViewModel { Role = RoleEnum.Delete };
+			var user = new GetUserViewModel {Role = RoleEnum.Delete};
 			_mockUserService.Setup(e => e.TryGetCurrentUser(out user)).Returns(true);
 
 			var command = new DeletePromptCommand(prompt.Id);
@@ -66,30 +66,29 @@ namespace AIDungeonPrompts.Test.Application.Commands.DeletePrompt
 		[InlineData(1, 10)]
 		[InlineData(12, 20)]
 		[InlineData(64, 64)]
-		public async Task Handle_RemovesPrompt_AndAllItsChildren_AndAllSubChildren_WhenUserIsOwner(int expectedPromptCount, int childDepth)
+		public async Task Handle_RemovesPrompt_AndAllItsChildren_AndAllSubChildren_WhenUserIsOwner(
+			int expectedPromptCount, int childDepth)
 		{
 			//arrange
-			var owner = new User { Username = "TestOwner" };
+			var owner = new User {Username = "TestOwner"};
 			var child = new Prompt();
-			var prompt = new Prompt
-			{
-				Children = new List<Prompt> { child },
-				Owner = owner
-			};
+			var prompt = new Prompt {Children = new List<Prompt> {child}, Owner = owner};
 			for (var i = 0; i < childDepth; i++)
 			{
 				var newChild = new Prompt();
 				child.Children.Add(newChild);
 				child = newChild;
 			}
+
 			DbContext.Add(prompt);
 			for (var i = 0; i < expectedPromptCount; i++)
 			{
 				DbContext.Add(new Prompt());
 			}
+
 			await DbContext.SaveChangesAsync();
 
-			var user = new GetUserViewModel { Id = owner.Id };
+			var user = new GetUserViewModel {Id = owner.Id};
 			_mockUserService.Setup(e => e.TryGetCurrentUser(out user)).Returns(true);
 
 			var command = new DeletePromptCommand(prompt.Id);
@@ -106,7 +105,8 @@ namespace AIDungeonPrompts.Test.Application.Commands.DeletePrompt
 		[InlineData(1, 10)]
 		[InlineData(12, 20)]
 		[InlineData(64, 64)]
-		public async Task Handle_RemovesPrompt_AndAllItsChildren_WhenUserHasDeletePermission(int expectedPromptCount, int childAmount)
+		public async Task Handle_RemovesPrompt_AndAllItsChildren_WhenUserHasDeletePermission(int expectedPromptCount,
+			int childAmount)
 		{
 			//arrange
 			var prompt = new Prompt();
@@ -114,14 +114,16 @@ namespace AIDungeonPrompts.Test.Application.Commands.DeletePrompt
 			{
 				prompt.Children.Add(new Prompt());
 			}
+
 			DbContext.Add(prompt);
 			for (var i = 0; i < expectedPromptCount; i++)
 			{
 				DbContext.Add(new Prompt());
 			}
+
 			await DbContext.SaveChangesAsync();
 
-			var user = new GetUserViewModel { Role = RoleEnum.Delete };
+			var user = new GetUserViewModel {Role = RoleEnum.Delete};
 			_mockUserService.Setup(e => e.TryGetCurrentUser(out user)).Returns(true);
 
 			var command = new DeletePromptCommand(prompt.Id);
@@ -138,26 +140,26 @@ namespace AIDungeonPrompts.Test.Application.Commands.DeletePrompt
 		[InlineData(1, 10)]
 		[InlineData(12, 20)]
 		[InlineData(64, 64)]
-		public async Task Handle_RemovesPrompt_AndAllItsChildren_WhenUserIsOwner(int expectedPromptCount, int childAmount)
+		public async Task Handle_RemovesPrompt_AndAllItsChildren_WhenUserIsOwner(int expectedPromptCount,
+			int childAmount)
 		{
 			//arrange
-			var owner = new User { Username = "TestOwner" };
-			var prompt = new Prompt
-			{
-				Owner = owner
-			};
+			var owner = new User {Username = "TestOwner"};
+			var prompt = new Prompt {Owner = owner};
 			for (var i = 0; i < childAmount; i++)
 			{
 				prompt.Children.Add(new Prompt());
 			}
+
 			DbContext.Add(prompt);
 			for (var i = 0; i < expectedPromptCount; i++)
 			{
 				DbContext.Add(new Prompt());
 			}
+
 			await DbContext.SaveChangesAsync();
 
-			var user = new GetUserViewModel { Id = owner.Id };
+			var user = new GetUserViewModel {Id = owner.Id};
 			_mockUserService.Setup(e => e.TryGetCurrentUser(out user)).Returns(true);
 
 			var command = new DeletePromptCommand(prompt.Id);
@@ -183,9 +185,10 @@ namespace AIDungeonPrompts.Test.Application.Commands.DeletePrompt
 			{
 				DbContext.Add(new Prompt());
 			}
+
 			await DbContext.SaveChangesAsync();
 
-			var user = new GetUserViewModel { Role = RoleEnum.Delete };
+			var user = new GetUserViewModel {Role = RoleEnum.Delete};
 			_mockUserService.Setup(e => e.TryGetCurrentUser(out user)).Returns(true);
 
 			var command = new DeletePromptCommand(prompt.Id);
@@ -205,20 +208,18 @@ namespace AIDungeonPrompts.Test.Application.Commands.DeletePrompt
 		public async Task Handle_RemovesPrompt_WhenUserIsOwner(int expectedPromptCount)
 		{
 			//arrange
-			var owner = new User { Username = "TestOwner" };
-			var prompt = new Prompt
-			{
-				Owner = owner
-			};
+			var owner = new User {Username = "TestOwner"};
+			var prompt = new Prompt {Owner = owner};
 			DbContext.Add(prompt);
 			for (var i = 0; i < expectedPromptCount; i++)
 			{
 				var extraPrompt = new Prompt();
 				DbContext.Add(extraPrompt);
 			}
+
 			await DbContext.SaveChangesAsync();
 
-			var user = new GetUserViewModel { Id = owner.Id };
+			var user = new GetUserViewModel {Id = owner.Id};
 			_mockUserService.Setup(e => e.TryGetCurrentUser(out user)).Returns(true);
 
 			var command = new DeletePromptCommand(prompt.Id);
@@ -239,10 +240,10 @@ namespace AIDungeonPrompts.Test.Application.Commands.DeletePrompt
 		public async Task Handle_ThrowsDeletePromptDoesNotExistException_WhenPromptIdDoesNotExist(int id)
 		{
 			//arrange
-			var owner = new User { Username = "TestUser" };
+			var owner = new User {Username = "TestUser"};
 			DbContext.Users.Add(owner);
 			await DbContext.SaveChangesAsync();
-			var user = new GetUserViewModel { Id = owner.Id };
+			var user = new GetUserViewModel {Id = owner.Id};
 			_mockUserService.Setup(e => e.TryGetCurrentUser(out user)).Returns(true);
 			var command = new DeletePromptCommand(id);
 
@@ -262,7 +263,7 @@ namespace AIDungeonPrompts.Test.Application.Commands.DeletePrompt
 			DbContext.Add(prompt);
 			await DbContext.SaveChangesAsync();
 
-			var user = new GetUserViewModel { Id = userId };
+			var user = new GetUserViewModel {Id = userId};
 			_mockUserService.Setup(e => e.TryGetCurrentUser(out user)).Returns(true);
 
 			var command = new DeletePromptCommand(prompt.Id);
@@ -291,18 +292,16 @@ namespace AIDungeonPrompts.Test.Application.Commands.DeletePrompt
 		[InlineData(100)]
 		[InlineData(-10)]
 		[InlineData(256)]
-		public async Task Handle_ThrowsDeletePromptUserUnauthorizedException_WhenTheUserIdDoesNotMatchPromptOwnerId(int userId)
+		public async Task Handle_ThrowsDeletePromptUserUnauthorizedException_WhenTheUserIdDoesNotMatchPromptOwnerId(
+			int userId)
 		{
 			//arrange
-			var owner = new User { Username = "TestOwner" };
-			var prompt = new Prompt
-			{
-				Owner = owner
-			};
+			var owner = new User {Username = "TestOwner"};
+			var prompt = new Prompt {Owner = owner};
 			DbContext.Add(prompt);
 			await DbContext.SaveChangesAsync();
 
-			var user = new GetUserViewModel { Id = userId };
+			var user = new GetUserViewModel {Id = userId};
 			_mockUserService.Setup(e => e.TryGetCurrentUser(out user)).Returns(true);
 
 			var command = new DeletePromptCommand(prompt.Id);

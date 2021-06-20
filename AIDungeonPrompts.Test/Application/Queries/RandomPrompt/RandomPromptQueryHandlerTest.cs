@@ -28,11 +28,12 @@ namespace AIDungeonPrompts.Test.Application.Queries.RandomPrompt
 			{
 				DbContext.Prompts.Add(new Prompt());
 			}
+
 			await DbContext.SaveChangesAsync();
 			var query = new RandomPromptQuery();
 
 			//act
-			var actual = await _handler.Handle(query);
+			RandomPromptViewModel? actual = await _handler.Handle(query);
 
 			//assert
 			Assert.True(DbContext.Prompts.Any(e => e.Id == actual.Id));
@@ -45,7 +46,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.RandomPrompt
 			var query = new RandomPromptQuery();
 
 			//act
-			var actual = await _handler.Handle(query);
+			RandomPromptViewModel? actual = await _handler.Handle(query);
 
 			//assert
 			Assert.Null(actual);
@@ -61,13 +62,14 @@ namespace AIDungeonPrompts.Test.Application.Queries.RandomPrompt
 			//arrange
 			for (var i = 0; i < amount; i++)
 			{
-				DbContext.Prompts.Add(new Prompt { IsDraft = true });
+				DbContext.Prompts.Add(new Prompt {IsDraft = true});
 			}
+
 			await DbContext.SaveChangesAsync();
 			var query = new RandomPromptQuery();
 
 			//act
-			var actual = await _handler.Handle(query);
+			RandomPromptViewModel? actual = await _handler.Handle(query);
 
 			//assert
 			Assert.Null(actual);

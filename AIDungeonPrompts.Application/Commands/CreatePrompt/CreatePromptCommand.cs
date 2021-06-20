@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using AIDungeonPrompts.Application.Abstractions.DbContexts;
 using AIDungeonPrompts.Application.Abstractions.Identity;
 using AIDungeonPrompts.Application.Helpers;
+using AIDungeonPrompts.Application.Queries.GetUser;
 using AIDungeonPrompts.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -42,10 +43,12 @@ namespace AIDungeonPrompts.Application.Commands.CreatePrompt
 
 		public string Title { get; set; } = string.Empty;
 
+		public string? NovelAiScenario { get; set; }
+
 		[Display(Name = "World Info")]
-		public List<CreatePromptCommandWorldInfo> WorldInfos { get; set; } = new List<CreatePromptCommandWorldInfo>()
+		public List<CreatePromptCommandWorldInfo> WorldInfos { get; set; } = new List<CreatePromptCommandWorldInfo>
 		{
-			new CreatePromptCommandWorldInfo(),
+			new CreatePromptCommandWorldInfo()
 		};
 	}
 
@@ -64,11 +67,12 @@ namespace AIDungeonPrompts.Application.Commands.CreatePrompt
 		{
 			if (request.ParentId.HasValue)
 			{
-				if (!_currentUserService.TryGetCurrentUser(out var user))
+				if (!_currentUserService.TryGetCurrentUser(out GetUserViewModel? user))
 				{
 					throw new CreatePromptUnauthorizedParentException();
 				}
-				var parent = await _dbContext.Prompts.FindAsync(request.ParentId);
+
+				Prompt? parent = await _dbContext.Prompts.FindAsync(request.ParentId);
 				if (parent.OwnerId != user!.Id)
 				{
 					throw new CreatePromptUnauthorizedParentException();
@@ -94,7 +98,10 @@ namespace AIDungeonPrompts.Application.Commands.CreatePrompt
 				IsDraft = isDraft,
 				PublishDate = isDraft ? null : (DateTime?)DateTime.UtcNow,
 				ParentId = request.ParentId,
-				ScriptZip = request.ScriptZip
+				ScriptZip = request.ScriptZip,
+				NovelAiScenario = string.IsNullOrWhiteSpace(request.NovelAiScenario)
+					? null
+					: request.NovelAiScenario
 			};
 
 			foreach (var worldInfo in request.WorldInfos)
@@ -103,6 +110,7 @@ namespace AIDungeonPrompts.Application.Commands.CreatePrompt
 				{
 					continue;
 				}
+
 				prompt.WorldInfos.Add(new WorldInfo
 				{
 					DateCreated = DateTime.UtcNow,
@@ -112,26 +120,29 @@ namespace AIDungeonPrompts.Application.Commands.CreatePrompt
 				});
 			}
 
-			var promptTags = request.PromptTags.Split(',').Select(p => p.Trim().ToLower()).Distinct();
+			IEnumerable<string>? promptTags = request.PromptTags.Split(',').Select(p => p.Trim().ToLower()).Distinct();
 			foreach (var promptTag in promptTags)
 			{
 				if (string.IsNullOrWhiteSpace(promptTag))
 				{
 					continue;
 				}
+
 				if (string.Equals(promptTag, "nsfw", StringComparison.OrdinalIgnoreCase))
 				{
 					prompt.Nsfw = true;
 					continue;
 				}
-				var tag = await _dbContext.Tags.FirstOrDefaultAsync(e => EF.Functions.ILike(e.Name, NpgsqlHelper.SafeIlike(promptTag), NpgsqlHelper.EscapeChar));
+
+				Tag? tag = await _dbContext.Tags.FirstOrDefaultAsync(e =>
+					EF.Functions.ILike(e.Name, NpgsqlHelper.SafeIlike(promptTag), NpgsqlHelper.EscapeChar));
 				if (tag == null)
 				{
-					prompt.PromptTags.Add(new PromptTag { Prompt = prompt, Tag = new Tag { Name = promptTag } });
+					prompt.PromptTags.Add(new PromptTag {Prompt = prompt, Tag = new Tag {Name = promptTag}});
 				}
 				else
 				{
-					prompt.PromptTags.Add(new PromptTag { Prompt = prompt, Tag = tag });
+					prompt.PromptTags.Add(new PromptTag {Prompt = prompt, Tag = tag});
 				}
 			}
 

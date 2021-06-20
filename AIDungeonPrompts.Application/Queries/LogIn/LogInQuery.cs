@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using AIDungeonPrompts.Application.Abstractions.DbContexts;
 using AIDungeonPrompts.Application.Helpers;
 using AIDungeonPrompts.Application.Queries.GetUser;
+using AIDungeonPrompts.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -32,24 +33,19 @@ namespace AIDungeonPrompts.Application.Queries.LogIn
 		public async Task<GetUserViewModel> Handle(LogInQuery request, CancellationToken cancellationToken = default)
 		{
 			var username = NpgsqlHelper.SafeIlike(request.Username);
-			var user = await _dbContext
+			User? user = await _dbContext
 				.Users
 				.AsNoTracking()
 				.FirstOrDefaultAsync(e => EF.Functions.ILike(e.Username, username, NpgsqlHelper.EscapeChar));
 
 			if (user == null ||
-				user.Password == null ||
-				!BCrypt.Net.BCrypt.EnhancedVerify(request.Password, user.Password))
+			    user.Password == null ||
+			    !BCrypt.Net.BCrypt.EnhancedVerify(request.Password, user.Password))
 			{
 				throw new LoginFailedException();
 			}
 
-			return new GetUserViewModel()
-			{
-				Id = user.Id,
-				Username = user.Username,
-				Role = user.Role
-			};
+			return new GetUserViewModel {Id = user.Id, Username = user.Username, Role = user.Role};
 		}
 	}
 }

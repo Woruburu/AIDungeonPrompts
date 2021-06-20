@@ -27,25 +27,24 @@ namespace AIDungeonPrompts.Web.Controllers
 			_currentUserService = currentUserService;
 		}
 
-		[Authorize, HttpGet("[controller]/[action]")]
-
+		[Authorize]
+		[HttpGet("[controller]/[action]")]
 		public IActionResult Edit()
 		{
-			if (!_currentUserService.TryGetCurrentUser(out var user))
+			if (!_currentUserService.TryGetCurrentUser(out GetUserViewModel? user))
 			{
 				return NotFound();
 			}
 
-			return View(new EditUserModel
-			{
-				Username = user!.Username
-			});
+			return View(new EditUserModel {Username = user!.Username});
 		}
 
-		[Authorize, HttpPost("[controller]/[action]"), ValidateAntiForgeryToken]
+		[Authorize]
+		[HttpPost("[controller]/[action]")]
+		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> Edit(EditUserModel model, CancellationToken cancellationToken)
 		{
-			if (!_currentUserService.TryGetCurrentUser(out var user))
+			if (!_currentUserService.TryGetCurrentUser(out GetUserViewModel? user))
 			{
 				return NotFound();
 			}
@@ -62,12 +61,9 @@ namespace AIDungeonPrompts.Web.Controllers
 
 			try
 			{
-				await _mediator.Send(new UpdateUserCommand
-				{
-					Username = model.Username,
-					Password = model.Password,
-					Id = user!.Id
-				}, cancellationToken);
+				await _mediator.Send(
+					new UpdateUserCommand {Username = model.Username, Password = model.Password, Id = user!.Id},
+					cancellationToken);
 			}
 			catch (UsernameNotUniqueException)
 			{
@@ -78,21 +74,18 @@ namespace AIDungeonPrompts.Web.Controllers
 			return RedirectToAction("Index");
 		}
 
-		[Authorize, HttpGet("[controller]")]
+		[Authorize]
+		[HttpGet("[controller]")]
 		public async Task<IActionResult> Index(int? page, CancellationToken cancellationToken)
 		{
-			if (!_currentUserService.TryGetCurrentUser(out var user))
+			if (!_currentUserService.TryGetCurrentUser(out GetUserViewModel? user))
 			{
 				return NotFound();
 			}
 
-			var result = await _mediator.Send(new SearchPromptsQuery
-			{
-				UserId = user!.Id,
-				Page = page ?? 1,
-				PageSize = 6,
-				IncludeDrafts = true
-			}, cancellationToken);
+			SearchPromptsViewModel? result = await _mediator.Send(
+				new SearchPromptsQuery {UserId = user!.Id, Page = page ?? 1, PageSize = 6, IncludeDrafts = true},
+				cancellationToken);
 
 			return View(new IndexUserModel
 			{
@@ -104,12 +97,10 @@ namespace AIDungeonPrompts.Web.Controllers
 			});
 		}
 
-		public IActionResult LogIn(string returnUrl)
-		{
-			return View(new LogInModel { ReturnUrl = returnUrl });
-		}
+		public IActionResult LogIn(string returnUrl) => View(new LogInModel {ReturnUrl = returnUrl});
 
-		[HttpPost, ValidateAntiForgeryToken]
+		[HttpPost]
+		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> LogIn(LogInModel model, CancellationToken cancellationToken)
 		{
 			if (!ModelState.IsValid)
@@ -119,7 +110,8 @@ namespace AIDungeonPrompts.Web.Controllers
 
 			try
 			{
-				var user = await _mediator.Send(new LogInQuery(model.Username, model.Password), cancellationToken);
+				GetUserViewModel? user =
+					await _mediator.Send(new LogInQuery(model.Username, model.Password), cancellationToken);
 				await HttpContext.SignInUserAsync(user);
 			}
 			catch (LoginFailedException)
@@ -132,6 +124,7 @@ namespace AIDungeonPrompts.Web.Controllers
 			{
 				return Redirect(model.ReturnUrl);
 			}
+
 			return RedirectToAction("Index", "Home");
 		}
 
@@ -143,14 +136,12 @@ namespace AIDungeonPrompts.Web.Controllers
 
 		public IActionResult Register(string returnUrl)
 		{
-			var model = new RegisterUserModel
-			{
-				ReturnUrl = returnUrl
-			};
+			var model = new RegisterUserModel {ReturnUrl = returnUrl};
 			return View(model);
 		}
 
-		[HttpPost, ValidateAntiForgeryToken]
+		[HttpPost]
+		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> Register(RegisterUserModel model, CancellationToken cancellationToken)
 		{
 			if (!string.Equals(model.Password, model.PasswordConfirm))
@@ -165,22 +156,18 @@ namespace AIDungeonPrompts.Web.Controllers
 
 			try
 			{
-				if (_currentUserService.TryGetCurrentUser(out var user))
+				if (_currentUserService.TryGetCurrentUser(out GetUserViewModel? user))
 				{
-					await _mediator.Send(new UpdateUserCommand
-					{
-						Username = model.Username,
-						Password = model.Password,
-						Id = user!.Id
-					}, cancellationToken);
+					await _mediator.Send(
+						new UpdateUserCommand {Username = model.Username, Password = model.Password, Id = user!.Id},
+						cancellationToken);
 				}
 				else
 				{
-					var userId = await _mediator.Send(new CreateUserCommand
-					{
-						Username = model.Username,
-						Password = model.Password
-					}, cancellationToken);
+					var userId =
+						await _mediator.Send(
+							new CreateUserCommand {Username = model.Username, Password = model.Password},
+							cancellationToken);
 					user = await _mediator.Send(new GetUserQuery(userId), cancellationToken);
 					await HttpContext.SignInUserAsync(user);
 				}
@@ -195,6 +182,7 @@ namespace AIDungeonPrompts.Web.Controllers
 			{
 				return Redirect(model.ReturnUrl);
 			}
+
 			return RedirectToAction("Index");
 		}
 	}

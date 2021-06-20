@@ -6,6 +6,12 @@
 		You are creating a sub scenario. <a asp-action="Edit" asp-route-id="@Model.Command.ParentId">Click here to return to the parent without saving.</a>
 	</div>
 }
+@if (!string.IsNullOrWhiteSpace(Model.Command.NovelAiScenario))
+{
+	<div class="alert alert-success">
+		NAI Import Successful!
+	</div>
+}
 <h2>Create Prompt</h2>
 <br/>
 @if (Model.CreationDisabled)
@@ -15,9 +21,20 @@
 }
 else
 {
+	<form asp-controller="Prompts" asp-action="UploadNai" asp-route-parentId="@Model.Command.ParentId" enctype="multipart/form-data" method="post">
+		<div class="d-flex mb-3">
+			<div>
+				<input type="file" name="scenarioFile"/>
+			</div>
+			<div class="ml-auto">
+				<button class="btn btn-outline-light">Upload NAI Scenario</button>
+			</div>
+		</div>
+	</form>
 	<form asp-controller="Prompts" asp-action="Create" enctype="multipart/form-data" method="post">
 		<input class="honey" name="Honey"/>
 		@Html.HiddenFor(e => e.Command.ParentId)
+		@Html.HiddenFor(e => e.Command.NovelAiScenario)
 		<div class="form-group required">
 			@Html.LabelFor(m => m.Command.Title)
 			<input asp-for="Command.Title" class="form-control"/>
@@ -111,14 +128,15 @@ else
 				<p>
 					There already @(Model.SimilarPromptQuery.SimilarPrompts.Count == 1 ? "exists a prompt" : "exist prompts") with the same title:
 					<br/>
-					@for (int i = 0; i < Model.SimilarPromptQuery.SimilarPrompts.Count; i++)
+					@for (var i = 0; i < Model.SimilarPromptQuery.SimilarPrompts.Count; i++)
 					{
 						var prompt = Model.SimilarPromptQuery.SimilarPrompts[i];
 						<a asp-action="View" asp-controller="Prompts" asp-route-id="@prompt.Id" target="_blank">@prompt.Title</a>
-						if (i != Model.SimilarPromptQuery.SimilarPrompts.Count - 1)
+						if (i == Model.SimilarPromptQuery.SimilarPrompts.Count - 1)
 						{
-							<span>, </span>
+							continue;
 						}
+						<span>, </span>
 					}
 					<br/>
 					Please confirm this isn't a duplicate before creating a new prompt.

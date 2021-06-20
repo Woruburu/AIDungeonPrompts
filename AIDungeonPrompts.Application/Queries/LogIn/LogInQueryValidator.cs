@@ -1,12 +1,7 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-using AIDungeonPrompts.Application.Abstractions.DbContexts;
-using FluentValidation;
-using MediatR;
+﻿using FluentValidation;
 
 namespace AIDungeonPrompts.Application.Queries.LogIn
 {
-
 	public class LogInQueryValidator : AbstractValidator<LogInQuery>
 	{
 		public LogInQueryValidator()

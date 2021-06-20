@@ -19,7 +19,7 @@ namespace AIDungeonPrompts.Infrastructure.Identity
 
 		public async Task InvokeAsync(HttpContext context, ICurrentUserService currentUserService)
 		{
-			var userIdClaim = context.User.FindFirst(e => e.Type == ClaimTypes.NameIdentifier);
+			Claim? userIdClaim = context.User.FindFirst(e => e.Type == ClaimTypes.NameIdentifier);
 			if (userIdClaim == null)
 			{
 				await _next(context);

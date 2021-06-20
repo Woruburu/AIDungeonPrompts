@@ -1,8 +1,10 @@
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using AIDungeonPrompts.Application.Abstractions.Identity;
 using AIDungeonPrompts.Application.Commands.ClearReport;
 using AIDungeonPrompts.Application.Queries.GetReports;
+using AIDungeonPrompts.Application.Queries.GetUser;
 using AIDungeonPrompts.Web.Constants;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -22,13 +24,15 @@ namespace AIDungeonPrompts.Web.Controllers
 			_currentUserService = currentUserService;
 		}
 
-		[HttpPost("[controller]/clear/{id}"), ValidateAntiForgeryToken]
+		[HttpPost("[controller]/clear/{id}")]
+		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> Clear(int? id, CancellationToken cancellationToken)
 		{
 			if (id == null)
 			{
 				return NotFound();
 			}
+
 			await _mediator.Send(new ClearReportCommand(id.Value), cancellationToken);
 			return RedirectToAction("Index");
 		}
@@ -36,11 +40,13 @@ namespace AIDungeonPrompts.Web.Controllers
 		[HttpGet("[controller]")]
 		public async Task<IActionResult> Index(CancellationToken cancellationToken)
 		{
-			if (!_currentUserService.TryGetCurrentUser(out var user))
+			if (!_currentUserService.TryGetCurrentUser(out GetUserViewModel? user))
 			{
 				return NotFound();
 			}
-			var reports = await _mediator.Send(new GetReportsQuery(user!.Role), cancellationToken);
+
+			List<GetReportViewModel>?
+				reports = await _mediator.Send(new GetReportsQuery(user!.Role), cancellationToken);
 			return View(reports);
 		}
 	}

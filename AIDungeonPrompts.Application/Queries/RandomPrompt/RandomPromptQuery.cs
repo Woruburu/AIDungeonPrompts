@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,8 +22,10 @@ namespace AIDungeonPrompts.Application.Queries.RandomPrompt
 			_dbContext = dbContext;
 		}
 
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Security", "SCS0005:Weak random generator", Justification = "Cryptographic Generator not required")]
-		public async Task<RandomPromptViewModel?> Handle(RandomPromptQuery request, CancellationToken cancellationToken = default)
+		[SuppressMessage("Security", "SCS0005:Weak random generator",
+			Justification = "Cryptographic Generator not required")]
+		public async Task<RandomPromptViewModel?> Handle(RandomPromptQuery request,
+			CancellationToken cancellationToken = default)
 		{
 			var count = await _dbContext.Prompts.Where(e => !e.IsDraft).CountAsync();
 			if (count < 1)
@@ -46,10 +49,7 @@ namespace AIDungeonPrompts.Application.Queries.RandomPrompt
 				return null;
 			}
 
-			return new RandomPromptViewModel
-			{
-				Id = id
-			};
+			return new RandomPromptViewModel {Id = id};
 		}
 	}
 }

@@ -1,22 +1,22 @@
-@model SearchViewModel
 @using AIDungeonPrompts.Application.Queries.SearchPrompts
+@model SearchViewModel
 <form asp-action="Index" method="get">
 	<div class="row mb-4">
 		<div class="col-sm-9 col-md-10">
 			<div class="row">
 				<div class="col-sm-6 mb-4">
-					<input class="form-control" asp-for="Query" placeholder="Search Title" />
+					<input class="form-control" asp-for="Query" placeholder="Search Title"/>
 				</div>
 				<div class="col-sm-6 mb-4">
 					<select class="form-control" asp-for="NsfwSetting" asp-items="Html.GetEnumSelectList<SearchNsfw>()"></select>
 				</div>
 				<div class="col-sm-6 mb-4">
-					<input class="form-control" asp-for="Tags" placeholder="Tags (comma delimited)" />
+					<input class="form-control" asp-for="Tags" placeholder="Tags (comma delimited)"/>
 				</div>
 				<div class="col-sm-6 mb-4">
 					<div class="form-check">
-						<input class="form-check-input" asp-for="MatchExact" />
-						@Html.LabelFor(m => m.MatchExact, new { @class = "form-check-label" })
+						<input class="form-check-input" asp-for="MatchExact"/>
+						@Html.LabelFor(m => m.MatchExact, new {@class = "form-check-label"})
 					</div>
 				</div>
 				<div class="col-sm-6 mb-4">
@@ -24,8 +24,8 @@
 				</div>
 				<div class="col-sm-6 mb-4">
 					<div class="form-check">
-						<input class="form-check-input" asp-for="Reverse" />
-						@Html.LabelFor(m => m.Reverse, new { @class = "form-check-label" })
+						<input class="form-check-input" asp-for="Reverse"/>
+						@Html.LabelFor(m => m.Reverse, new {@class = "form-check-label"})
 					</div>
 				</div>
 			</div>
@@ -49,12 +49,12 @@
 	var page = Model.Page ?? 1;
 	var data = new Dictionary<string, string>
 	{
-		{ "Query", Model.Query ?? string.Empty },
-		{ "Tags", Model.Tags ?? string.Empty },
-		{ "NsfwSetting", ((int)Model.NsfwSetting).ToString() },
-		{ "Reverse", Model.Reverse.ToString() },
-		{ "TagJoin", ((int)Model.TagJoin).ToString() },
-		{ "MatchExact", Model.MatchExact.ToString() }
+		{"Query", Model.Query ?? string.Empty},
+		{"Tags", Model.Tags ?? string.Empty},
+		{"NsfwSetting", ((int) Model.NsfwSetting).ToString()},
+		{"Reverse", Model.Reverse.ToString()},
+		{"TagJoin", ((int) Model.TagJoin).ToString()},
+		{"MatchExact", Model.MatchExact.ToString()}
 	};
 }
 <nav>
@@ -68,7 +68,7 @@
 				Previous
 			</a>
 		</li>
-		@if(page > 2)
+		@if (page > 2)
 		{
 			<li class="page-item">
 				<a class="page-link"
@@ -80,7 +80,7 @@
 				</a>
 			</li>
 		}
-		@if(page > 3)
+		@if (page > 3)
 		{
 			<li class="page-item disabled">
 				<span class="page-link">
@@ -88,15 +88,15 @@
 				</span>
 			</li>
 		}
-		@if(page-1 > 0)
+		@if (page - 1 > 0)
 		{
 			<li class="page-item">
 				<a class="page-link"
 				   tabindex="-1"
 				   asp-action="Index"
 				   asp-all-route-data="data"
-				   asp-route-Page="@(page-1)">
-					@(page-1)
+				   asp-route-Page="@(page - 1)">
+					@(page - 1)
 				</a>
 			</li>
 		}
@@ -105,15 +105,15 @@
 				@(Model.Page ?? 1)
 			</span>
 		</li>
-		@if(page+1 <= Model.SearchResult.TotalPages)
+		@if (page + 1 <= Model.SearchResult.TotalPages)
 		{
 			<li class="page-item">
 				<a class="page-link"
 				   tabindex="-1"
 				   asp-action="Index"
 				   asp-all-route-data="data"
-				   asp-route-Page="@(page+1)">
-					@(page+1)
+				   asp-route-Page="@(page + 1)">
+					@(page + 1)
 				</a>
 			</li>
 		}
@@ -125,8 +125,8 @@
 				</span>
 			</li>
 		}
-		@if(page < Model.SearchResult.TotalPages-1)
-		{			
+		@if (page < Model.SearchResult.TotalPages - 1)
+		{
 			<li class="page-item">
 				<a class="page-link"
 				   tabindex="-1"

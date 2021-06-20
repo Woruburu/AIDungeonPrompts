@@ -1,12 +1,12 @@
-@model CreateReportViewModel
 @using AIDungeonPrompts.Domain.Enums
+@model CreateReportViewModel
 @{
 	ViewData["Title"] = "Report";
 }
 <h2>Report @Model.Prompt.Title</h2>
-<br />
+<br/>
 <form asp-controller="Prompts" asp-action="Report" method="post">
-	<input class="honey" name="Honey" />
+	<input class="honey" name="Honey"/>
 	<div class="form-group required">
 		@Html.LabelFor(m => m.Command.ReportReason)
 		<select class="form-control" asp-for="Command.ReportReason" asp-items="Html.GetEnumSelectList<ReportReason>()"></select>

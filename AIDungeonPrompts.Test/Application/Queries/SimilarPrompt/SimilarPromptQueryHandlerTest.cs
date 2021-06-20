@@ -20,28 +20,22 @@ namespace AIDungeonPrompts.Test.Application.Queries.SimilarPrompt
 		[InlineData(10)]
 		[InlineData(67)]
 		[InlineData(256)]
-		public async Task Handle_ReturnsExpectedMatches_WhenThereAreTitleMatches_AndOnePromptMatchesId(int expectedMatches)
+		public async Task Handle_ReturnsExpectedMatches_WhenThereAreTitleMatches_AndOnePromptMatchesId(
+			int expectedMatches)
 		{
 			//arrange
-			var prompt = new Prompt
-			{
-				Title = "TestTitle",
-				PromptContent = "TestContent"
-			};
+			var prompt = new Prompt {Title = "TestTitle", PromptContent = "TestContent"};
 			DbContext.Prompts.Add(prompt);
 			for (var i = 0; i < expectedMatches; i++)
 			{
-				DbContext.Prompts.Add(new Prompt
-				{
-					Title = "TestTitle",
-					PromptContent = "TestContent"
-				});
+				DbContext.Prompts.Add(new Prompt {Title = "TestTitle", PromptContent = "TestContent"});
 			}
+
 			await DbContext.SaveChangesAsync();
 			var query = new SimilarPromptQuery("TestTitle", prompt.Id);
 
 			//act
-			var actual = await _handler.Handle(query);
+			SimilarPromptViewModel? actual = await _handler.Handle(query);
 
 			//assert
 			Assert.True(actual.Matched);
@@ -58,17 +52,14 @@ namespace AIDungeonPrompts.Test.Application.Queries.SimilarPrompt
 			//arrange
 			for (var i = 0; i < expectedAmount; i++)
 			{
-				DbContext.Prompts.Add(new Prompt
-				{
-					Title = "TestTitle",
-					PromptContent = "TestContent"
-				});
+				DbContext.Prompts.Add(new Prompt {Title = "TestTitle", PromptContent = "TestContent"});
 			}
+
 			await DbContext.SaveChangesAsync();
 			var query = new SimilarPromptQuery("TestTitle");
 
 			//act
-			var actual = await _handler.Handle(query);
+			SimilarPromptViewModel? actual = await _handler.Handle(query);
 
 			//assert
 			Assert.True(actual.Matched);
@@ -80,31 +71,25 @@ namespace AIDungeonPrompts.Test.Application.Queries.SimilarPrompt
 		[InlineData(10, 20)]
 		[InlineData(38, 60)]
 		[InlineData(120, 45)]
-		public async Task Handle_ReturnsMatchesThatDontIncludeDrafts_WhenManyTitlesMatch_ButSomeAreDrafts(int expectedAmount, int drafts)
+		public async Task Handle_ReturnsMatchesThatDontIncludeDrafts_WhenManyTitlesMatch_ButSomeAreDrafts(
+			int expectedAmount, int drafts)
 		{
 			//arrange
 			for (var i = 0; i < expectedAmount; i++)
 			{
-				DbContext.Prompts.Add(new Prompt
-				{
-					Title = "TestTitle",
-					PromptContent = "TestContent"
-				});
+				DbContext.Prompts.Add(new Prompt {Title = "TestTitle", PromptContent = "TestContent"});
 			}
+
 			for (var i = 0; i < drafts; i++)
 			{
-				DbContext.Prompts.Add(new Prompt
-				{
-					Title = "TestTitle",
-					PromptContent = "TestContent",
-					IsDraft = true
-				});
+				DbContext.Prompts.Add(new Prompt {Title = "TestTitle", PromptContent = "TestContent", IsDraft = true});
 			}
+
 			await DbContext.SaveChangesAsync();
 			var query = new SimilarPromptQuery("TestTitle");
 
 			//act
-			var actual = await _handler.Handle(query);
+			SimilarPromptViewModel? actual = await _handler.Handle(query);
 
 			//assert
 			Assert.True(actual.Matched);
@@ -118,7 +103,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.SimilarPrompt
 			var query = new SimilarPromptQuery("TestTitle");
 
 			//act
-			var actual = await _handler.Handle(query);
+			SimilarPromptViewModel? actual = await _handler.Handle(query);
 
 			//assert
 			Assert.False(actual.Matched);
@@ -129,17 +114,12 @@ namespace AIDungeonPrompts.Test.Application.Queries.SimilarPrompt
 		public async Task Handle_ReturnsNoMatches_WhenOneTitleMatches_ButIsDraft()
 		{
 			//arrange
-			DbContext.Prompts.Add(new Prompt
-			{
-				Title = "TestTitle",
-				PromptContent = "TestContent",
-				IsDraft = true
-			});
+			DbContext.Prompts.Add(new Prompt {Title = "TestTitle", PromptContent = "TestContent", IsDraft = true});
 			await DbContext.SaveChangesAsync();
 			var query = new SimilarPromptQuery("TestTitle");
 
 			//act
-			var actual = await _handler.Handle(query);
+			SimilarPromptViewModel? actual = await _handler.Handle(query);
 
 			//assert
 			Assert.False(actual.Matched);
@@ -150,16 +130,12 @@ namespace AIDungeonPrompts.Test.Application.Queries.SimilarPrompt
 		public async Task Handle_ReturnsNoMatches_WhenThereAreNoSimilarPrompts()
 		{
 			//arrange
-			DbContext.Prompts.Add(new Prompt
-			{
-				Title = "TestTitle",
-				PromptContent = "TestContent"
-			});
+			DbContext.Prompts.Add(new Prompt {Title = "TestTitle", PromptContent = "TestContent"});
 			await DbContext.SaveChangesAsync();
 			var query = new SimilarPromptQuery("NewTitle");
 
 			//act
-			var actual = await _handler.Handle(query);
+			SimilarPromptViewModel? actual = await _handler.Handle(query);
 
 			//assert
 			Assert.False(actual.Matched);
@@ -170,16 +146,12 @@ namespace AIDungeonPrompts.Test.Application.Queries.SimilarPrompt
 		public async Task Handle_ReturnsOneMatch_WhenOneTitleMatches()
 		{
 			//arrange
-			DbContext.Prompts.Add(new Prompt
-			{
-				Title = "TestTitle",
-				PromptContent = "TestContent"
-			});
+			DbContext.Prompts.Add(new Prompt {Title = "TestTitle", PromptContent = "TestContent"});
 			await DbContext.SaveChangesAsync();
 			var query = new SimilarPromptQuery("TestTitle");
 
 			//act
-			var actual = await _handler.Handle(query);
+			SimilarPromptViewModel? actual = await _handler.Handle(query);
 
 			//assert
 			Assert.True(actual.Matched);
@@ -190,23 +162,13 @@ namespace AIDungeonPrompts.Test.Application.Queries.SimilarPrompt
 		public async Task Handle_ReturnsOneMatch_WhenTwoTitlesMatch_ButOneIsDraft()
 		{
 			//arrange
-			DbContext.Prompts.Add(new Prompt
-			{
-				Title = "TestTitle",
-				PromptContent = "TestContent",
-				IsDraft = true
-			});
-			DbContext.Prompts.Add(new Prompt
-			{
-				Title = "TestTitle",
-				PromptContent = "TestContent",
-				IsDraft = false
-			});
+			DbContext.Prompts.Add(new Prompt {Title = "TestTitle", PromptContent = "TestContent", IsDraft = true});
+			DbContext.Prompts.Add(new Prompt {Title = "TestTitle", PromptContent = "TestContent", IsDraft = false});
 			await DbContext.SaveChangesAsync();
 			var query = new SimilarPromptQuery("TestTitle");
 
 			//act
-			var actual = await _handler.Handle(query);
+			SimilarPromptViewModel? actual = await _handler.Handle(query);
 
 			//assert
 			Assert.True(actual.Matched);

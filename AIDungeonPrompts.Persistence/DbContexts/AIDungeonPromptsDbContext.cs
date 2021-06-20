@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ using AIDungeonPrompts.Domain.Views;
 using Audit.EntityFramework;
 using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace AIDungeonPrompts.Persistence.DbContexts
 {
@@ -21,7 +23,6 @@ namespace AIDungeonPrompts.Persistence.DbContexts
 
 		public DbSet<ApplicationLog> ApplicationLogs { get; set; }
 		public DbSet<AuditPrompt> AuditPrompts { get; set; }
-		public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
 		public DbSet<NonDraftPrompt> NonDraftPrompts { get; set; }
 		public DbSet<Prompt> Prompts { get; set; }
 		public DbSet<PromptTag> PromptTags { get; set; }
@@ -33,10 +34,10 @@ namespace AIDungeonPrompts.Persistence.DbContexts
 
 		public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
 		{
-			var changedEntities = ChangeTracker.Entries<BaseDomainEntity>()
+			IEnumerable<EntityEntry<BaseDomainEntity>> changedEntities = ChangeTracker.Entries<BaseDomainEntity>()
 				.Where(e => e.State == EntityState.Added || e.State == EntityState.Modified);
 
-			foreach (var entity in changedEntities)
+			foreach (EntityEntry<BaseDomainEntity> entity in changedEntities)
 			{
 				switch (entity.State)
 				{
@@ -45,6 +46,7 @@ namespace AIDungeonPrompts.Persistence.DbContexts
 						{
 							entity.Entity.DateCreated = DateTime.UtcNow;
 						}
+
 						break;
 
 					case EntityState.Modified:
@@ -52,6 +54,7 @@ namespace AIDungeonPrompts.Persistence.DbContexts
 						{
 							entity.Entity.DateEdited = DateTime.UtcNow;
 						}
+
 						break;
 				}
 			}
@@ -59,7 +62,9 @@ namespace AIDungeonPrompts.Persistence.DbContexts
 			return await base.SaveChangesAsync(cancellationToken);
 		}
 
+		public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
+
 		protected override void OnModelCreating(ModelBuilder modelBuilder) =>
-					modelBuilder.ApplyConfigurationsFromAssembly(typeof(AIDungeonPromptsDbContext).Assembly);
+			modelBuilder.ApplyConfigurationsFromAssembly(typeof(AIDungeonPromptsDbContext).Assembly);
 	}
 }

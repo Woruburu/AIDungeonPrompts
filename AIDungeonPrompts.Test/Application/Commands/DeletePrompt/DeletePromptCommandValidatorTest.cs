@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using AIDungeonPrompts.Application.Commands.DeletePrompt;
+using FluentValidation.Results;
 using Xunit;
 
 namespace AIDungeonPrompts.Test.Application.Commands.DeletePrompt
@@ -20,7 +21,7 @@ namespace AIDungeonPrompts.Test.Application.Commands.DeletePrompt
 			var command = new DeletePromptCommand(default);
 
 			//act
-			var actual = await _validator.ValidateAsync(command);
+			ValidationResult? actual = await _validator.ValidateAsync(command);
 
 			//assert
 			Assert.False(actual.IsValid);
@@ -37,7 +38,7 @@ namespace AIDungeonPrompts.Test.Application.Commands.DeletePrompt
 			var command = new DeletePromptCommand(id);
 
 			//act
-			var actual = await _validator.ValidateAsync(command);
+			ValidationResult? actual = await _validator.ValidateAsync(command);
 
 			//assert
 			Assert.True(actual.IsValid);

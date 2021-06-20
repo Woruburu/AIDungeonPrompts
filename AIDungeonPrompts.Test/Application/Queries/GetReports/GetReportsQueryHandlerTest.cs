@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using AIDungeonPrompts.Application.Queries.GetReports;
 using AIDungeonPrompts.Domain.Entities;
@@ -22,18 +23,18 @@ namespace AIDungeonPrompts.Test.Application.Queries.GetReports
 			//arrange
 			var prompt = new Prompt();
 			DbContext.Reports.AddRange(
-				new Report { ReportReason = ReportReason.Duplicate, Prompt = prompt },
-				new Report { ReportReason = ReportReason.IllegalContent, Prompt = prompt },
-				new Report { ReportReason = ReportReason.IncorrectTags, Prompt = prompt },
-				new Report { ReportReason = ReportReason.LowQuality, Prompt = prompt },
-				new Report { ReportReason = ReportReason.NeedsCorrection, Prompt = prompt },
-				new Report { ReportReason = ReportReason.Other, Prompt = prompt },
-				new Report { ReportReason = ReportReason.UntaggedNsfw, Prompt = prompt });
+				new Report {ReportReason = ReportReason.Duplicate, Prompt = prompt},
+				new Report {ReportReason = ReportReason.IllegalContent, Prompt = prompt},
+				new Report {ReportReason = ReportReason.IncorrectTags, Prompt = prompt},
+				new Report {ReportReason = ReportReason.LowQuality, Prompt = prompt},
+				new Report {ReportReason = ReportReason.NeedsCorrection, Prompt = prompt},
+				new Report {ReportReason = ReportReason.Other, Prompt = prompt},
+				new Report {ReportReason = ReportReason.UntaggedNsfw, Prompt = prompt});
 			await DbContext.SaveChangesAsync();
 			var query = new GetReportsQuery(RoleEnum.FieldEdit);
 
 			//act
-			var actual = await _handler.Handle(query);
+			List<GetReportViewModel>? actual = await _handler.Handle(query);
 
 			//assert
 			Assert.Equal(7, actual.Count);
@@ -45,18 +46,18 @@ namespace AIDungeonPrompts.Test.Application.Queries.GetReports
 			//arrange
 			var prompt = new Prompt();
 			DbContext.Reports.AddRange(
-				new Report { ReportReason = ReportReason.Duplicate, Prompt = prompt },
-				new Report { ReportReason = ReportReason.IllegalContent, Prompt = prompt },
-				new Report { ReportReason = ReportReason.IncorrectTags, Prompt = prompt },
-				new Report { ReportReason = ReportReason.LowQuality, Prompt = prompt },
-				new Report { ReportReason = ReportReason.NeedsCorrection, Prompt = prompt },
-				new Report { ReportReason = ReportReason.Other, Prompt = prompt },
-				new Report { ReportReason = ReportReason.UntaggedNsfw, Prompt = prompt });
+				new Report {ReportReason = ReportReason.Duplicate, Prompt = prompt},
+				new Report {ReportReason = ReportReason.IllegalContent, Prompt = prompt},
+				new Report {ReportReason = ReportReason.IncorrectTags, Prompt = prompt},
+				new Report {ReportReason = ReportReason.LowQuality, Prompt = prompt},
+				new Report {ReportReason = ReportReason.NeedsCorrection, Prompt = prompt},
+				new Report {ReportReason = ReportReason.Other, Prompt = prompt},
+				new Report {ReportReason = ReportReason.UntaggedNsfw, Prompt = prompt});
 			await DbContext.SaveChangesAsync();
 			var query = new GetReportsQuery(RoleEnum.TagEdit);
 
 			//act
-			var actual = await _handler.Handle(query);
+			List<GetReportViewModel>? actual = await _handler.Handle(query);
 
 			//assert
 			Assert.Equal(2, actual.Count);
@@ -72,7 +73,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.GetReports
 			var query = new GetReportsQuery(role);
 
 			//act
-			var actual = await _handler.Handle(query);
+			List<GetReportViewModel>? actual = await _handler.Handle(query);
 
 			//assert
 			Assert.Empty(actual);

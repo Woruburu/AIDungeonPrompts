@@ -29,9 +29,9 @@ namespace AIDungeonPrompts.Application.Commands.CreatePrompt
 				.DependentRules(() =>
 				{
 					RuleFor(e => e.ScriptZip)
-					.Must(scriptZip => ZipHelper.CheckFileContents(scriptZip!))
-					.WithMessage("File was not in the expected format. Please re-export and try again.")
-					.When(e => e.ScriptZip != null);
+						.Must(scriptZip => ZipHelper.CheckFileContents(scriptZip!))
+						.WithMessage("File was not in the expected format. Please re-export and try again.")
+						.When(e => e.ScriptZip != null);
 				})
 				.When(e => e.ScriptZip?.Length < MAX_SIZE);
 		}

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using AIDungeonPrompts.Application.Abstractions.DbContexts;
 using AIDungeonPrompts.Application.Exceptions;
 using AIDungeonPrompts.Application.Helpers;
+using AIDungeonPrompts.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,7 +28,7 @@ namespace AIDungeonPrompts.Application.Commands.UpdateUser
 
 		public async Task<Unit> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
 		{
-			var user = await _dbContext.Users.FindAsync(request.Id);
+			User? user = await _dbContext.Users.FindAsync(request.Id);
 			if (user == null)
 			{
 				throw new UpdateUserNotFoundException();
@@ -38,7 +39,8 @@ namespace AIDungeonPrompts.Application.Commands.UpdateUser
 				if (await _dbContext
 					.Users
 					.FirstOrDefaultAsync(e =>
-						EF.Functions.ILike(e.Username, NpgsqlHelper.SafeIlike(request.Username), NpgsqlHelper.EscapeChar) &&
+						EF.Functions.ILike(e.Username, NpgsqlHelper.SafeIlike(request.Username),
+							NpgsqlHelper.EscapeChar) &&
 						e.Id != request.Id) != null)
 				{
 					throw new UsernameNotUniqueException();

@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using AIDungeonPrompts.Application.Abstractions.DbContexts;
 using AIDungeonPrompts.Application.Abstractions.Identity;
+using AIDungeonPrompts.Application.Queries.GetUser;
 using AIDungeonPrompts.Domain.Entities;
 using AIDungeonPrompts.Domain.Enums;
 using MediatR;
@@ -33,12 +34,13 @@ namespace AIDungeonPrompts.Application.Commands.DeletePrompt
 
 		public async Task<Unit> Handle(DeletePromptCommand request, CancellationToken cancellationToken = default)
 		{
-			if (!_currentUserService.TryGetCurrentUser(out var user))
+			if (!_currentUserService.TryGetCurrentUser(out GetUserViewModel? user))
 			{
 				throw new DeletePromptUserUnauthorizedException();
 			}
 
-			var prompt = await _dbContext.Prompts.Include(e => e.Children).FirstOrDefaultAsync(e => e.Id == request.Id);
+			Prompt? prompt = await _dbContext.Prompts.Include(e => e.Children)
+				.FirstOrDefaultAsync(e => e.Id == request.Id);
 
 			if (prompt == null)
 			{

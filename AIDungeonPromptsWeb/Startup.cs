@@ -23,9 +23,9 @@ using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Headers;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.StaticFiles;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -77,7 +77,7 @@ namespace AIDungeonPrompts.Web
 			{
 				HttpOnly = HttpOnlyPolicy.Always,
 				Secure = CookieSecurePolicy.Always,
-				MinimumSameSitePolicy = SameSiteMode.Strict,
+				MinimumSameSitePolicy = SameSiteMode.Strict
 			});
 
 			app.UseCorrelationId();
@@ -85,16 +85,13 @@ namespace AIDungeonPrompts.Web
 
 			var provider = new FileExtensionContentTypeProvider();
 			provider.Mappings[".db"] = "application/octet-stream";
-			app.UseStaticFiles(new StaticFileOptions()
+			app.UseStaticFiles(new StaticFileOptions
 			{
 				ContentTypeProvider = provider,
-				OnPrepareResponse = (context) =>
+				OnPrepareResponse = context =>
 				{
-					var headers = context.Context.Response.GetTypedHeaders();
-					headers.CacheControl = new CacheControlHeaderValue()
-					{
-						MaxAge = TimeSpan.FromDays(1)
-					};
+					ResponseHeaders? headers = context.Context.Response.GetTypedHeaders();
+					headers.CacheControl = new CacheControlHeaderValue {MaxAge = TimeSpan.FromDays(1)};
 				}
 			});
 
@@ -110,8 +107,8 @@ namespace AIDungeonPrompts.Web
 			app.UseEndpoints(endpoints =>
 			{
 				endpoints.MapControllerRoute(
-					name: "default",
-					pattern: "{controller=Home}/{action=Index}/{id?}");
+					"default",
+					"{controller=Home}/{action=Index}/{id?}");
 			});
 		}
 
@@ -155,8 +152,8 @@ namespace AIDungeonPrompts.Web
 				.AddHttpContextAccessor()
 				.AddDefaultCorrelationId()
 				.AddDistributedMemoryCache()
-				.AddMediatR(new[] { typeof(DomainLayer), typeof(ApplicationLayer) }.Select(t => t.Assembly).ToArray())
-				.AddFluentValidation(new[] { typeof(ApplicationLayer) }.Select(t => t.Assembly).ToArray())
+				.AddMediatR(new[] {typeof(DomainLayer), typeof(ApplicationLayer)}.Select(t => t.Assembly).ToArray())
+				.AddFluentValidation(new[] {typeof(ApplicationLayer)}.Select(t => t.Assembly).ToArray())
 				.AddRouting(builder =>
 				{
 					builder.LowercaseUrls = true;
@@ -165,21 +162,22 @@ namespace AIDungeonPrompts.Web
 				.AddControllersWithViews(builder =>
 				{
 					builder.Filters.Add(typeof(CspAttribute));
-					builder.Filters.Add(new CspDefaultSrcAttribute { Self = true });
-					builder.Filters.Add(new CspImgSrcAttribute { Self = true, CustomSources = "data:" });
-					builder.Filters.Add(new CspScriptSrcAttribute { Self = true, UnsafeEval = false, UnsafeInline = false });
-					builder.Filters.Add(new CspStyleSrcAttribute { Self = true, UnsafeInline = false });
-					builder.Filters.Add(new CspObjectSrcAttribute { None = true });
-					builder.ModelMetadataDetailsProviders.Add(new DoNotConvertEmptyStringToNullMetadataDetailsProvider());
+					builder.Filters.Add(new CspDefaultSrcAttribute {Self = true});
+					builder.Filters.Add(new CspImgSrcAttribute {Self = true, CustomSources = "data:"});
+					builder.Filters.Add(new CspScriptSrcAttribute
+					{
+						Self = true, UnsafeEval = false, UnsafeInline = false
+					});
+					builder.Filters.Add(new CspStyleSrcAttribute {Self = true, UnsafeInline = false});
+					builder.Filters.Add(new CspObjectSrcAttribute {None = true});
+					builder.ModelMetadataDetailsProviders.Add(
+						new DoNotConvertEmptyStringToNullMetadataDetailsProvider());
 				})
 				.AddFluentValidation(fv =>
 				{
 					fv.ImplicitlyValidateChildProperties = true;
-					fv.RegisterValidatorsFromAssemblies(new[]
-					{
-						typeof(ApplicationLayer),
-						typeof(Startup)
-					}.Select(t => t.Assembly).ToArray());
+					fv.RegisterValidatorsFromAssemblies(new[] {typeof(ApplicationLayer), typeof(Startup)}
+						.Select(t => t.Assembly).ToArray());
 				});
 
 			services.AddAuthorization(options =>
@@ -197,6 +195,7 @@ namespace AIDungeonPrompts.Web
 			services.AddHostedService<ReportCleanerCronJob>();
 		}
 
-		private string BackupDatabaseConnectionName() => $"Data Source={Path.Combine(Environment.WebRootPath, "backup.db")};";
+		private string BackupDatabaseConnectionName() =>
+			$"Data Source={Path.Combine(Environment.WebRootPath, "backup.db")};";
 	}
 }

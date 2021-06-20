@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using AIDungeonPrompts.Application.Abstractions.DbContexts;
+using AIDungeonPrompts.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -27,15 +29,17 @@ namespace AIDungeonPrompts.Web.HostedServices
 		public async Task StartAsync(CancellationToken cancellationToken)
 		{
 			_logger.LogInformation($"{nameof(NewlineFixerHostedService)} Starting");
-			using var services = _serviceScopeFactory.CreateScope();
-			var dbContext = services.ServiceProvider.GetRequiredService<IAIDungeonPromptsDbContext>();
+			using IServiceScope? services = _serviceScopeFactory.CreateScope();
+			IAIDungeonPromptsDbContext? dbContext =
+				services.ServiceProvider.GetRequiredService<IAIDungeonPromptsDbContext>();
 			if (dbContext == null)
 			{
 				_logger.LogWarning($"{nameof(NewlineFixerHostedService)}: Could not get DbContext from services");
 				return;
 			}
 
-			var allPrompts = await dbContext.Prompts.Include(e => e.WorldInfos).ToListAsync(cancellationToken);
+			List<Prompt>? allPrompts =
+				await dbContext.Prompts.Include(e => e.WorldInfos).ToListAsync(cancellationToken);
 			_logger.LogInformation($"Updating {allPrompts.Count} prompts from \\r\\n to \\n");
 			foreach (var prompt in allPrompts)
 			{
@@ -51,14 +55,12 @@ namespace AIDungeonPrompts.Web.HostedServices
 					wi.Keys = wi.Keys.Replace("\r\n", "\n");
 				}
 			}
+
 			dbContext.Prompts.UpdateRange(allPrompts);
 			await dbContext.SaveChangesAsync(cancellationToken);
 			_logger.LogInformation($"{nameof(NewlineFixerHostedService)} Finished");
 		}
 
-		public Task StopAsync(CancellationToken cancellationToken)
-		{
-			return Task.CompletedTask;
-		}
+		public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 	}
 }

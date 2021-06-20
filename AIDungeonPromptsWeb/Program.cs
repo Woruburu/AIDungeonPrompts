@@ -33,17 +33,16 @@ namespace AIDungeonPrompts.Web
 			}
 		}
 
-		private static IHostBuilder CreateHostBuilder(string[] args)
-		{
-			return Host.CreateDefaultBuilder(args)
+		private static IHostBuilder CreateHostBuilder(string[] args) =>
+			Host.CreateDefaultBuilder(args)
 				.ConfigureAppConfiguration((hostingContext, config) =>
 				{
-					var env = hostingContext.HostingEnvironment;
-					config.AddJsonFile($"appSettings.{Environment.MachineName}.json", optional: true,
-							reloadOnChange: true)
-						.AddJsonFile("serilog.json", optional: false, reloadOnChange: true)
-						.AddJsonFile($"serilog.{env.EnvironmentName}.json", optional: true, reloadOnChange: true)
-						.AddJsonFile($"serilog.{Environment.MachineName}.json", optional: true, reloadOnChange: true);
+					IHostEnvironment? env = hostingContext.HostingEnvironment;
+					config.AddJsonFile($"appSettings.{Environment.MachineName}.json", true,
+							true)
+						.AddJsonFile("serilog.json", false, true)
+						.AddJsonFile($"serilog.{env.EnvironmentName}.json", true, true)
+						.AddJsonFile($"serilog.{Environment.MachineName}.json", true, true);
 				})
 				.UseSerilog((context, services, configuration) =>
 				{
@@ -51,6 +50,5 @@ namespace AIDungeonPrompts.Web
 					configuration.ReadFrom.Services(services);
 				})
 				.ConfigureWebHostDefaults(webBuilder => webBuilder.UseStartup<Startup>());
-		}
 	}
 }

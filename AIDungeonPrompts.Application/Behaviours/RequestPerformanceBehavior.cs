@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -44,7 +45,7 @@ namespace AIDungeonPrompts.Application.Behaviours
 			if (_timer.ElapsedMilliseconds > 2000)
 			{
 				_logger.LogWarning(
-					$"Request {name} {(errored ? "failed in" : "took")} {_timer.ElapsedMilliseconds} milliseconds which was over longer than 2000 ms with parameters {System.Text.Json.JsonSerializer.Serialize(request)}");
+					$"Request {name} {(errored ? "failed in" : "took")} {_timer.ElapsedMilliseconds} milliseconds which was over longer than 2000 ms with parameters {JsonSerializer.Serialize(request)}");
 			}
 		}
 	}

@@ -1,3 +1,7 @@
 .collapse:not(.show) {
 	display: unset;
 }
+
+.js-only {
+	display:none;
+}

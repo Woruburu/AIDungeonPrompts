@@ -19,12 +19,8 @@ namespace AIDungeonPrompts.Test.Application.Queries.GetScript
 		public async Task Handle_ReturnsNull_WhenRelatedPromptHasNoScriptBytes()
 		{
 			//arrange
-			var owner = new User { Username = "TestUser" };
-			var prompt = new Prompt()
-			{
-				Owner = owner,
-				ScriptZip = null
-			};
+			var owner = new User {Username = "TestUser"};
+			var prompt = new Prompt {Owner = owner, ScriptZip = null};
 			DbContext.Prompts.Add(prompt);
 			await DbContext.SaveChangesAsync();
 			var query = new GetScriptQuery(prompt.Id);
@@ -37,18 +33,14 @@ namespace AIDungeonPrompts.Test.Application.Queries.GetScript
 		}
 
 		[Theory]
-		[InlineData(new byte[] { 0x50, 0x4b, 0x03, 0x04 })]
-		[InlineData(new byte[] { 0x50, 0x4b, 0x05, 0x06 })]
-		[InlineData(new byte[] { 0x50, 0x4b, 0x07, 0x08 })]
+		[InlineData(new byte[] {0x50, 0x4b, 0x03, 0x04})]
+		[InlineData(new byte[] {0x50, 0x4b, 0x05, 0x06})]
+		[InlineData(new byte[] {0x50, 0x4b, 0x07, 0x08})]
 		public async Task Handle_ReturnsScriptBytes_WhenRelatedPromptHasScriptBytes(byte[] expectedBytes)
 		{
 			//arrange
-			var owner = new User { Username = "TestUser" };
-			var prompt = new Prompt()
-			{
-				Owner = owner,
-				ScriptZip = expectedBytes
-			};
+			var owner = new User {Username = "TestUser"};
+			var prompt = new Prompt {Owner = owner, ScriptZip = expectedBytes};
 			DbContext.Prompts.Add(prompt);
 			await DbContext.SaveChangesAsync();
 			var query = new GetScriptQuery(prompt.Id);

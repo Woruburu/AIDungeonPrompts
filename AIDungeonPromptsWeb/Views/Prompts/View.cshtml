@@ -12,7 +12,8 @@
 }
 @if (Model.Reported ?? false)
 {
-	<div class="alert alert-danger alert-dismissible fade show" role="alert">
+
+<div class="alert alert-danger alert-dismissible fade show" role="alert" xmlns="http://www.w3.org/1999/html">
 		You have successfully reported this prompt.
 		<button type="button" class="close" data-dismiss="alert" aria-label="Close">
 			<span aria-hidden="true">&times;</span>
@@ -81,11 +82,23 @@
 			</p>
 		}
 	</div>
-	<div>
-		<form method="get" asp-action="NovelAiScenario" asp-route-id="@Model.Prompt.Id">
-			<button class="btn btn-outline-light">Export as NAI Scenario</button>
-		</form>
+</div>
+
+<div class="card mb-4 p-2">
+<details>
+	<summary>Export Options</summary>
+	<div class="mt-2 p-2">
+	<h3>NAI</h3>
+		<div class="d-flex flex-column flex-sm-row">
+			<div>
+				<a class="btn btn-outline-light" asp-action="NovelAiScenario" asp-route-id="@Model.Prompt.Id">Download .scenario</a>
+			</div>
+			<div class="js-only mt-3 mt-sm-0 ml-sm-3">
+				<button data-id="@Model.Prompt.Id" id="get-nai-json" class="btn btn-secondary">Copy to clipboard</button>
+			</div>
+		</div>
 	</div>
+</details>
 </div>
 
 @if (!string.IsNullOrWhiteSpace(Model.Prompt.Description))
@@ -160,7 +173,7 @@
 {
 	<div class="d-flex mb-2">
 		<h5 class="mt-auto mb-0 card-title mr-auto">@Html.DisplayNameFor(m => m.Prompt.WorldInfos)</h5>
-		<a class="btn btn-secondary" asp-action="DownloadWorldInfo" asp-route-Id="@Model.Prompt.Id">Download JSON</a>
+		<a class="btn btn-secondary" asp-action="DownloadWorldInfo" asp-route-Id="@Model.Prompt.Id">Download AID JSON</a>
 	</div>
 	<div class="row">
 		@foreach (var worldInfo in Model.Prompt.WorldInfos)
@@ -212,14 +225,6 @@
 	<h5>Sub Scenarios</h5>
 	@Html.DisplayFor(m => m.Prompt.Children)
 }
-
-<div class="d-flex">
-	<div class="ml-auto">
-		<form method="get" asp-action="NovelAiScenario" asp-route-id="@Model.Prompt.Id">
-			<button class="btn btn-outline-light">Export as NAI Scenario</button>
-		</form>
-	</div>
-</div>
 
 @section Scripts {
 	<script src="~/js/prompts/view.js" asp-append-version="true"></script>

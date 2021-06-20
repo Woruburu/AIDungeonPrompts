@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,11 +14,12 @@ namespace AIDungeonPrompts.Web.HostedServices.DatabaseBackups
 {
 	public static class DatabaseBackup
 	{
-		public async static Task BackupDatabase(IAIDungeonPromptsDbContext dbContext, BackupDbContext backupContext, CancellationToken cancellationToken = default)
+		public static async Task BackupDatabase(IAIDungeonPromptsDbContext dbContext, BackupDbContext backupContext,
+			CancellationToken cancellationToken = default)
 		{
 			await CleanBackup(backupContext, cancellationToken);
 
-			var nonDrafts = await dbContext.NonDraftPrompts.Select(e => e.Id).ToListAsync(cancellationToken);
+			List<int>? nonDrafts = await dbContext.NonDraftPrompts.Select(e => e.Id).ToListAsync(cancellationToken);
 
 			var page = 0;
 			const int pageSize = 100;
@@ -24,7 +27,7 @@ namespace AIDungeonPrompts.Web.HostedServices.DatabaseBackups
 
 			while (page * pageSize < totalCount)
 			{
-				var allPrompts = await dbContext
+				List<Prompt>? allPrompts = await dbContext
 					.Prompts
 					.Include(e => e.PromptTags)
 					.ThenInclude(e => e.Tag)
@@ -34,7 +37,8 @@ namespace AIDungeonPrompts.Web.HostedServices.DatabaseBackups
 					.Take(pageSize)
 					.AsNoTracking()
 					.ToListAsync(cancellationToken);
-				var backups = allPrompts.Where(e => nonDrafts.Contains(e.Id)).Select(prompt => CreateBackupPrompt(prompt)).ToList();
+				var backups = allPrompts.Where(e => nonDrafts.Contains(e.Id))
+					.Select(prompt => CreateBackupPrompt(prompt)).ToList();
 				backupContext.Prompts.AddRange(backups);
 				await backupContext.SaveChangesAsync(cancellationToken);
 				page++;
@@ -46,17 +50,17 @@ namespace AIDungeonPrompts.Web.HostedServices.DatabaseBackups
 			var promptTableName = context.Model.FindEntityType(typeof(BackupPrompt)).GetTableName();
 			var worldInfoTableName = context.Model.FindEntityType(typeof(BackupWorldInfo)).GetTableName();
 
-			await using var command = context.Database.GetDbConnection().CreateCommand();
-			command.CommandText = $"PRAGMA journal_mode = NONE;DELETE FROM {worldInfoTableName};DELETE FROM sqlite_sequence WHERE name='{worldInfoTableName}';DELETE FROM {promptTableName};DELETE FROM sqlite_sequence WHERE name='{promptTableName}';VACUUM";
+			await using DbCommand? command = context.Database.GetDbConnection().CreateCommand();
+			command.CommandText =
+				$"PRAGMA journal_mode = NONE;DELETE FROM {worldInfoTableName};DELETE FROM sqlite_sequence WHERE name='{worldInfoTableName}';DELETE FROM {promptTableName};DELETE FROM sqlite_sequence WHERE name='{promptTableName}';VACUUM";
 			command.CommandType = CommandType.Text;
 			await context.Database.OpenConnectionAsync(cancellationToken);
 			await command.ExecuteNonQueryAsync(cancellationToken);
 			await context.Database.CloseConnectionAsync();
 		}
 
-		private static BackupPrompt CreateBackupPrompt(Prompt prompt)
-		{
-			return new BackupPrompt
+		private static BackupPrompt CreateBackupPrompt(Prompt prompt) =>
+			new()
 			{
 				AuthorsNote = prompt.AuthorsNote,
 				DateCreated = prompt.DateCreated,
@@ -82,6 +86,5 @@ namespace AIDungeonPrompts.Web.HostedServices.DatabaseBackups
 					PromptId = worldInfo.PromptId
 				}).ToList()
 			};
-		}
 	}
 }

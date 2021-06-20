@@ -1,14 +1,7 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using AIDungeonPrompts.Application.Abstractions.DbContexts;
-using AIDungeonPrompts.Domain.Entities;
-using FluentValidation;
-using MediatR;
+﻿using FluentValidation;
 
 namespace AIDungeonPrompts.Application.Commands.CreateUser
 {
-
 	public class CreateUserCommandValidator : AbstractValidator<CreateUserCommand>
 	{
 		public CreateUserCommandValidator()
