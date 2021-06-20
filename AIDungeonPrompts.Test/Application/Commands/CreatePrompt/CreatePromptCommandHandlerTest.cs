@@ -25,10 +25,10 @@ namespace AIDungeonPrompts.Test.Application.Commands.CreatePrompt
 		public async Task Handle_AddsANewPromptToTheDatabase_AndReturnsThePromptId()
 		{
 			//arrange
-			var user = new User { Username = "TestUser" };
+			var user = new User {Username = "TestUser"};
 			DbContext.Users.Add(user);
 			await DbContext.SaveChangesAsync();
-			var command = new CreatePromptCommand { OwnerId = user.Id };
+			var command = new CreatePromptCommand {OwnerId = user.Id};
 
 			//act
 			var actual = await _handler.Handle(command);
@@ -42,20 +42,16 @@ namespace AIDungeonPrompts.Test.Application.Commands.CreatePrompt
 		public async Task Handle_CreatesAPromptWithANullPublishDate_WhenItIsDraft()
 		{
 			//arrange
-			var user = new User { Username = "TestUser" };
+			var user = new User {Username = "TestUser"};
 			DbContext.Users.Add(user);
 			await DbContext.SaveChangesAsync();
-			var command = new CreatePromptCommand
-			{
-				OwnerId = user.Id,
-				SaveDraft = true
-			};
+			var command = new CreatePromptCommand {OwnerId = user.Id, SaveDraft = true};
 
 			//act
 			var actual = await _handler.Handle(command);
 
 			//assert
-			var actualPrompt = await DbContext.Prompts.FindAsync(actual);
+			Prompt? actualPrompt = await DbContext.Prompts.FindAsync(actual);
 			Assert.Null(actualPrompt.PublishDate);
 		}
 
@@ -63,55 +59,123 @@ namespace AIDungeonPrompts.Test.Application.Commands.CreatePrompt
 		public async Task Handle_CreatesAPromptWithAPublishDate_WhenItIsNotADraft()
 		{
 			//arrange
-			var user = new User { Username = "TestUser" };
+			var user = new User {Username = "TestUser"};
 			DbContext.Users.Add(user);
 			await DbContext.SaveChangesAsync();
-			var command = new CreatePromptCommand
-			{
-				OwnerId = user.Id,
-				SaveDraft = false
-			};
+			var command = new CreatePromptCommand {OwnerId = user.Id, SaveDraft = false};
 
 			//act
 			var actual = await _handler.Handle(command);
 
 			//assert
-			var actualPrompt = await DbContext.Prompts.FindAsync(actual);
+			Prompt? actualPrompt = await DbContext.Prompts.FindAsync(actual);
 			Assert.NotNull(actualPrompt.PublishDate);
 		}
 
 		[Fact]
-		public async Task Handle_CreatesAPromptWithSCriptZipSetToExpectedBytes()
+		public async Task Handle_CreatesAPromptWithScriptZipSetToExpectedBytes()
 		{
 			//arrange
 			var expectedBytes = new byte[] { };
-			var user = new User { Username = "TestUser" };
+			var user = new User {Username = "TestUser"};
 			DbContext.Users.Add(user);
 			await DbContext.SaveChangesAsync();
-			var command = new CreatePromptCommand { OwnerId = user.Id, ScriptZip = expectedBytes };
+			var command = new CreatePromptCommand {OwnerId = user.Id, ScriptZip = expectedBytes};
 
 			//act
 			var actualId = await _handler.Handle(command);
 
 			//assert
-			var actualPrompt = await DbContext.Prompts.FindAsync(actualId);
+			Prompt? actualPrompt = await DbContext.Prompts.FindAsync(actualId);
 			Assert.Equal(expectedBytes, actualPrompt.ScriptZip);
+		}
+
+		[Fact]
+		public async Task Handle_CreatesAPromptWithNovelAiScenarioSetToNull_WhenNovelAiScenarioIsNull()
+		{
+			//arrange
+			const string? expectedString = null;
+			var user = new User {Username = "TestUser"};
+			DbContext.Users.Add(user);
+			await DbContext.SaveChangesAsync();
+			var command = new CreatePromptCommand {OwnerId = user.Id, NovelAiScenario = null};
+
+			//act
+			var actualId = await _handler.Handle(command);
+
+			//assert
+			Prompt? actualPrompt = await DbContext.Prompts.FindAsync(actualId);
+			Assert.Equal(expectedString, actualPrompt.NovelAiScenario);
+		}
+
+		[Fact]
+		public async Task Handle_CreatesAPromptWithNovelAiScenarioSetToNull_WhenNovelAiScenarioIsEmptyString()
+		{
+			//arrange
+			const string? expectedString = null;
+			var user = new User {Username = "TestUser"};
+			DbContext.Users.Add(user);
+			await DbContext.SaveChangesAsync();
+			var command = new CreatePromptCommand {OwnerId = user.Id, NovelAiScenario = ""};
+
+			//act
+			var actualId = await _handler.Handle(command);
+
+			//assert
+			Prompt? actualPrompt = await DbContext.Prompts.FindAsync(actualId);
+			Assert.Equal(expectedString, actualPrompt.NovelAiScenario);
+		}
+
+		[Fact]
+		public async Task Handle_CreatesAPromptWithNovelAiScenarioSetToNull_WhenNovelAiScenarioIsWhitespace()
+		{
+			//arrange
+			const string? expectedString = null;
+			var user = new User {Username = "TestUser"};
+			DbContext.Users.Add(user);
+			await DbContext.SaveChangesAsync();
+			var command = new CreatePromptCommand {OwnerId = user.Id, NovelAiScenario = "   "};
+
+			//act
+			var actualId = await _handler.Handle(command);
+
+			//assert
+			Prompt? actualPrompt = await DbContext.Prompts.FindAsync(actualId);
+			Assert.Equal(expectedString, actualPrompt.NovelAiScenario);
+		}
+
+		[Fact]
+		public async Task Handle_CreatesAPromptWithNovelAiScenarioSetToExpectedValue()
+		{
+			//arrange
+			const string? expectedString = "{\"test\":\"test\"}";
+			var user = new User {Username = "TestUser"};
+			DbContext.Users.Add(user);
+			await DbContext.SaveChangesAsync();
+			var command = new CreatePromptCommand {OwnerId = user.Id, NovelAiScenario = expectedString};
+
+			//act
+			var actualId = await _handler.Handle(command);
+
+			//assert
+			Prompt? actualPrompt = await DbContext.Prompts.FindAsync(actualId);
+			Assert.Equal(expectedString, actualPrompt.NovelAiScenario);
 		}
 
 		[Fact]
 		public async Task Handle_CreatesAPromptWithScriptZipSetToNull()
 		{
 			//arrange
-			var user = new User { Username = "TestUser" };
+			var user = new User {Username = "TestUser"};
 			DbContext.Users.Add(user);
 			await DbContext.SaveChangesAsync();
-			var command = new CreatePromptCommand { OwnerId = user.Id, ScriptZip = null };
+			var command = new CreatePromptCommand {OwnerId = user.Id, ScriptZip = null};
 
 			//act
 			var actualId = await _handler.Handle(command);
 
 			//assert
-			var actualPrompt = await DbContext.Prompts.FindAsync(actualId);
+			Prompt? actualPrompt = await DbContext.Prompts.FindAsync(actualId);
 			Assert.Null(actualPrompt.ScriptZip);
 		}
 
@@ -119,24 +183,21 @@ namespace AIDungeonPrompts.Test.Application.Commands.CreatePrompt
 		public async Task Handle_CreatesAPromptWithTheParentId_WhenParentIdIsGiven_AndTheCurrentUserIsTheSameId()
 		{
 			//arrange
-			var owner = new User { Username = "TestUser" };
+			var owner = new User {Username = "TestUser"};
 			DbContext.Users.Add(owner);
 			await DbContext.SaveChangesAsync();
-			var parent = new Prompt
-			{
-				OwnerId = owner.Id
-			};
+			var parent = new Prompt {OwnerId = owner.Id};
 			DbContext.Prompts.Add(parent);
 			await DbContext.SaveChangesAsync();
-			var user = new GetUserViewModel { Id = owner.Id };
+			var user = new GetUserViewModel {Id = owner.Id};
 			_mockUserService.Setup(e => e.TryGetCurrentUser(out user)).Returns(true);
-			var command = new CreatePromptCommand { ParentId = parent.Id, OwnerId = owner.Id };
+			var command = new CreatePromptCommand {ParentId = parent.Id, OwnerId = owner.Id};
 
 			//act
 			var actual = await _handler.Handle(command);
 
 			//assert
-			var actualPrompt = await DbContext.Prompts.FindAsync(actual);
+			Prompt? actualPrompt = await DbContext.Prompts.FindAsync(actual);
 			Assert.NotNull(actualPrompt);
 			Assert.Equal(parent.Id, actualPrompt.ParentId);
 		}
@@ -145,16 +206,16 @@ namespace AIDungeonPrompts.Test.Application.Commands.CreatePrompt
 		public async Task Handle_DoesNotSetPromptToDraft_WhenSaveDraftIsFalse()
 		{
 			//arrange
-			var user = new User { Username = "TestUser" };
+			var user = new User {Username = "TestUser"};
 			DbContext.Users.Add(user);
 			await DbContext.SaveChangesAsync();
-			var command = new CreatePromptCommand { OwnerId = user.Id, SaveDraft = false };
+			var command = new CreatePromptCommand {OwnerId = user.Id, SaveDraft = false};
 
 			//act
 			var actual = await _handler.Handle(command);
 
 			//assert
-			var prompt = DbContext.Prompts.Find(actual);
+			Prompt? prompt = DbContext.Prompts.Find(actual);
 			Assert.False(prompt.IsDraft);
 		}
 
@@ -164,24 +225,24 @@ namespace AIDungeonPrompts.Test.Application.Commands.CreatePrompt
 		public async Task Handle_SetsDraftToFalse_WhenThereIsAParentId(bool intitialStatus)
 		{
 			//arrange
-			var owner = new User { Username = "TestUser" };
+			var owner = new User {Username = "TestUser"};
 			DbContext.Users.Add(owner);
 
-			var parent = new Prompt { Owner = owner };
+			var parent = new Prompt {Owner = owner};
 			DbContext.Prompts.Add(parent);
 
 			await DbContext.SaveChangesAsync();
 
-			var user = new GetUserViewModel { Id = owner.Id };
+			var user = new GetUserViewModel {Id = owner.Id};
 			_mockUserService.Setup(e => e.TryGetCurrentUser(out user)).Returns(true);
 
-			var command = new CreatePromptCommand { OwnerId = user.Id, SaveDraft = intitialStatus, ParentId = parent.Id };
+			var command = new CreatePromptCommand {OwnerId = user.Id, SaveDraft = intitialStatus, ParentId = parent.Id};
 
 			//act
 			var actual = await _handler.Handle(command);
 
 			//assert
-			var actualPrompt = DbContext.Prompts.Find(actual);
+			Prompt? actualPrompt = DbContext.Prompts.Find(actual);
 			Assert.False(actualPrompt.IsDraft);
 		}
 
@@ -189,16 +250,16 @@ namespace AIDungeonPrompts.Test.Application.Commands.CreatePrompt
 		public async Task Handle_SetsPromptToDraft_WhenSaveDraftIsTrue()
 		{
 			//arrange
-			var user = new User { Username = "TestUser" };
+			var user = new User {Username = "TestUser"};
 			DbContext.Users.Add(user);
 			await DbContext.SaveChangesAsync();
-			var command = new CreatePromptCommand { OwnerId = user.Id, SaveDraft = true };
+			var command = new CreatePromptCommand {OwnerId = user.Id, SaveDraft = true};
 
 			//act
 			var actual = await _handler.Handle(command);
 
 			//assert
-			var prompt = DbContext.Prompts.Find(actual);
+			Prompt? prompt = DbContext.Prompts.Find(actual);
 			Assert.True(prompt.IsDraft);
 		}
 
@@ -210,52 +271,50 @@ namespace AIDungeonPrompts.Test.Application.Commands.CreatePrompt
 		public async Task Handle_Throws_WhenThereIsNoValidOwner(int ownerId)
 		{
 			//arrange
-			var command = new CreatePromptCommand() { OwnerId = ownerId };
+			var command = new CreatePromptCommand {OwnerId = ownerId};
 
 			//act + assert
 			await Assert.ThrowsAnyAsync<Exception>(async () => await _handler.Handle(command));
 		}
 
 		[Fact]
-		public async Task Handle_ThrowsCreatePromptUnauthorizedParentException_WhenParentIdIsGiven_AndTheCurrentUserIsNotTheSameId()
+		public async Task
+			Handle_ThrowsCreatePromptUnauthorizedParentException_WhenParentIdIsGiven_AndTheCurrentUserIsNotTheSameId()
 		{
 			//arrange
-			var owner = new User { Username = "TestUser" };
-			var ownerTwo = new User { Username = "TestUserTwo" };
+			var owner = new User {Username = "TestUser"};
+			var ownerTwo = new User {Username = "TestUserTwo"};
 			DbContext.Users.Add(owner);
 			DbContext.Users.Add(ownerTwo);
 			await DbContext.SaveChangesAsync();
-			var parent = new Prompt
-			{
-				OwnerId = owner.Id
-			};
+			var parent = new Prompt {OwnerId = owner.Id};
 			DbContext.Prompts.Add(parent);
 			await DbContext.SaveChangesAsync();
-			var user = new GetUserViewModel { Id = ownerTwo.Id };
+			var user = new GetUserViewModel {Id = ownerTwo.Id};
 			_mockUserService.Setup(e => e.TryGetCurrentUser(out user)).Returns(true);
-			var command = new CreatePromptCommand { ParentId = parent.Id };
+			var command = new CreatePromptCommand {ParentId = parent.Id};
 
 			//act + assert
-			await Assert.ThrowsAsync<CreatePromptUnauthorizedParentException>(async () => await _handler.Handle(command));
+			await Assert.ThrowsAsync<CreatePromptUnauthorizedParentException>(
+				async () => await _handler.Handle(command));
 		}
 
 		[Fact]
-		public async Task Handle_ThrowsCreatePromptUnauthorizedParentException_WhenParentIdIsGiven_AndWhenThereIsNoCurrentUser()
+		public async Task
+			Handle_ThrowsCreatePromptUnauthorizedParentException_WhenParentIdIsGiven_AndWhenThereIsNoCurrentUser()
 		{
 			//arrange
-			var user = new User { Username = "TestUser" };
+			var user = new User {Username = "TestUser"};
 			DbContext.Users.Add(user);
 			await DbContext.SaveChangesAsync();
-			var parent = new Prompt
-			{
-				OwnerId = user.Id
-			};
+			var parent = new Prompt {OwnerId = user.Id};
 			DbContext.Prompts.Add(parent);
 			await DbContext.SaveChangesAsync();
-			var command = new CreatePromptCommand { ParentId = parent.Id };
+			var command = new CreatePromptCommand {ParentId = parent.Id};
 
 			//act + assert
-			await Assert.ThrowsAsync<CreatePromptUnauthorizedParentException>(async () => await _handler.Handle(command));
+			await Assert.ThrowsAsync<CreatePromptUnauthorizedParentException>(
+				async () => await _handler.Handle(command));
 		}
 	}
 }

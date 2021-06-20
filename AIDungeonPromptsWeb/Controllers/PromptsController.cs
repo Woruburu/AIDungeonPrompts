@@ -23,13 +23,13 @@ using AIDungeonPrompts.Web.Extensions;
 using AIDungeonPrompts.Web.Models.NovelAi;
 using AIDungeonPrompts.Web.Models.Prompts;
 using FluentValidation.AspNetCore;
+using FluentValidation.Results;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace AIDungeonPrompts.Web.Controllers
 {
@@ -39,7 +39,8 @@ namespace AIDungeonPrompts.Web.Controllers
 		private readonly ILogger<PromptsController> _logger;
 		private readonly IMediator _mediator;
 
-		public PromptsController(IMediator mediator, ICurrentUserService currentUserService, ILogger<PromptsController> logger)
+		public PromptsController(IMediator mediator, ICurrentUserService currentUserService,
+			ILogger<PromptsController> logger)
 		{
 			_mediator = mediator;
 			_currentUserService = currentUserService;
@@ -49,22 +50,75 @@ namespace AIDungeonPrompts.Web.Controllers
 		[HttpGet("[controller]/create")]
 		public async Task<ActionResult> Create(int? parentId, CancellationToken cancellationToken)
 		{
-			var flag = await _mediator.Send(new GetServerFlagQuery(ServerFlagName.CreateDisabled), cancellationToken);
+			GetServerFlagViewModel? flag = await _mediator.Send(new GetServerFlagQuery(ServerFlagName.CreateDisabled),
+				cancellationToken);
+			var command = new CreatePromptCommand {ParentId = parentId};
+			if (TempData["NovelAiScenario"] is string tempData)
+			{
+				try
+				{
+					NovelAiScenario? novelAiScenario = JsonSerializer.Deserialize<NovelAiScenario>(tempData);
+					if (novelAiScenario != null)
+					{
+						command.Description = novelAiScenario.Description;
+						command.Memory = novelAiScenario.Context.FirstOrDefault()?.Text;
+						command.AuthorsNote = novelAiScenario.Context.ElementAtOrDefault(1)?.Text;
+						command.Title = novelAiScenario.Title;
+						command.PromptContent = novelAiScenario.Prompt;
+						command.PromptTags = string.Join(", ", novelAiScenario.Tags);
+						command.WorldInfos = novelAiScenario.Lorebook.LorebookEntries.Count > 0
+							? novelAiScenario.Lorebook.LorebookEntries.Select(lore =>
+									new CreatePromptCommandWorldInfo
+									{
+										Keys = string.Join(", ", lore.Keys), Entry = lore.Text
+									})
+								.ToList()
+							: new List<CreatePromptCommandWorldInfo> {new()};
+						command.NovelAiScenario = tempData;
+					}
+				}
+				catch (JsonException e)
+				{
+					_logger.LogError(e, "Could not decode NAI Json data");
+				}
+			}
+
 			return View(new CreatePromptViewModel
 			{
-				Command = new CreatePromptCommand
-				{
-					ParentId = parentId
-				},
-				CreationDisabled = flag.Enabled,
-				DisabledMessage = flag.Message
+				Command = command, CreationDisabled = flag.Enabled, DisabledMessage = flag.Message
 			});
 		}
 
-		[HttpPost, ValidateAntiForgeryToken]
-		public async Task<IActionResult> Create(bool addWi, bool confirm, bool saveDraft, bool addChild, bool uploadWi, int? wiDelete, CreatePromptViewModel model, CancellationToken cancellationToken)
+		[HttpPost("[controller]/create/upload-nai")]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> UploadNai(int? parentId, IFormFile scenarioFile)
 		{
-			var flag = await _mediator.Send(new GetServerFlagQuery(ServerFlagName.CreateDisabled), cancellationToken);
+			await ReadNovelAiScenario(scenarioFile);
+			return RedirectToAction("Create", new {parentId});
+		}
+
+		private async Task ReadNovelAiScenario(IFormFile scenarioFile)
+		{
+			try
+			{
+				await using Stream stream = scenarioFile.OpenReadStream();
+				using var reader = new StreamReader(stream);
+				var scenarioString = await reader.ReadToEndAsync();
+				TempData["NovelAiScenario"] = scenarioString;
+			}
+			catch (Exception e)
+			{
+				_logger.LogError(e, "Could not read Novel AI scenario");
+			}
+		}
+
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> Create(bool addWi, bool confirm, bool saveDraft, bool addChild, bool uploadWi,
+			int? wiDelete, CreatePromptViewModel model, CancellationToken cancellationToken)
+		{
+			GetServerFlagViewModel? flag = await _mediator.Send(new GetServerFlagQuery(ServerFlagName.CreateDisabled),
+				cancellationToken);
 			if (flag.Enabled)
 			{
 				return RedirectToAction("Create");
@@ -73,31 +127,34 @@ namespace AIDungeonPrompts.Web.Controllers
 			if (uploadWi)
 			{
 				ModelState.Clear();
-				if (model.WorldInfoFile != null)
+				if (model.WorldInfoFile == null)
 				{
-					var worldInfos = await ReadWorldInfoFromFileAsync(model.WorldInfoFile);
-					if (worldInfos?.Count > 0)
-					{
-						if (model.Command.WorldInfos.Count == 1
-							&& string.IsNullOrWhiteSpace(model.Command.WorldInfos[0].Entry)
-							&& string.IsNullOrWhiteSpace(model.Command.WorldInfos[0].Keys))
-						{
-							model.Command.WorldInfos = worldInfos.Select(wi => new CreatePromptCommandWorldInfo
-							{
-								Keys = wi.Keys,
-								Entry = wi.Entry
-							}).ToList();
-						}
-						else
-						{
-							model.Command.WorldInfos.AddRange(worldInfos.Select(wi => new CreatePromptCommandWorldInfo
-							{
-								Keys = wi.Keys,
-								Entry = wi.Entry
-							}));
-						}
-					}
+					return View(model);
 				}
+
+				List<WorldInfoJson>? worldInfos = await ReadWorldInfoFromFileAsync(model.WorldInfoFile);
+				if (!(worldInfos?.Count > 0))
+				{
+					return View(model);
+				}
+
+				if (model.Command.WorldInfos.Count == 1
+				    && string.IsNullOrWhiteSpace(model.Command.WorldInfos[0].Entry)
+				    && string.IsNullOrWhiteSpace(model.Command.WorldInfos[0].Keys))
+				{
+					model.Command.WorldInfos = worldInfos.Select(wi => new CreatePromptCommandWorldInfo
+					{
+						Keys = wi.Keys, Entry = wi.Entry
+					}).ToList();
+				}
+				else
+				{
+					model.Command.WorldInfos.AddRange(worldInfos.Select(wi => new CreatePromptCommandWorldInfo
+					{
+						Keys = wi.Keys, Entry = wi.Entry
+					}));
+				}
+
 				return View(model);
 			}
 
@@ -109,6 +166,7 @@ namespace AIDungeonPrompts.Web.Controllers
 				{
 					model.Command.WorldInfos.Add(new CreatePromptCommandWorldInfo());
 				}
+
 				return View(model);
 			}
 
@@ -128,7 +186,7 @@ namespace AIDungeonPrompts.Web.Controllers
 				model.Command.ScriptZip = stream.ToArray();
 
 				var validator = new CreatePromptCommandValidator();
-				var results = await validator.ValidateAsync(model.Command, cancellationToken);
+				ValidationResult? results = await validator.ValidateAsync(model.Command, cancellationToken);
 
 				results.AddToModelState(ModelState, nameof(model.Command));
 			}
@@ -140,7 +198,8 @@ namespace AIDungeonPrompts.Web.Controllers
 
 			if (!model.Command.SaveDraft && !addChild && !model.Command.ParentId.HasValue)
 			{
-				var duplicate = await _mediator.Send(new SimilarPromptQuery(model.Command.Title), cancellationToken);
+				SimilarPromptViewModel? duplicate =
+					await _mediator.Send(new SimilarPromptQuery(model.Command.Title), cancellationToken);
 				if (duplicate.Matched && !confirm)
 				{
 					model.SimilarPromptQuery = duplicate;
@@ -148,7 +207,7 @@ namespace AIDungeonPrompts.Web.Controllers
 				}
 			}
 
-			if (!_currentUserService.TryGetCurrentUser(out var user))
+			if (!_currentUserService.TryGetCurrentUser(out GetUserViewModel? user))
 			{
 				var userId = await _mediator.Send(new CreateTransientUserCommand(), cancellationToken);
 				user = await _mediator.Send(new GetUserQuery(userId), cancellationToken);
@@ -164,26 +223,25 @@ namespace AIDungeonPrompts.Web.Controllers
 
 			if (addChild)
 			{
-				return RedirectToAction("Create", new { parentId = id });
+				return RedirectToAction("Create", new {parentId = id});
 			}
 
-			if (model.Command.ParentId.HasValue)
-			{
-				return RedirectToAction("Edit", new { id = model.Command.ParentId });
-			}
-
-			return RedirectToAction("View", new { id });
+			return model.Command.ParentId.HasValue
+				? RedirectToAction("Edit", new {id = model.Command.ParentId})
+				: RedirectToAction("View", new {id});
 		}
 
-		[HttpPost("/{id}/delete"), ValidateAntiForgeryToken, Authorize]
+		[HttpPost("/{id}/delete")]
+		[ValidateAntiForgeryToken]
+		[Authorize]
 		public async Task<ActionResult> Delete(int? id, CancellationToken cancellationToken)
 		{
-			if (id == null || !_currentUserService.TryGetCurrentUser(out var user))
+			if (id == null || !_currentUserService.TryGetCurrentUser(out GetUserViewModel? user))
 			{
 				return NotFound();
 			}
 
-			var prompt = await _mediator.Send(new GetPromptQuery(id.Value), cancellationToken);
+			GetPromptViewModel? prompt = await _mediator.Send(new GetPromptQuery(id.Value), cancellationToken);
 
 			if (prompt == null || (prompt.OwnerId != user!.Id && (user.Role & RoleEnum.Delete) == 0))
 			{
@@ -194,44 +252,38 @@ namespace AIDungeonPrompts.Web.Controllers
 
 			if (prompt.ParentId.HasValue)
 			{
-				return RedirectToAction("Edit", new { id = prompt.ParentId });
+				return RedirectToAction("Edit", new {id = prompt.ParentId});
 			}
 
 			return RedirectToAction("Index", "Home");
 		}
 
-		[HttpGet("/{id}/world-info")]
+		[HttpGet("/{id:int}/world-info")]
 		public async Task<IActionResult> DownloadWorldInfo(int? id, CancellationToken cancellationToken)
 		{
-			if (id == null || id == default)
+			if (id is null or default(int))
 			{
 				return NotFound();
 			}
-			var prompt = await _mediator.Send(new GetPromptQuery(id.Value), cancellationToken);
+
+			GetPromptViewModel? prompt = await _mediator.Send(new GetPromptQuery(id.Value), cancellationToken);
 			if (prompt == null)
 			{
 				return NotFound();
 			}
-			var worldInfos = prompt.WorldInfos.Select(wi => new WorldInfoJson
+
+			IEnumerable<WorldInfoJson>? worldInfos = prompt.WorldInfos.Select(wi => new WorldInfoJson
 			{
-				Entry = wi.Entry,
-				Keys = wi.Keys,
-				IsNotHidden = true
+				Entry = wi.Entry, Keys = wi.Keys, IsNotHidden = true
 			});
-			var worldInfosString = JsonSerializer.Serialize(worldInfos, new JsonSerializerOptions
-			{
-				WriteIndented = true,
-				PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-			});
+			var worldInfosString = JsonSerializer.Serialize(worldInfos,
+				new JsonSerializerOptions {WriteIndented = true, PropertyNamingPolicy = JsonNamingPolicy.CamelCase});
 			Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(worldInfosString));
 			const string? mimeType = "application/json";
-			return new FileStreamResult(stream, mimeType)
-			{
-				FileDownloadName = "worldInfo.json"
-			};
+			return new FileStreamResult(stream, mimeType) {FileDownloadName = "worldInfo.json"};
 		}
 
-		[HttpGet("/{id}/nai-scenario")]
+		[HttpGet("/{id:int}/nai-scenario")]
 		public async Task<IActionResult> NovelAiScenario(int? id, CancellationToken cancellationToken)
 		{
 			if (id == null || (int)id == default)
@@ -239,33 +291,38 @@ namespace AIDungeonPrompts.Web.Controllers
 				return NotFound();
 			}
 
-			var prompt = await _mediator.Send(new GetPromptQuery(id.Value), cancellationToken);
+			GetPromptViewModel? prompt = await _mediator.Send(new GetPromptQuery(id.Value), cancellationToken);
 			if (prompt == null)
 			{
 				return NotFound();
 			}
 
-			var scenario = new NovelAiScenario(prompt);
-			var scenarioString = JsonSerializer.Serialize(scenario);
+			var scenarioString = prompt.NovelAiScenario;
+			if (string.IsNullOrWhiteSpace(scenarioString))
+			{
+				var scenario = new NovelAiScenario(prompt);
+				scenarioString = JsonSerializer.Serialize(scenario);
+			}
+
 			Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(scenarioString));
 			const string? mimeType = "application/json";
-			return new FileStreamResult(stream, mimeType)
-			{
-				FileDownloadName = $"{prompt.Title.Trim()}.scenario"
-			};
+			return new FileStreamResult(stream, mimeType) {FileDownloadName = $"{prompt.Title.Trim()}.scenario"};
 		}
 
-		[HttpPost("/{id}/edit"), ValidateAntiForgeryToken, Authorize]
-		public async Task<IActionResult> Edit(int? id, bool addWi, bool saveDraft, bool confirm, bool addChild, bool uploadWi, int? wiDelete, UpdatePromptViewModel model, CancellationToken cancellationToken)
+		[HttpPost("/{id:int}/edit")]
+		[ValidateAntiForgeryToken]
+		[Authorize]
+		public async Task<IActionResult> Edit(int? id, bool addWi, bool saveDraft, bool confirm, bool addChild,
+			bool uploadWi, int? wiDelete, UpdatePromptViewModel model, CancellationToken cancellationToken)
 		{
 			model.Command.SaveDraft = saveDraft;
 
-			if (id == null || !_currentUserService.TryGetCurrentUser(out var user))
+			if (id == null || !_currentUserService.TryGetCurrentUser(out GetUserViewModel? user))
 			{
 				return NotFound();
 			}
 
-			var prompt = await _mediator.Send(new GetPromptQuery(id.Value), cancellationToken);
+			GetPromptViewModel? prompt = await _mediator.Send(new GetPromptQuery(id.Value), cancellationToken);
 
 			if (prompt == null || (prompt.OwnerId != user!.Id && !RoleHelper.CanEdit(user.Role)))
 			{
@@ -281,29 +338,26 @@ namespace AIDungeonPrompts.Web.Controllers
 				ModelState.Clear();
 				if (model.WorldInfoFile != null)
 				{
-					var worldInfos = await ReadWorldInfoFromFileAsync(model.WorldInfoFile);
-					if (worldInfos?.Count > 0)
+					List<WorldInfoJson> worldInfos = await ReadWorldInfoFromFileAsync(model.WorldInfoFile);
+					if (worldInfos.Count > 0)
 					{
 						if (model.Command.WorldInfos.Count == 1
-							&& string.IsNullOrWhiteSpace(model.Command.WorldInfos[0].Entry)
-							&& string.IsNullOrWhiteSpace(model.Command.WorldInfos[0].Keys))
+						    && string.IsNullOrWhiteSpace(model.Command.WorldInfos[0].Entry)
+						    && string.IsNullOrWhiteSpace(model.Command.WorldInfos[0].Keys))
 						{
 							model.Command.WorldInfos = worldInfos.Select(wi => new UpdatePromptCommandWorldInfo
 							{
-								Keys = wi.Keys,
-								Entry = wi.Entry
+								Keys = wi.Keys, Entry = wi.Entry
 							}).ToList();
 						}
 						else
 						{
-							model.Command.WorldInfos.AddRange(worldInfos.Select(wi => new UpdatePromptCommandWorldInfo
-							{
-								Keys = wi.Keys,
-								Entry = wi.Entry
-							}));
+							model.Command.WorldInfos.AddRange(worldInfos.Select(wi =>
+								new UpdatePromptCommandWorldInfo {Keys = wi.Keys, Entry = wi.Entry}));
 						}
 					}
 				}
+
 				return View(model);
 			}
 
@@ -315,6 +369,7 @@ namespace AIDungeonPrompts.Web.Controllers
 				{
 					model.Command.WorldInfos.Add(new UpdatePromptCommandWorldInfo());
 				}
+
 				return View(model);
 			}
 
@@ -332,7 +387,7 @@ namespace AIDungeonPrompts.Web.Controllers
 				model.Command.ScriptZip = stream.ToArray();
 
 				var validator = new UpdatePromptCommandValidator();
-				var results = await validator.ValidateAsync(model.Command, cancellationToken);
+				ValidationResult? results = await validator.ValidateAsync(model.Command, cancellationToken);
 
 				results.AddToModelState(ModelState, nameof(model.Command));
 			}
@@ -344,7 +399,9 @@ namespace AIDungeonPrompts.Web.Controllers
 
 			if (!model.Command.SaveDraft && !addChild && !model.Command.ParentId.HasValue)
 			{
-				var duplicate = await _mediator.Send(new SimilarPromptQuery(model.Command.Title, model.Command.Id), cancellationToken);
+				SimilarPromptViewModel? duplicate =
+					await _mediator.Send(new SimilarPromptQuery(model.Command.Title, model.Command.Id),
+						cancellationToken);
 				if (duplicate.Matched && !confirm)
 				{
 					model.SimilarPromptQuery = duplicate;
@@ -356,111 +413,153 @@ namespace AIDungeonPrompts.Web.Controllers
 
 			if (addChild)
 			{
-				return RedirectToAction("Create", new { parentId = id });
+				return RedirectToAction("Create", new {parentId = id});
 			}
 
 			if (model.Command.ParentId.HasValue)
 			{
-				return RedirectToAction("Edit", new { id = model.Command.ParentId });
+				return RedirectToAction("Edit", new {id = model.Command.ParentId});
 			}
 
-			return RedirectToAction("View", new { id });
+			return RedirectToAction("View", new {id});
 		}
 
-		[HttpGet("/{id}/edit"), Authorize]
+		[HttpPost("[controller]/{id:int}/edit/upload-nai")]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> EditUploadNai(int id, IFormFile scenarioFile,
+			CancellationToken cancellationToken)
+		{
+			await ReadNovelAiScenario(scenarioFile);
+			return RedirectToAction("Edit", new {id});
+		}
+
+		[HttpGet("/{id:int}/edit")]
+		[Authorize]
 		public async Task<IActionResult> Edit(int? id, CancellationToken cancellationToken)
 		{
-			if (id == null || !_currentUserService.TryGetCurrentUser(out var user))
+			if (id == null || !_currentUserService.TryGetCurrentUser(out GetUserViewModel? user))
 			{
 				return NotFound();
 			}
 
-			var prompt = await _mediator.Send(new GetPromptQuery(id.Value), cancellationToken);
+			GetPromptViewModel? prompt = await _mediator.Send(new GetPromptQuery(id.Value), cancellationToken);
 
 			if (prompt == null || (prompt.OwnerId != user!.Id && !RoleHelper.CanEdit(user.Role)))
 			{
 				return NotFound();
 			}
 
-			return View(new UpdatePromptViewModel
+			var command = new UpdatePromptCommand
 			{
-				Children = prompt.Children.ToList(),
-				Command = new UpdatePromptCommand
+				AuthorsNote = prompt.AuthorsNote,
+				Description = prompt.Description,
+				Id = prompt.Id,
+				Memory = prompt.Memory,
+				Nsfw = prompt.Nsfw,
+				PromptContent = prompt.PromptContent,
+				PromptTags = string.Join(", ", prompt.PromptTags.Select(pt => pt.Name)),
+				Quests = prompt.Quests,
+				Title = prompt.Title,
+				OwnerId = prompt.OwnerId,
+				ParentId = prompt.ParentId,
+				NovelAiScenario = prompt.NovelAiScenario,
+				WorldInfos = prompt.WorldInfos.Any()
+					? prompt.WorldInfos
+						.Select(wi => new UpdatePromptCommandWorldInfo {Entry = wi.Entry, Keys = wi.Keys}).ToList()
+					: new List<UpdatePromptCommandWorldInfo> {new()}
+			};
+
+			if (TempData["NovelAiScenario"] is string tempData)
+			{
+				try
 				{
-					AuthorsNote = prompt.AuthorsNote,
-					Description = prompt.Description,
-					Id = prompt.Id,
-					Memory = prompt.Memory,
-					Nsfw = prompt.Nsfw,
-					PromptContent = prompt.PromptContent,
-					PromptTags = string.Join(", ", prompt.PromptTags.Select(pt => pt.Name)),
-					Quests = prompt.Quests,
-					Title = prompt.Title,
-					OwnerId = prompt.OwnerId,
-					ParentId = prompt.ParentId,
-					WorldInfos = prompt.WorldInfos.Any()
-						? prompt.WorldInfos.Select(wi => new UpdatePromptCommandWorldInfo
-						{
-							Entry = wi.Entry,
-							Keys = wi.Keys
-						}).ToList()
-						: new List<UpdatePromptCommandWorldInfo>()
-						{
-							 new UpdatePromptCommandWorldInfo()
-						}
+					NovelAiScenario? novelAiScenario = JsonSerializer.Deserialize<NovelAiScenario>(tempData);
+					if (novelAiScenario != null)
+					{
+						command.Description = novelAiScenario.Description;
+						command.Memory = novelAiScenario.Context.FirstOrDefault()?.Text;
+						command.AuthorsNote = novelAiScenario.Context.ElementAtOrDefault(1)?.Text;
+						command.Title = novelAiScenario.Title;
+						command.PromptContent = novelAiScenario.Prompt;
+						command.PromptTags = string.Join(", ", novelAiScenario.Tags);
+						command.WorldInfos = novelAiScenario.Lorebook.LorebookEntries.Any()
+							? novelAiScenario.Lorebook.LorebookEntries.Select(lore =>
+									new UpdatePromptCommandWorldInfo
+									{
+										Keys = string.Join(", ", lore.Keys), Entry = lore.Text
+									})
+								.ToList()
+							: new List<UpdatePromptCommandWorldInfo> {new()};
+						command.NovelAiScenario = tempData;
+					}
 				}
-			});
+				catch (JsonException e)
+				{
+					_logger.LogError(e, "Could not decode NAI Json data");
+				}
+			}
+
+			return View(new UpdatePromptViewModel {Children = prompt.Children.ToList(), Command = command});
 		}
 
-		[EnableCors("AiDungeon"), HttpGet("/api/{id}")]
+		[EnableCors("AiDungeon")]
+		[HttpGet("/api/{id:int}")]
 		public async Task<ActionResult<GetPromptViewModel>> Get(int? id, CancellationToken cancellationToken)
 		{
-			if (id == null || id == default)
+			if (id is null or default(int))
 			{
 				return NotFound();
 			}
-			var prompt = await _mediator.Send(new GetPromptQuery(id.Value), cancellationToken);
+
+			GetPromptViewModel? prompt = await _mediator.Send(new GetPromptQuery(id.Value), cancellationToken);
 			return prompt ?? (ActionResult<GetPromptViewModel>)NotFound();
 		}
 
-		[HttpGet("{id}/report")]
+		[HttpGet("{id:int}/report")]
 		public async Task<IActionResult> Report(int? id, CancellationToken cancellationToken)
 		{
-			if (id == null || id == default)
+			if (id is null or default(int))
 			{
 				return NotFound();
 			}
-			var prompt = await _mediator.Send(new GetPromptQuery(id.Value), cancellationToken);
+
+			GetPromptViewModel? prompt = await _mediator.Send(new GetPromptQuery(id.Value), cancellationToken);
 			if (prompt == null)
 			{
 				return NotFound();
 			}
-			return View(new CreateReportViewModel { Prompt = prompt });
+
+			return View(new CreateReportViewModel {Prompt = prompt});
 		}
 
-		[HttpPost("{id}/report"), ValidateAntiForgeryToken]
-		public async Task<IActionResult> Report(int? id, CreateReportViewModel viewModel, CancellationToken cancellationToken)
+		[HttpPost("{id:int}/report")]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> Report(int? id, CreateReportViewModel viewModel,
+			CancellationToken cancellationToken)
 		{
-			if (id == null || id == default)
+			if (id is null or default(int))
 			{
 				return NotFound();
 			}
-			var prompt = await _mediator.Send(new GetPromptQuery(id.Value), cancellationToken);
+
+			GetPromptViewModel? prompt = await _mediator.Send(new GetPromptQuery(id.Value), cancellationToken);
 			if (prompt == null)
 			{
 				return NotFound();
 			}
+
 			if (!ModelState.IsValid)
 			{
 				viewModel.Prompt = prompt;
 				return View(viewModel);
 			}
+
 			viewModel.Command.PromptId = id.Value;
 			await _mediator.Send(viewModel.Command, cancellationToken);
-			return RedirectToAction("View", new { id, reported = true });
+			return RedirectToAction("View", new {id, reported = true});
 		}
 
-		[HttpGet("{id}/script")]
+		[HttpGet("{id:int}/script")]
 		public async Task<ActionResult> Script(int? id, CancellationToken cancellationToken)
 		{
 			if (id == null)
@@ -477,45 +576,39 @@ namespace AIDungeonPrompts.Web.Controllers
 
 			Stream stream = new MemoryStream(file);
 			const string? mimeType = "application/zip";
-			return new FileStreamResult(stream, mimeType)
-			{
-				FileDownloadName = $"{id}-scripts.zip"
-			};
+			return new FileStreamResult(stream, mimeType) {FileDownloadName = $"{id}-scripts.zip"};
 		}
 
-		[HttpGet("/{id}")]
+		[HttpGet("/{id:int}")]
 		public async Task<IActionResult> View(int? id, bool? reported, CancellationToken cancellationToken)
 		{
-			if (id == null || id == default)
+			if (id is null or default(int))
 			{
 				return NotFound();
 			}
-			var prompt = await _mediator.Send(new GetPromptQuery(id.Value), cancellationToken);
+
+			GetPromptViewModel? prompt = await _mediator.Send(new GetPromptQuery(id.Value), cancellationToken);
 			if (prompt == null)
 			{
 				return NotFound();
 			}
-			return View(new ViewPromptViewModel { Prompt = prompt, Reported = reported });
+
+			return View(new ViewPromptViewModel {Prompt = prompt, Reported = reported});
 		}
 
-		[HttpGet("[controller]/{id}")]
-		public IActionResult ViewOld(int? id)
-		{
-			return RedirectToActionPermanent("View", new { id });
-		}
+		[HttpGet("[controller]/{id:int}")]
+		public IActionResult ViewOld(int? id) => RedirectToActionPermanent("View", new {id});
 
 		private async Task<List<WorldInfoJson>> ReadWorldInfoFromFileAsync(IFormFile file)
 		{
-			var serializerOptions = new JsonSerializerOptions
-			{
-				PropertyNameCaseInsensitive = true
-			};
+			var serializerOptions = new JsonSerializerOptions {PropertyNameCaseInsensitive = true};
 			try
 			{
-				using var stream = file.OpenReadStream();
+				await using Stream stream = file.OpenReadStream();
 				using var reader = new StreamReader(stream);
 				var fileString = await reader.ReadToEndAsync();
-				return JsonSerializer.Deserialize<List<WorldInfoJson>>(fileString, serializerOptions) ?? new List<WorldInfoJson>();
+				return JsonSerializer.Deserialize<List<WorldInfoJson>>(fileString, serializerOptions) ??
+				       new List<WorldInfoJson>();
 			}
 			catch (Exception e)
 			{

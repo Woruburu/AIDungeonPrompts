@@ -17,8 +17,8 @@ namespace AIDungeonPrompts.Web.Extensions
 		{
 			var claims = new List<Claim>
 			{
-				new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-				new Claim(ClaimValueConstants.CanEdit, RoleHelper.CanEdit(user.Role).ToString())
+				new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+				new(ClaimValueConstants.CanEdit, RoleHelper.CanEdit(user.Role).ToString())
 			};
 
 			var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -28,7 +28,7 @@ namespace AIDungeonPrompts.Web.Extensions
 				AllowRefresh = true,
 				ExpiresUtc = DateTimeOffset.UtcNow.AddDays(365),
 				IsPersistent = true,
-				IssuedUtc = DateTimeOffset.UtcNow,
+				IssuedUtc = DateTimeOffset.UtcNow
 			};
 
 			return context.SignInAsync(

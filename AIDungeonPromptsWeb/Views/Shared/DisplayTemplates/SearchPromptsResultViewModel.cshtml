@@ -1,6 +1,6 @@
 @model AIDungeonPrompts.Application.Queries.SearchPrompts.SearchPromptsResultViewModel
 @{
-	var diplayEdit = ViewData["DisplayEdit"] != null ? (bool)ViewData["DisplayEdit"] : false;
+	var diplayEdit = ViewData["DisplayEdit"] != null ? (bool) ViewData["DisplayEdit"] : false;
 	var showEdit = false;
 	if (userService.TryGetCurrentUser(out var user) && user!.Id == Model.OwnerId)
 	{
@@ -16,7 +16,9 @@
 				</a>
 				@if (Model.IsDraft)
 				{
-					<h4><span class="badge badge-warning">Draft</span></h4>
+					<h4>
+						<span class="badge badge-warning">Draft</span>
+					</h4>
 				}
 			</div>
 			<p tabindex="-1" class="tags truncated">
@@ -40,8 +42,9 @@
 		</div>
 		<div class="card-footer bg-transparent d-flex border-0">
 			<div class="ml-auto"></div>
-			@if (diplayEdit && showEdit) { 
-				<a asp-action="Edit" asp-controller="Prompts" asp-route-id="@Model.Id" class="align-self-end btn btn-outline-success mr-2 px-3">Edit</a>			
+			@if (diplayEdit && showEdit)
+			{
+				<a asp-action="Edit" asp-controller="Prompts" asp-route-id="@Model.Id" class="align-self-end btn btn-outline-success mr-2 px-3">Edit</a>
 			}
 			<a asp-controller="Prompts" asp-action="View" asp-route-id="@Model.Id" class="align-self-end btn btn-primary">View Prompt</a>
 		</div>

@@ -14,11 +14,13 @@ namespace AIDungeonPrompts.Application.Queries.GetReports
 		{
 		}
 
-		public GetReportUnauthorizedUserException(string message, Exception innerException) : base(message, innerException)
+		public GetReportUnauthorizedUserException(string message, Exception innerException) : base(message,
+			innerException)
 		{
 		}
 
-		protected GetReportUnauthorizedUserException(SerializationInfo info, StreamingContext context) : base(info, context)
+		protected GetReportUnauthorizedUserException(SerializationInfo info, StreamingContext context) : base(info,
+			context)
 		{
 		}
 	}

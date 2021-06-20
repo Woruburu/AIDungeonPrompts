@@ -1,6 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using AIDungeonPrompts.Application.Abstractions.DbContexts;
+using AIDungeonPrompts.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,11 +28,12 @@ namespace AIDungeonPrompts.Application.Commands.ClearReport
 
 		public async Task<Unit> Handle(ClearReportCommand request, CancellationToken cancellationToken = default)
 		{
-			var report = await _dbContext.Reports.FirstOrDefaultAsync(report => report.Id == request.Id);
+			Report? report = await _dbContext.Reports.FirstOrDefaultAsync(report => report.Id == request.Id);
 			if (report == null)
 			{
 				throw new ClearReportNotFoundException();
 			}
+
 			report.Cleared = true;
 			_dbContext.Reports.Update(report);
 			await _dbContext.SaveChangesAsync(cancellationToken);

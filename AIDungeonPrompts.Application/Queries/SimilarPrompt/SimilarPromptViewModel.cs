@@ -6,6 +6,7 @@ namespace AIDungeonPrompts.Application.Queries.SimilarPrompt
 	{
 		public bool Matched { get; set; }
 
-		public List<SimilarPromptDetailsViewModel> SimilarPrompts { get; set; } = new List<SimilarPromptDetailsViewModel>();
+		public List<SimilarPromptDetailsViewModel> SimilarPrompts { get; set; } =
+			new List<SimilarPromptDetailsViewModel>();
 	}
 }

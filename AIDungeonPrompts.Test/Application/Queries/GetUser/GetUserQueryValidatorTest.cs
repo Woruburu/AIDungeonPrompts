@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using AIDungeonPrompts.Application.Queries.GetUser;
+using FluentValidation.Results;
 using Xunit;
 
 namespace AIDungeonPrompts.Test.Application.Queries.GetUser
@@ -20,7 +21,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.GetUser
 			var query = new GetUserQuery(default);
 
 			//act
-			var actual = await _validator.ValidateAsync(query);
+			ValidationResult? actual = await _validator.ValidateAsync(query);
 
 			//assert
 			Assert.False(actual.IsValid);
@@ -37,7 +38,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.GetUser
 			var query = new GetUserQuery(id);
 
 			//act + assert
-			var actual = await _validator.ValidateAsync(query);
+			ValidationResult? actual = await _validator.ValidateAsync(query);
 
 			//assert
 			Assert.True(actual.IsValid);

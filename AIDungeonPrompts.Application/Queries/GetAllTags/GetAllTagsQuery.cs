@@ -21,20 +21,17 @@ namespace AIDungeonPrompts.Application.Queries.GetAllTags
 			_dbContext = dbContext;
 		}
 
-		public Task<List<GetTagViewModel>> Handle(GetAllTagsQuery request, CancellationToken cancellationToken = default)
-		{
-			return _dbContext.PromptTags
+		public Task<List<GetTagViewModel>> Handle(GetAllTagsQuery request,
+			CancellationToken cancellationToken = default) =>
+			_dbContext.PromptTags
 				.Include(promptTag => promptTag.Tag)
 				.Where(promptTag => !promptTag.Prompt!.IsDraft)
 				.AsNoTracking()
 				.Select(promptTag => new GetTagViewModel
 				{
-					Id = promptTag.Tag!.Id,
-					Name = promptTag.Tag.Name,
-					Count = promptTag.Tag.PromptTags.Count
+					Id = promptTag.Tag!.Id, Name = promptTag.Tag.Name, Count = promptTag.Tag.PromptTags.Count
 				})
 				.Distinct()
 				.ToListAsync(cancellationToken);
-		}
 	}
 }

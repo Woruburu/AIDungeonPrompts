@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using AIDungeonPrompts.Application.Queries.GetPrompt;
+using FluentValidation.Results;
 using Xunit;
 
 namespace AIDungeonPrompts.Test.Application.Queries.GetPrompt
@@ -20,7 +21,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.GetPrompt
 			var query = new GetPromptQuery(default);
 
 			//act
-			var actual = await _validator.ValidateAsync(query);
+			ValidationResult? actual = await _validator.ValidateAsync(query);
 
 			//assert
 			Assert.False(actual.IsValid);
@@ -37,7 +38,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.GetPrompt
 			var query = new GetPromptQuery(id);
 
 			//act + assert
-			var actual = await _validator.ValidateAsync(query);
+			ValidationResult? actual = await _validator.ValidateAsync(query);
 
 			//assert
 			Assert.True(actual.IsValid);

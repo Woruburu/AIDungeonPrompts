@@ -1,6 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using AIDungeonPrompts.Application.Abstractions.DbContexts;
+using AIDungeonPrompts.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,7 +28,7 @@ namespace AIDungeonPrompts.Application.Queries.GetUser
 
 		public async Task<GetUserViewModel?> Handle(GetUserQuery request, CancellationToken cancellationToken = default)
 		{
-			var user = await _dbContext
+			User? user = await _dbContext
 				.Users
 				.AsNoTracking()
 				.FirstOrDefaultAsync(user => user.Id == request.Id, cancellationToken);

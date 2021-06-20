@@ -1,5 +1,6 @@
 using System;
 using System.Data;
+using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
 using AIDungeonPrompts.Application.Abstractions.DbContexts;
@@ -30,26 +31,29 @@ namespace AIDungeonPrompts.Web.HostedServices
 			try
 			{
 				_logger.LogInformation($"{nameof(DatabaseMigrationHostedService)} Running Job");
-				using var services = _serviceScopeFactory.CreateScope();
+				using IServiceScope? services = _serviceScopeFactory.CreateScope();
 
-				using var dbContext = services.ServiceProvider.GetRequiredService<IAIDungeonPromptsDbContext>();
+				using IAIDungeonPromptsDbContext? dbContext =
+					services.ServiceProvider.GetRequiredService<IAIDungeonPromptsDbContext>();
 				if (dbContext == null)
 				{
-					_logger.LogWarning($"{nameof(DatabaseMigrationHostedService)}: Could not get DbContext from services");
+					_logger.LogWarning(
+						$"{nameof(DatabaseMigrationHostedService)}: Could not get DbContext from services");
 					return;
 				}
 
-				using var backupContext = services.ServiceProvider.GetRequiredService<BackupDbContext>();
+				using BackupDbContext? backupContext = services.ServiceProvider.GetRequiredService<BackupDbContext>();
 				if (backupContext == null)
 				{
-					_logger.LogWarning($"{nameof(DatabaseMigrationHostedService)}: Could not get Backup DbContext from services");
+					_logger.LogWarning(
+						$"{nameof(DatabaseMigrationHostedService)}: Could not get Backup DbContext from services");
 					return;
 				}
 
 				await dbContext.Database.MigrateAsync(cancellationToken);
 
-				await using var command = backupContext.Database.GetDbConnection().CreateCommand();
-				command.CommandText = $"PRAGMA journal_mode = NONE;";
+				await using DbCommand? command = backupContext.Database.GetDbConnection().CreateCommand();
+				command.CommandText = "PRAGMA journal_mode = NONE;";
 				command.CommandType = CommandType.Text;
 				await backupContext.Database.OpenConnectionAsync(cancellationToken);
 				await command.ExecuteNonQueryAsync(cancellationToken);
@@ -64,9 +68,6 @@ namespace AIDungeonPrompts.Web.HostedServices
 			}
 		}
 
-		public Task StopAsync(CancellationToken cancellationToken)
-		{
-			return Task.CompletedTask;
-		}
+		public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 	}
 }

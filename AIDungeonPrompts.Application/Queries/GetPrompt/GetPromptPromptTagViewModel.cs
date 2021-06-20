@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-
-namespace AIDungeonPrompts.Application.Queries.GetPrompt
+﻿namespace AIDungeonPrompts.Application.Queries.GetPrompt
 {
 	public class GetPromptPromptTagViewModel
 	{

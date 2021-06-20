@@ -24,6 +24,7 @@ namespace AIDungeonPrompts.Test.Collections.Database
 					dbEntityEntry.State = EntityState.Detached;
 				}
 			}
+
 			DbContext.AuditPrompts.RemoveRange(DbContext.AuditPrompts);
 			DbContext.WorldInfos.RemoveRange(DbContext.WorldInfos);
 			DbContext.Reports.RemoveRange(DbContext.Reports);

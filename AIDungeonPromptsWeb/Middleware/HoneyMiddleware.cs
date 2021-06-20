@@ -1,8 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Primitives;
 
 namespace AIDungeonPrompts.Web.Middleware
 {
@@ -24,7 +26,8 @@ namespace AIDungeonPrompts.Web.Middleware
 				await _next(context);
 				return;
 			}
-			var result = context
+
+			KeyValuePair<string, StringValues> result = context
 				.Request
 				.Form
 				.FirstOrDefault(e => string.Equals("honey", e.Key, StringComparison.OrdinalIgnoreCase));

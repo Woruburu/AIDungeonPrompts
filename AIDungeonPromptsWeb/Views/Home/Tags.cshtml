@@ -2,7 +2,7 @@
 @{ ViewData["Title"] = "All Tags"; }
 
 @{
-	var chars = new List<char> { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' };
+	var chars = new List<char> {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
 	var groups = Model
 		.Where(e => !string.IsNullOrWhiteSpace(e.Name))
 		.GroupBy(e => chars.Contains(char.ToLower(e.Name[0])) ? char.ToUpper(e.Name[0]) : '#')
@@ -31,7 +31,7 @@
 				<div class="card-header">
 					<h3 id="@(char.ToLower(group.Key))" class="text-center card-title">@group.Key</h3>
 				</div>
-				<div class="card-body">			
+				<div class="card-body">
 					<div class="row">
 						@foreach (var tag in group.OrderBy(e => e.Name))
 						{
@@ -47,7 +47,7 @@
 									</a>
 								</div>
 							</div>
-						}	
+						}
 					</div>
 				</div>
 			</div>

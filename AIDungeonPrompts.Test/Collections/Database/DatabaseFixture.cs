@@ -12,7 +12,8 @@ namespace AIDungeonPrompts.Test.Collections.Database
 
 		public DatabaseFixture()
 		{
-			var dbContextOptions = new DbContextOptionsBuilder<AIDungeonPromptsDbContext>()
+			DbContextOptions<AIDungeonPromptsDbContext>? dbContextOptions =
+				new DbContextOptionsBuilder<AIDungeonPromptsDbContext>()
 					.UseNpgsql(ConfigHelper.GetConfiguration().GetConnectionString(DatabaseConnectionName))
 					.Options;
 			DbContext = new AIDungeonPromptsDbContext(dbContextOptions);

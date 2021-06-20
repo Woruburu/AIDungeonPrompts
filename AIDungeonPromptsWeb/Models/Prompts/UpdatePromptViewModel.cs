@@ -8,10 +8,10 @@ namespace AIDungeonPrompts.Web.Models.Prompts
 {
 	public class UpdatePromptViewModel
 	{
-		public List<GetPromptChild> Children { get; set; } = new List<GetPromptChild>();
-		public UpdatePromptCommand Command { get; set; } = new UpdatePromptCommand();
+		public List<GetPromptChild> Children { get; set; } = new();
+		public UpdatePromptCommand Command { get; set; } = new();
 		public IFormFile? ScriptZip { get; set; }
-		public SimilarPromptViewModel SimilarPromptQuery { get; set; } = new SimilarPromptViewModel();
+		public SimilarPromptViewModel SimilarPromptQuery { get; set; } = new();
 		public IFormFile? WorldInfoFile { get; set; }
 	}
 }

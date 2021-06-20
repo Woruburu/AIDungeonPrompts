@@ -29,11 +29,7 @@ namespace AIDungeonPrompts.Application.Commands.CreateTransientUser
 				username = Guid.NewGuid().ToString();
 			}
 
-			var user = new User
-			{
-				Username = username,
-				DateCreated = DateTime.UtcNow
-			};
+			var user = new User {Username = username, DateCreated = DateTime.UtcNow};
 
 			_dbContext.Users.Add(user);
 			await _dbContext.SaveChangesAsync(cancellationToken);
@@ -41,9 +37,7 @@ namespace AIDungeonPrompts.Application.Commands.CreateTransientUser
 			return user.Id;
 		}
 
-		private async Task<bool> UsernameIsUnique(string username)
-		{
-			return (await _dbContext.Users.FirstOrDefaultAsync(user => user.Username == username)) == null;
-		}
+		private async Task<bool> UsernameIsUnique(string username) =>
+			await _dbContext.Users.FirstOrDefaultAsync(user => user.Username == username) == null;
 	}
 }

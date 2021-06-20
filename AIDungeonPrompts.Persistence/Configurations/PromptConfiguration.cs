@@ -12,6 +12,7 @@ namespace AIDungeonPrompts.Persistence.Configurations
 			builder.Property(e => e.Title).IsRequired();
 			builder.Property(e => e.PromptContent).IsRequired();
 			builder.Property(e => e.ScriptZip).HasMaxLength(5000000);
+			builder.Property(e => e.NovelAiScenario).HasColumnType("jsonb");
 			builder.HasIndex(e => e.Title);
 			builder.HasOne(e => e.Owner)
 				.WithMany(e => e.Prompts)

@@ -1,5 +1,4 @@
-﻿using System.Net;
-using AIDungeonPrompts.Domain.Entities.Abstract;
+﻿using AIDungeonPrompts.Domain.Entities.Abstract;
 
 namespace AIDungeonPrompts.Domain.Entities
 {

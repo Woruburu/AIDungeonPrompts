@@ -22,7 +22,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.GetUser
 			var query = new GetUserQuery(int.MaxValue);
 
 			//act
-			var actual = await _handler.Handle(query);
+			GetUserViewModel? actual = await _handler.Handle(query);
 
 			//assert
 			Assert.Null(actual);
@@ -33,15 +33,15 @@ namespace AIDungeonPrompts.Test.Application.Queries.GetUser
 		{
 			//arrange
 			DbContext.Users.AddRange(
-				new User { Username = "1" },
-				new User { Username = "2" },
-				new User { Username = "3" },
-				new User { Username = "4" });
+				new User {Username = "1"},
+				new User {Username = "2"},
+				new User {Username = "3"},
+				new User {Username = "4"});
 			await DbContext.SaveChangesAsync();
 			var query = new GetUserQuery(int.MaxValue);
 
 			//act
-			var actual = await _handler.Handle(query);
+			GetUserViewModel? actual = await _handler.Handle(query);
 
 			//assert
 			Assert.Null(actual);
@@ -61,13 +61,13 @@ namespace AIDungeonPrompts.Test.Application.Queries.GetUser
 			{
 				if (i == index)
 				{
-					user = new User() { Username = expectedUsername };
+					user = new User {Username = expectedUsername};
 					DbContext.Users.Add(user);
 					await DbContext.SaveChangesAsync();
 				}
 				else
 				{
-					DbContext.Users.Add(new User() { Username = i.ToString() });
+					DbContext.Users.Add(new User {Username = i.ToString()});
 				}
 			}
 
@@ -75,7 +75,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.GetUser
 			var query = new GetUserQuery(user.Id);
 
 			//act
-			var actual = await _handler.Handle(query);
+			GetUserViewModel? actual = await _handler.Handle(query);
 
 			//assert
 			Assert.Equal(user.Id, actual.Id);

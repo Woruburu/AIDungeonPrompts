@@ -48,7 +48,7 @@ namespace AIDungeonPrompts.Persistence
 							auditEntity.Entry = entry.ToJson();
 							auditEntity.AuditScopeId = (Guid)evt.CustomFields[AuditScopeId];
 						})
-					).IgnoreMatchedProperties(true)
+					).IgnoreMatchedProperties()
 				);
 
 			return services;

@@ -1,13 +1,14 @@
+@using System.Text.RegularExpressions
 @model AIDungeonPrompts.Application.Commands.UpdatePrompt.UpdatePromptCommandWorldInfo
 @{
-	var disabled = ViewData["Disabled"] != null ? (bool)ViewData["Disabled"] : false;
+	var disabled = ViewData["Disabled"] != null ? (bool) ViewData["Disabled"] : false;
 	var prefix = ViewData.TemplateInfo.HtmlFieldPrefix;
-	var m = System.Text.RegularExpressions.Regex.Match(prefix, @".+\[(\d+)\]");
+	var m = Regex.Match(prefix, @".+\[(\d+)\]");
 	var index = m.Groups[1].Value;
 	var fragment = int.TryParse(index, out var intIndex)
 		? intIndex < 1
 			? "world-info-card-0"
-			: $"world-info-card-{(intIndex - 1)}"
+			: $"world-info-card-{intIndex - 1}"
 		: "upload-wi";
 }
 
@@ -15,7 +16,7 @@
 	<div class="card-body">
 		<div class="form-group">
 			@Html.LabelFor(m => m.Keys)
-			<input readonly="@disabled" asp-for="Keys" class="form-control" />
+			<input readonly="@disabled" asp-for="Keys" class="form-control"/>
 			<span asp-validation-for="Keys"></span>
 		</div>
 		<div class="form-group">

@@ -14,11 +14,13 @@ namespace AIDungeonPrompts.Application.Commands.DeletePrompt
 		{
 		}
 
-		public DeletePromptDoesNotExistException(string message, Exception innerException) : base(message, innerException)
+		public DeletePromptDoesNotExistException(string message, Exception innerException) : base(message,
+			innerException)
 		{
 		}
 
-		protected DeletePromptDoesNotExistException(SerializationInfo info, StreamingContext context) : base(info, context)
+		protected DeletePromptDoesNotExistException(SerializationInfo info, StreamingContext context) : base(info,
+			context)
 		{
 		}
 	}

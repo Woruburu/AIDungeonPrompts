@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	ignoreSettingsOnClick(uploadWiButton);
 	for (let i = 0; i < wiDeleteBtns.length; i++) {
 		ignoreSettingsOnClick(wiDeleteBtns[i]);
-	};
+	}
 });
 
 function ignoreSettingsOnClick(element) {

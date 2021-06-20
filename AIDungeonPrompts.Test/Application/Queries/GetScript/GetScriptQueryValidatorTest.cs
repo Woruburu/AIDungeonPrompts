@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using AIDungeonPrompts.Application.Queries.GetScript;
+using FluentValidation.Results;
 using Xunit;
 
 namespace AIDungeonPrompts.Test.Application.Queries.GetScript
@@ -20,7 +21,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.GetScript
 			var query = new GetScriptQuery(default);
 
 			//act
-			var results = await _validator.ValidateAsync(query);
+			ValidationResult? results = await _validator.ValidateAsync(query);
 
 			//assert
 			Assert.False(results.IsValid);
@@ -37,7 +38,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.GetScript
 			var query = new GetScriptQuery(id);
 
 			//act
-			var results = await _validator.ValidateAsync(query);
+			ValidationResult? results = await _validator.ValidateAsync(query);
 
 			//assert
 			Assert.True(results.IsValid);

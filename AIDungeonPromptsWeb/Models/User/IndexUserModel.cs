@@ -8,7 +8,7 @@ namespace AIDungeonPrompts.Web.Models.User
 		public bool IsTransient { get; set; }
 		public int? Page { get; set; }
 		public string Username { get; set; } = string.Empty;
-		public SearchPromptsViewModel UserPrompts { get; set; } = new SearchPromptsViewModel();
+		public SearchPromptsViewModel UserPrompts { get; set; } = new();
 		public RoleEnum UserRoles { get; set; }
 	}
 }

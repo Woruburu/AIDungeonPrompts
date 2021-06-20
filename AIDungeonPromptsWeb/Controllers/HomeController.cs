@@ -25,32 +25,31 @@ namespace AIDungeonPrompts.Web.Controllers
 			_mediator = mediator;
 		}
 
-		[HttpPost("/color-scheme"), ValidateAntiForgeryToken]
+		[HttpPost("/color-scheme")]
+		[ValidateAntiForgeryToken]
 		public IActionResult ColorScheme(ColorSchemePreference? preference, string? returnUrl)
 		{
 			if (preference != null)
 			{
 				var cookieOptions = new CookieOptions
 				{
-					HttpOnly = true,
-					IsEssential = true,
-					MaxAge = new TimeSpan(365, 0, 0, 0),
-					Secure = true,
+					HttpOnly = true, IsEssential = true, MaxAge = new TimeSpan(365, 0, 0, 0), Secure = true
 				};
-				Response.Cookies.Append(CookieValueConstants.DarkModePreference, ((int)preference).ToString(), cookieOptions);
+				Response.Cookies.Append(CookieValueConstants.DarkModePreference, ((int)preference).ToString(),
+					cookieOptions);
 			}
+
 			if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
 			{
 				return Redirect(returnUrl);
 			}
+
 			return RedirectToAction("Index");
 		}
 
 		[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-		public IActionResult Error()
-		{
-			return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-		}
+		public IActionResult Error() =>
+			View(new ErrorViewModel {RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier});
 
 		public async Task<IActionResult> Index(SearchRequestParameters request, CancellationToken cancellationToken)
 		{
@@ -59,23 +58,25 @@ namespace AIDungeonPrompts.Web.Controllers
 			{
 				tags = request.Tags.Split(',').Select(t => t.Trim()).ToList();
 			}
-			var nsfwIndex = tags.FindIndex(t => string.Equals("nsfw", t, System.StringComparison.OrdinalIgnoreCase));
+
+			var nsfwIndex = tags.FindIndex(t => string.Equals("nsfw", t, StringComparison.OrdinalIgnoreCase));
 			if (nsfwIndex > -1)
 			{
 				request.NsfwSetting = SearchNsfw.NsfwOnly;
 				tags.RemoveAt(nsfwIndex);
 			}
 
-			var result = await _mediator.Send(new SearchPromptsQuery
-			{
-				Page = request.Page ?? 1,
-				Reverse = request.Reverse,
-				Search = request.Query ?? string.Empty,
-				Tags = tags,
-				Nsfw = request.NsfwSetting,
-				TagJoin = request.TagJoin,
-				TagsFuzzy = !request.MatchExact
-			}, cancellationToken);
+			SearchPromptsViewModel? result = await _mediator.Send(
+				new SearchPromptsQuery
+				{
+					Page = request.Page ?? 1,
+					Reverse = request.Reverse,
+					Search = request.Query ?? string.Empty,
+					Tags = tags,
+					Nsfw = request.NsfwSetting,
+					TagJoin = request.TagJoin,
+					TagsFuzzy = !request.MatchExact
+				}, cancellationToken);
 
 			return View(new SearchViewModel
 			{
@@ -92,25 +93,23 @@ namespace AIDungeonPrompts.Web.Controllers
 
 		public async Task<IActionResult> Random()
 		{
-			var result = await _mediator.Send(new RandomPromptQuery());
+			RandomPromptViewModel? result = await _mediator.Send(new RandomPromptQuery());
 			if (result == null)
 			{
 				return RedirectToAction("Index");
 			}
-			return RedirectToAction("View", "Prompts", new { result.Id });
+
+			return RedirectToAction("View", "Prompts", new {result.Id});
 		}
 
 		[HttpGet("/tags")]
 		public async Task<IActionResult> Tags()
 		{
-			var result = await _mediator.Send(new GetAllTagsQuery());
+			List<GetTagViewModel>? result = await _mediator.Send(new GetAllTagsQuery());
 			return View(result);
 		}
 
 		[HttpGet("/whats-new")]
-		public IActionResult WhatsNew()
-		{
-			return View();
-		}
+		public IActionResult WhatsNew() => View();
 	}
 }

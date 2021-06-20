@@ -14,11 +14,13 @@ namespace AIDungeonPrompts.Application.Commands.DeletePrompt
 		{
 		}
 
-		public DeletePromptUserUnauthorizedException(string message, Exception innerException) : base(message, innerException)
+		public DeletePromptUserUnauthorizedException(string message, Exception innerException) : base(message,
+			innerException)
 		{
 		}
 
-		protected DeletePromptUserUnauthorizedException(SerializationInfo info, StreamingContext context) : base(info, context)
+		protected DeletePromptUserUnauthorizedException(SerializationInfo info, StreamingContext context) : base(info,
+			context)
 		{
 		}
 	}

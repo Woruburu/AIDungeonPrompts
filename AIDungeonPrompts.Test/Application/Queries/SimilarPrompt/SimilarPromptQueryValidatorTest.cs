@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using AIDungeonPrompts.Application.Queries.SimilarPrompt;
+using FluentValidation.Results;
 using Xunit;
 
 namespace AIDungeonPrompts.Test.Application.Queries.SimilarPrompt
@@ -23,7 +24,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.SimilarPrompt
 			var query = new SimilarPromptQuery(title);
 
 			//act
-			var actual = await _validator.ValidateAsync(query);
+			ValidationResult? actual = await _validator.ValidateAsync(query);
 
 			//assert
 			Assert.False(actual.IsValid);
@@ -36,10 +37,10 @@ namespace AIDungeonPrompts.Test.Application.Queries.SimilarPrompt
 		public async Task ValidateAsync_ReturnsNotValid_WhenTitleIsEmpty_AndIdIsDefault(string title)
 		{
 			//arrange
-			var query = new SimilarPromptQuery(title, default);
+			var query = new SimilarPromptQuery(title);
 
 			//act
-			var actual = await _validator.ValidateAsync(query);
+			ValidationResult? actual = await _validator.ValidateAsync(query);
 
 			//assert
 			Assert.False(actual.IsValid);
@@ -52,7 +53,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.SimilarPrompt
 			var query = new SimilarPromptQuery("Value");
 
 			//act
-			var actual = await _validator.ValidateAsync(query);
+			ValidationResult? actual = await _validator.ValidateAsync(query);
 
 			//assert
 			Assert.True(actual.IsValid);
@@ -68,7 +69,7 @@ namespace AIDungeonPrompts.Test.Application.Queries.SimilarPrompt
 			var query = new SimilarPromptQuery("Value", id);
 
 			//act
-			var actual = await _validator.ValidateAsync(query);
+			ValidationResult? actual = await _validator.ValidateAsync(query);
 
 			//assert
 			Assert.True(actual.IsValid);

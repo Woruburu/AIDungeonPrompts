@@ -4,7 +4,7 @@ namespace AIDungeonPrompts.Web.Models.Prompts
 {
 	public class ViewPromptViewModel
 	{
-		public GetPromptViewModel Prompt { get; set; } = new GetPromptViewModel();
+		public GetPromptViewModel Prompt { get; set; } = new();
 		public bool? Reported { get; set; }
 	}
 }

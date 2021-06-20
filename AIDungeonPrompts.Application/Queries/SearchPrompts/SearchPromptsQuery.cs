@@ -68,9 +68,10 @@ namespace AIDungeonPrompts.Application.Queries.SearchPrompts
 			_dbContext = dbContext;
 		}
 
-		public async Task<SearchPromptsViewModel> Handle(SearchPromptsQuery request, CancellationToken cancellationToken = default)
+		public async Task<SearchPromptsViewModel> Handle(SearchPromptsQuery request,
+			CancellationToken cancellationToken = default)
 		{
-			var query = _dbContext.Prompts
+			IQueryable<Prompt>? query = _dbContext.Prompts
 				.Include(prompt => prompt.PromptTags)
 				.ThenInclude(prompt => prompt.Tag)
 				.Where(e => e.ParentId == null)
@@ -91,7 +92,9 @@ namespace AIDungeonPrompts.Application.Queries.SearchPrompts
 
 			if (!string.IsNullOrWhiteSpace(request.Search))
 			{
-				query = query.Where(e => EF.Functions.ILike(e.Title, $"%{NpgsqlHelper.SafeIlike(request.Search)}%", NpgsqlHelper.EscapeChar));
+				query = query.Where(e =>
+					EF.Functions.ILike(e.Title, $"%{NpgsqlHelper.SafeIlike(request.Search)}%",
+						NpgsqlHelper.EscapeChar));
 			}
 
 			if (request.Tags.Count > 0)
@@ -112,6 +115,7 @@ namespace AIDungeonPrompts.Application.Queries.SearchPrompts
 								)
 							);
 						}
+
 						break;
 
 					case TagJoin.None:
@@ -123,6 +127,7 @@ namespace AIDungeonPrompts.Application.Queries.SearchPrompts
 								)
 							);
 						}
+
 						break;
 
 					case TagJoin.Or:
@@ -148,7 +153,7 @@ namespace AIDungeonPrompts.Application.Queries.SearchPrompts
 				query = query.Where(e => !e.IsDraft);
 			}
 
-			var results = await query
+			List<SearchPromptsResultViewModel>? results = await query
 				.Skip(skip)
 				.Take(request.PageSize)
 				.AsNoTracking()
@@ -165,8 +170,7 @@ namespace AIDungeonPrompts.Application.Queries.SearchPrompts
 					SearchPromptsTagViewModel = prompt.PromptTags
 						.Select(promptTag => new SearchPromptsTagViewModel
 						{
-							Id = promptTag.Tag!.Id,
-							Name = promptTag!.Tag!.Name
+							Id = promptTag.Tag!.Id, Name = promptTag!.Tag!.Name
 						})
 				})
 				.ToListAsync(cancellationToken);
@@ -175,11 +179,7 @@ namespace AIDungeonPrompts.Application.Queries.SearchPrompts
 			var pageAdd = count % request.PageSize == 0 ? 0 : 1;
 			var totalPages = count < 1 ? 1 : (count / request.PageSize) + pageAdd;
 
-			return new SearchPromptsViewModel
-			{
-				Results = results,
-				TotalPages = totalPages
-			};
+			return new SearchPromptsViewModel {Results = results, TotalPages = totalPages};
 		}
 
 		private static IQueryable<Prompt> OrderBy(SearchPromptsQuery request, IQueryable<Prompt> query)
@@ -191,6 +191,7 @@ namespace AIDungeonPrompts.Application.Queries.SearchPrompts
 					{
 						return query.OrderByDescending(prompt => prompt.PublishDate ?? prompt.DateCreated);
 					}
+
 					return query.OrderBy(prompt => prompt.PublishDate ?? prompt.DateCreated);
 
 				case SearchOrderBy.Views:
@@ -198,6 +199,7 @@ namespace AIDungeonPrompts.Application.Queries.SearchPrompts
 					{
 						return query.OrderByDescending(prompt => prompt.Views);
 					}
+
 					return query.OrderBy(prompt => prompt.Views);
 
 				case SearchOrderBy.Rating:
@@ -205,8 +207,10 @@ namespace AIDungeonPrompts.Application.Queries.SearchPrompts
 					{
 						return query.OrderByDescending(prompt => prompt.Upvote);
 					}
+
 					return query.OrderBy(prompt => prompt.Upvote);
 			}
+
 			return query;
 		}
 	}

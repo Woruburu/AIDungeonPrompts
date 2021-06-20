@@ -7,6 +7,10 @@ namespace AIDungeonPrompts.Web.Models.NovelAi
 {
 	public class NovelAiScenario
 	{
+		public NovelAiScenario()
+		{
+		}
+
 		public NovelAiScenario(GetPromptViewModel prompt)
 		{
 			Title = prompt.Title;
@@ -29,7 +33,8 @@ namespace AIDungeonPrompts.Web.Models.NovelAi
 						InsertionType = "token",
 						InsertionPosition = 0
 					}
-				}, new()
+				},
+				new()
 				{
 					Text = prompt.AuthorsNote?.Trim() ?? string.Empty,
 					Config = new NovelAiContextConfig

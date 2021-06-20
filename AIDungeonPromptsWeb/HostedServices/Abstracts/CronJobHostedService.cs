@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Cronos;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Timer = System.Timers.Timer;
 
 namespace AIDungeonPrompts.Web.HostedServices.Abstracts
 {
@@ -13,9 +14,10 @@ namespace AIDungeonPrompts.Web.HostedServices.Abstracts
 		private readonly ILogger<CronJobHostedService> _logger;
 		private readonly TimeZoneInfo _timeZoneInfo;
 		private bool _disposedValue;
-		private System.Timers.Timer? _timer;
+		private Timer? _timer;
 
-		protected CronJobHostedService(string cronExpression, TimeZoneInfo timeZoneInfo, ILogger<CronJobHostedService> logger)
+		protected CronJobHostedService(string cronExpression, TimeZoneInfo timeZoneInfo,
+			ILogger<CronJobHostedService> logger)
 		{
 			_expression = CronExpression.Parse(cronExpression);
 			_timeZoneInfo = timeZoneInfo;
@@ -24,22 +26,19 @@ namespace AIDungeonPrompts.Web.HostedServices.Abstracts
 
 		public void Dispose()
 		{
-			Dispose(disposing: true);
+			Dispose(true);
 			GC.SuppressFinalize(this);
 		}
 
-		public abstract Task DoWork(CancellationToken cancellationToken);
-
-		public virtual Task StartAsync(CancellationToken cancellationToken)
-		{
-			return ScheduleJob(cancellationToken);
-		}
+		public virtual Task StartAsync(CancellationToken cancellationToken) => ScheduleJob(cancellationToken);
 
 		public virtual Task StopAsync(CancellationToken cancellationToken)
 		{
 			_timer?.Stop();
 			return Task.CompletedTask;
 		}
+
+		public abstract Task DoWork(CancellationToken cancellationToken);
 
 		protected virtual void Dispose(bool disposing)
 		{
@@ -49,24 +48,26 @@ namespace AIDungeonPrompts.Web.HostedServices.Abstracts
 				{
 					_timer?.Dispose();
 				}
+
 				_disposedValue = true;
 			}
 		}
 
 		protected virtual async Task ScheduleJob(CancellationToken cancellationToken)
 		{
-			var next = _expression.GetNextOccurrence(DateTimeOffset.Now, _timeZoneInfo);
+			DateTimeOffset? next = _expression.GetNextOccurrence(DateTimeOffset.Now, _timeZoneInfo);
 			if (next.HasValue)
 			{
-				var delay = next.Value - DateTimeOffset.Now;
-				if (delay.TotalMilliseconds <= 0)   // prevent non-positive values from being passed into Timer
+				TimeSpan delay = next.Value - DateTimeOffset.Now;
+				if (delay.TotalMilliseconds <= 0) // prevent non-positive values from being passed into Timer
 				{
 					await ScheduleJob(cancellationToken);
 				}
-				_timer = new System.Timers.Timer(delay.TotalMilliseconds);
+
+				_timer = new Timer(delay.TotalMilliseconds);
 				_timer.Elapsed += async (sender, args) =>
 				{
-					_timer.Dispose();  // reset and dispose timer
+					_timer.Dispose(); // reset and dispose timer
 					_timer = null;
 
 					if (!cancellationToken.IsCancellationRequested)
@@ -83,11 +84,12 @@ namespace AIDungeonPrompts.Web.HostedServices.Abstracts
 
 					if (!cancellationToken.IsCancellationRequested)
 					{
-						await ScheduleJob(cancellationToken);    // reschedule next
+						await ScheduleJob(cancellationToken); // reschedule next
 					}
 				};
 				_timer.Start();
 			}
+
 			await Task.CompletedTask;
 		}
 	}

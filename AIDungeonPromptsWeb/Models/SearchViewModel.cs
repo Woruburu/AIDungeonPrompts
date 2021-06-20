@@ -23,6 +23,6 @@ namespace AIDungeonPrompts.Web.Models
 
 	public class SearchViewModel : SearchRequestParameters
 	{
-		public SearchPromptsViewModel SearchResult { get; set; } = new SearchPromptsViewModel();
+		public SearchPromptsViewModel SearchResult { get; set; } = new();
 	}
 }

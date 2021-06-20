@@ -2,6 +2,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Threading.Tasks;
 using AIDungeonPrompts.Application.Commands.UpdatePrompt;
+using FluentValidation.Results;
 using Xunit;
 
 namespace AIDungeonPrompts.Test.Application.Commands.UpdatePrompt
@@ -22,17 +23,18 @@ namespace AIDungeonPrompts.Test.Application.Commands.UpdatePrompt
 			var command = new UpdatePromptCommand();
 
 			//act
-			var actual = await _validator.ValidateAsync(command);
+			ValidationResult? actual = await _validator.ValidateAsync(command);
 
 			//assert
 			Assert.False(actual.IsValid);
 		}
 
 		[Fact]
-		public async Task ValidateAsync_ReturnsIsValidFalse_WhenScriptZipHasValidZipHeaders_AndFiveFiles_ButNotTheExpectedFilenames()
+		public async Task
+			ValidateAsync_ReturnsIsValidFalse_WhenScriptZipHasValidZipHeaders_AndFiveFiles_ButNotTheExpectedFilenames()
 		{
 			//arrange
-			var command = CreateValidCommand();
+			UpdatePromptCommand? command = CreateValidCommand();
 			using (var memoryStream = new MemoryStream())
 			{
 				using (var zip = new ZipArchive(memoryStream, ZipArchiveMode.Create))
@@ -42,11 +44,12 @@ namespace AIDungeonPrompts.Test.Application.Commands.UpdatePrompt
 						zip.CreateEntry(i.ToString());
 					}
 				}
+
 				command.ScriptZip = memoryStream.ToArray();
 			}
 
 			//act
-			var actual = await _validator.ValidateAsync(command);
+			ValidationResult? actual = await _validator.ValidateAsync(command);
 
 			//assert
 			Assert.False(actual.IsValid);
@@ -56,11 +59,11 @@ namespace AIDungeonPrompts.Test.Application.Commands.UpdatePrompt
 		public async Task ValidateAsync_ReturnsIsValidFalse_WhenScriptZipHasValidZipHeaders_AndNoOtherContents()
 		{
 			//arrange
-			var command = CreateValidCommand();
-			command.ScriptZip = new byte[] { 0x50, 0x4b, 0x03, 0x04 };
+			UpdatePromptCommand? command = CreateValidCommand();
+			command.ScriptZip = new byte[] {0x50, 0x4b, 0x03, 0x04};
 
 			//act
-			var actual = await _validator.ValidateAsync(command);
+			ValidationResult? actual = await _validator.ValidateAsync(command);
 
 			//assert
 			Assert.False(actual.IsValid);
@@ -70,11 +73,11 @@ namespace AIDungeonPrompts.Test.Application.Commands.UpdatePrompt
 		public async Task ValidateAsync_ReturnsIsValidFalse_WhenScriptZipIsAnEmptyArray()
 		{
 			//arrange
-			var command = CreateValidCommand();
+			UpdatePromptCommand? command = CreateValidCommand();
 			command.ScriptZip = new byte[] { };
 
 			//act
-			var actual = await _validator.ValidateAsync(command);
+			ValidationResult? actual = await _validator.ValidateAsync(command);
 
 			//assert
 			Assert.False(actual.IsValid);
@@ -84,16 +87,13 @@ namespace AIDungeonPrompts.Test.Application.Commands.UpdatePrompt
 		public async Task ValidateAsync_ReturnsIsValidFalse_WhenTitleContentAndTagsAreFilledIn_AndAParentIdIsNull()
 		{
 			//arrange
-			var command = new UpdatePromptCommand()
+			var command = new UpdatePromptCommand
 			{
-				Id = 1,
-				Title = "NewTitle",
-				PromptContent = "PromptContent",
-				ParentId = null
+				Id = 1, Title = "NewTitle", PromptContent = "PromptContent", ParentId = null
 			};
 
 			//act
-			var actual = await _validator.ValidateAsync(command);
+			ValidationResult? actual = await _validator.ValidateAsync(command);
 
 			//assert
 			Assert.False(actual.IsValid);
@@ -103,8 +103,8 @@ namespace AIDungeonPrompts.Test.Application.Commands.UpdatePrompt
 		public async Task ValidateAsync_ReturnsIsValidTrue_WhenScriptZipHasValidZipHeaders_AndTheExpectedFilenames()
 		{
 			//arrange
-			var command = CreateValidCommand();
-			var expectedFiles = new string[] { "contextModifier.js", "inputModifier.js", "outputModifier.js", "shared.js" };
+			UpdatePromptCommand? command = CreateValidCommand();
+			var expectedFiles = new[] {"contextModifier.js", "inputModifier.js", "outputModifier.js", "shared.js"};
 			using (var memoryStream = new MemoryStream())
 			{
 				using (var zip = new ZipArchive(memoryStream, ZipArchiveMode.Create))
@@ -114,11 +114,12 @@ namespace AIDungeonPrompts.Test.Application.Commands.UpdatePrompt
 						zip.CreateEntry(file);
 					}
 				}
+
 				command.ScriptZip = memoryStream.ToArray();
 			}
 
 			//act
-			var actual = await _validator.ValidateAsync(command);
+			ValidationResult? actual = await _validator.ValidateAsync(command);
 
 			//assert
 			Assert.True(actual.IsValid);
@@ -128,16 +129,13 @@ namespace AIDungeonPrompts.Test.Application.Commands.UpdatePrompt
 		public async Task ValidateAsync_ReturnsIsValidTrue_WhenTitleContentAndTagsAreFilledIn()
 		{
 			//arrange
-			var command = new UpdatePromptCommand()
+			var command = new UpdatePromptCommand
 			{
-				Id = 1,
-				Title = "NewTitle",
-				PromptContent = "PromptContent",
-				PromptTags = "tag"
+				Id = 1, Title = "NewTitle", PromptContent = "PromptContent", PromptTags = "tag"
 			};
 
 			//act
-			var actual = await _validator.ValidateAsync(command);
+			ValidationResult? actual = await _validator.ValidateAsync(command);
 
 			//assert
 			Assert.True(actual.IsValid);
@@ -147,30 +145,19 @@ namespace AIDungeonPrompts.Test.Application.Commands.UpdatePrompt
 		public async Task ValidateAsync_ReturnsIsValidTrue_WhenTitleContentAndTagsAreFilledIn_AndHasAParentId()
 		{
 			//arrange
-			var command = new UpdatePromptCommand()
+			var command = new UpdatePromptCommand
 			{
-				Id = 1,
-				Title = "NewTitle",
-				PromptContent = "PromptContent",
-				ParentId = 2
+				Id = 1, Title = "NewTitle", PromptContent = "PromptContent", ParentId = 2
 			};
 
 			//act
-			var actual = await _validator.ValidateAsync(command);
+			ValidationResult? actual = await _validator.ValidateAsync(command);
 
 			//assert
 			Assert.True(actual.IsValid);
 		}
 
-		private UpdatePromptCommand CreateValidCommand()
-		{
-			return new UpdatePromptCommand()
-			{
-				Id = 1,
-				Title = "NewTitle",
-				PromptContent = "PromptContent",
-				PromptTags = "PromptTags"
-			};
-		}
+		private UpdatePromptCommand CreateValidCommand() =>
+			new() {Id = 1, Title = "NewTitle", PromptContent = "PromptContent", PromptTags = "PromptTags"};
 	}
 }
