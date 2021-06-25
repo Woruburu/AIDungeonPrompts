@@ -53,20 +53,54 @@ namespace AIDungeonPrompts.Web.Controllers
 			GetServerFlagViewModel? flag = await _mediator.Send(new GetServerFlagQuery(ServerFlagName.CreateDisabled),
 				cancellationToken);
 			var command = new CreatePromptCommand {ParentId = parentId};
-			if (TempData["NovelAiScenario"] is string tempData)
+			return View(new CreatePromptViewModel
 			{
+				Command = command, CreationDisabled = flag.Enabled, DisabledMessage = flag.Message
+			});
+		}
+		private async Task<string> ReadNovelAiScenario(IFormFile scenarioFile)
+		{
+			try
+			{
+				await using Stream stream = scenarioFile.OpenReadStream();
+				using var reader = new StreamReader(stream);
+				return await reader.ReadToEndAsync();
+			}
+			catch (Exception e)
+			{
+				_logger.LogError(e, "Could not read Novel AI scenario");
+				return string.Empty;
+			}
+		}
+
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> Create(bool addWi, bool confirm, bool saveDraft, bool addChild, bool uploadWi,
+			int? wiDelete, CreatePromptViewModel model, IFormFile? scenarioFile, CancellationToken cancellationToken)
+		{
+			GetServerFlagViewModel? flag = await _mediator.Send(new GetServerFlagQuery(ServerFlagName.CreateDisabled),
+				cancellationToken);
+			if (flag.Enabled)
+			{
+				return RedirectToAction("Create");
+			}
+
+			if (scenarioFile != null)
+			{
+				var novelAiScenarioString = await ReadNovelAiScenario(scenarioFile);
 				try
 				{
-					NovelAiScenario? novelAiScenario = JsonSerializer.Deserialize<NovelAiScenario>(tempData);
+					NovelAiScenario? novelAiScenario =
+						JsonSerializer.Deserialize<NovelAiScenario>(novelAiScenarioString);
 					if (novelAiScenario != null)
 					{
-						command.Description = novelAiScenario.Description;
-						command.Memory = novelAiScenario.Context.FirstOrDefault()?.Text;
-						command.AuthorsNote = novelAiScenario.Context.ElementAtOrDefault(1)?.Text;
-						command.Title = novelAiScenario.Title;
-						command.PromptContent = novelAiScenario.Prompt;
-						command.PromptTags = string.Join(", ", novelAiScenario.Tags);
-						command.WorldInfos = novelAiScenario.Lorebook.LorebookEntries.Count > 0
+						model.Command.Description = novelAiScenario.Description;
+						model.Command.Memory = novelAiScenario.Context.FirstOrDefault()?.Text;
+						model.Command.AuthorsNote = novelAiScenario.Context.ElementAtOrDefault(1)?.Text;
+						model.Command.Title = novelAiScenario.Title;
+						model.Command.PromptContent = novelAiScenario.Prompt;
+						model.Command.PromptTags = string.Join(", ", novelAiScenario.Tags);
+						model.Command.WorldInfos = novelAiScenario.Lorebook.LorebookEntries.Count > 0
 							? novelAiScenario.Lorebook.LorebookEntries.Select(lore =>
 									new CreatePromptCommandWorldInfo
 									{
@@ -74,54 +108,16 @@ namespace AIDungeonPrompts.Web.Controllers
 									})
 								.ToList()
 							: new List<CreatePromptCommandWorldInfo> {new()};
-						command.NovelAiScenario = tempData;
+						model.Command.NovelAiScenario = novelAiScenarioString;
 					}
 				}
 				catch (JsonException e)
 				{
 					_logger.LogError(e, "Could not decode NAI Json data");
 				}
-			}
 
-			return View(new CreatePromptViewModel
-			{
-				Command = command, CreationDisabled = flag.Enabled, DisabledMessage = flag.Message
-			});
-		}
-
-		[HttpPost("[controller]/create/upload-nai")]
-		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> UploadNai(int? parentId, IFormFile scenarioFile)
-		{
-			await ReadNovelAiScenario(scenarioFile);
-			return RedirectToAction("Create", new {parentId});
-		}
-
-		private async Task ReadNovelAiScenario(IFormFile scenarioFile)
-		{
-			try
-			{
-				await using Stream stream = scenarioFile.OpenReadStream();
-				using var reader = new StreamReader(stream);
-				var scenarioString = await reader.ReadToEndAsync();
-				TempData["NovelAiScenario"] = scenarioString;
-			}
-			catch (Exception e)
-			{
-				_logger.LogError(e, "Could not read Novel AI scenario");
-			}
-		}
-
-		[HttpPost]
-		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> Create(bool addWi, bool confirm, bool saveDraft, bool addChild, bool uploadWi,
-			int? wiDelete, CreatePromptViewModel model, CancellationToken cancellationToken)
-		{
-			GetServerFlagViewModel? flag = await _mediator.Send(new GetServerFlagQuery(ServerFlagName.CreateDisabled),
-				cancellationToken);
-			if (flag.Enabled)
-			{
-				return RedirectToAction("Create");
+				ModelState.Clear();
+				return View(model);
 			}
 
 			if (uploadWi)
@@ -313,7 +309,7 @@ namespace AIDungeonPrompts.Web.Controllers
 		[ValidateAntiForgeryToken]
 		[Authorize]
 		public async Task<IActionResult> Edit(int? id, bool addWi, bool saveDraft, bool confirm, bool addChild,
-			bool uploadWi, int? wiDelete, UpdatePromptViewModel model, CancellationToken cancellationToken)
+			bool uploadWi, int? wiDelete, UpdatePromptViewModel model, IFormFile? scenarioFile, CancellationToken cancellationToken)
 		{
 			model.Command.SaveDraft = saveDraft;
 
@@ -332,6 +328,42 @@ namespace AIDungeonPrompts.Web.Controllers
 			model.Children = prompt.Children.ToList();
 			model.Command.Id = prompt.Id;
 			model.Command.OwnerId = prompt.OwnerId;
+
+			if (scenarioFile != null)
+			{
+				var novelAiScenarioString = await ReadNovelAiScenario(scenarioFile);
+				try
+				{
+					NovelAiScenario? novelAiScenario = JsonSerializer.Deserialize<NovelAiScenario>(novelAiScenarioString);
+
+
+					if (novelAiScenario != null)
+					{
+						model.Command.Description = novelAiScenario.Description;
+						model.Command.Memory = novelAiScenario.Context.FirstOrDefault()?.Text;
+						model.Command.AuthorsNote = novelAiScenario.Context.ElementAtOrDefault(1)?.Text;
+						model.Command.Title = novelAiScenario.Title;
+						model.Command.PromptContent = novelAiScenario.Prompt;
+						model.Command.PromptTags = string.Join(", ", novelAiScenario.Tags);
+						model.Command.WorldInfos = novelAiScenario.Lorebook.LorebookEntries.Any()
+							? novelAiScenario.Lorebook.LorebookEntries.Select(lore =>
+									new UpdatePromptCommandWorldInfo
+									{
+										Keys = string.Join(", ", lore.Keys), Entry = lore.Text
+									})
+								.ToList()
+							: new List<UpdatePromptCommandWorldInfo> {new()};
+						model.Command.NovelAiScenario = novelAiScenarioString;
+					}
+				}
+				catch (JsonException e)
+				{
+					_logger.LogError(e, "Could not decode NAI Json data");
+				}
+
+				ModelState.Clear();
+				return View(model);
+			}
 
 			if (uploadWi)
 			{
@@ -424,25 +456,16 @@ namespace AIDungeonPrompts.Web.Controllers
 			return RedirectToAction("View", new {id});
 		}
 
-		[HttpPost("[controller]/{id:int}/edit/upload-nai")]
-		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> EditUploadNai(int id, IFormFile scenarioFile,
-			CancellationToken cancellationToken)
-		{
-			await ReadNovelAiScenario(scenarioFile);
-			return RedirectToAction("Edit", new {id});
-		}
-
 		[HttpGet("/{id:int}/edit")]
 		[Authorize]
-		public async Task<IActionResult> Edit(int? id, CancellationToken cancellationToken)
+		public async Task<IActionResult> Edit(int id, CancellationToken cancellationToken)
 		{
-			if (id == null || !_currentUserService.TryGetCurrentUser(out GetUserViewModel? user))
+			if (!_currentUserService.TryGetCurrentUser(out GetUserViewModel? user))
 			{
 				return NotFound();
 			}
 
-			GetPromptViewModel? prompt = await _mediator.Send(new GetPromptQuery(id.Value), cancellationToken);
+			GetPromptViewModel? prompt = await _mediator.Send(new GetPromptQuery(id), cancellationToken);
 
 			if (prompt == null || (prompt.OwnerId != user!.Id && !RoleHelper.CanEdit(user.Role)))
 			{
@@ -468,36 +491,6 @@ namespace AIDungeonPrompts.Web.Controllers
 						.Select(wi => new UpdatePromptCommandWorldInfo {Entry = wi.Entry, Keys = wi.Keys}).ToList()
 					: new List<UpdatePromptCommandWorldInfo> {new()}
 			};
-
-			if (TempData["NovelAiScenario"] is string tempData)
-			{
-				try
-				{
-					NovelAiScenario? novelAiScenario = JsonSerializer.Deserialize<NovelAiScenario>(tempData);
-					if (novelAiScenario != null)
-					{
-						command.Description = novelAiScenario.Description;
-						command.Memory = novelAiScenario.Context.FirstOrDefault()?.Text;
-						command.AuthorsNote = novelAiScenario.Context.ElementAtOrDefault(1)?.Text;
-						command.Title = novelAiScenario.Title;
-						command.PromptContent = novelAiScenario.Prompt;
-						command.PromptTags = string.Join(", ", novelAiScenario.Tags);
-						command.WorldInfos = novelAiScenario.Lorebook.LorebookEntries.Any()
-							? novelAiScenario.Lorebook.LorebookEntries.Select(lore =>
-									new UpdatePromptCommandWorldInfo
-									{
-										Keys = string.Join(", ", lore.Keys), Entry = lore.Text
-									})
-								.ToList()
-							: new List<UpdatePromptCommandWorldInfo> {new()};
-						command.NovelAiScenario = tempData;
-					}
-				}
-				catch (JsonException e)
-				{
-					_logger.LogError(e, "Could not decode NAI Json data");
-				}
-			}
 
 			return View(new UpdatePromptViewModel {Children = prompt.Children.ToList(), Command = command});
 		}
