@@ -18,7 +18,7 @@
 <br />
 @if (canEditField)
 {
-	<form asp-controller="Prompts" asp-action="EditUploadNai" asp-route-id="@Model.Command.Id" enctype="multipart/form-data" method="post">
+	<form asp-route-id="@Model.Command.Id" enctype="multipart/form-data" method="post">
 		<div class="d-flex mb-3">
 			<div>
 				<input type="file" name="scenarioFile"/>

@@ -21,7 +21,7 @@
 }
 else
 {
-	<form asp-controller="Prompts" asp-action="UploadNai" asp-route-parentId="@Model.Command.ParentId" enctype="multipart/form-data" method="post">
+	<form enctype="multipart/form-data" method="post">
 		<div class="d-flex mb-3">
 			<div>
 				<input type="file" name="scenarioFile"/>
