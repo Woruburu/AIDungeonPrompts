@@ -12,13 +12,13 @@ namespace AIDungeonPrompts.Web.HostedServices
 {
 	public class DatabaseBackupCronJob : CronJobHostedService
 	{
-		private readonly ILogger<ApplicationLogCleanerCronJob> _logger;
+		private readonly ILogger<DatabaseBackupCronJob> _logger;
 		private readonly IServiceScopeFactory _serviceScopeFactory;
 
 		public DatabaseBackupCronJob(
-			ILogger<ApplicationLogCleanerCronJob> logger,
+			ILogger<DatabaseBackupCronJob> logger,
 			IServiceScopeFactory serviceScopeFactory
-		) : base("0 * * * *", TimeZoneInfo.Local, logger)
+		) : base("0 0 * * *", TimeZoneInfo.Local, logger)
 		{
 			_logger = logger;
 			_serviceScopeFactory = serviceScopeFactory;
