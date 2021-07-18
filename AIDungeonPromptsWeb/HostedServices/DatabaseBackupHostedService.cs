@@ -1,4 +1,3 @@
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 using AIDungeonPrompts.Application.Abstractions.DbContexts;
@@ -24,9 +23,9 @@ namespace AIDungeonPrompts.Web.HostedServices
 			_serviceScopeFactory = serviceScopeFactory;
 		}
 
-		public async Task StartAsync(CancellationToken cancellationToken)
+		public Task StartAsync(CancellationToken cancellationToken)
 		{
-			try
+			Task.Run(async () =>
 			{
 				_logger.LogInformation($"{nameof(DatabaseBackupHostedService)} Running Job");
 				using IServiceScope? services = _serviceScopeFactory.CreateScope();
@@ -50,11 +49,8 @@ namespace AIDungeonPrompts.Web.HostedServices
 				await DatabaseBackup.BackupDatabase(dbContext, backupContext, cancellationToken);
 
 				_logger.LogInformation($"{nameof(DatabaseBackupHostedService)} Job Complete");
-			}
-			catch (Exception e)
-			{
-				_logger.LogError(e, $"{nameof(DatabaseBackupHostedService)} Job Failed");
-			}
+			});
+			return Task.CompletedTask;
 		}
 
 		public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
