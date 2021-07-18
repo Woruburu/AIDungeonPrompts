@@ -24,29 +24,34 @@ namespace AIDungeonPrompts.Web.HostedServices
 			_serviceScopeFactory = serviceScopeFactory;
 		}
 
-		public override async Task DoWork(CancellationToken cancellationToken)
+		public override Task DoWork(CancellationToken cancellationToken)
 		{
-			_logger.LogInformation($"{nameof(DatabaseBackupCronJob)} Running Job");
-			using IServiceScope? services = _serviceScopeFactory.CreateScope();
-
-			using IAIDungeonPromptsDbContext? dbContext =
-				services.ServiceProvider.GetRequiredService<IAIDungeonPromptsDbContext>();
-			if (dbContext == null)
+			Task.Run(async () =>
 			{
-				_logger.LogWarning($"{nameof(DatabaseBackupCronJob)}: Could not get DbContext from services");
-				return;
-			}
+				_logger.LogInformation($"{nameof(DatabaseBackupCronJob)} Running Job");
+				using IServiceScope? services = _serviceScopeFactory.CreateScope();
 
-			using BackupDbContext? backupContext = services.ServiceProvider.GetRequiredService<BackupDbContext>();
-			if (backupContext == null)
-			{
-				_logger.LogWarning($"{nameof(DatabaseBackupCronJob)}: Could not get Backup DbContext from services");
-				return;
-			}
+				using IAIDungeonPromptsDbContext? dbContext =
+					services.ServiceProvider.GetRequiredService<IAIDungeonPromptsDbContext>();
+				if (dbContext == null)
+				{
+					_logger.LogWarning($"{nameof(DatabaseBackupCronJob)}: Could not get DbContext from services");
+					return;
+				}
 
-			await DatabaseBackup.BackupDatabase(dbContext, backupContext, cancellationToken);
+				using BackupDbContext? backupContext = services.ServiceProvider.GetRequiredService<BackupDbContext>();
+				if (backupContext == null)
+				{
+					_logger.LogWarning(
+						$"{nameof(DatabaseBackupCronJob)}: Could not get Backup DbContext from services");
+					return;
+				}
 
-			_logger.LogInformation($"{nameof(DatabaseBackupCronJob)} Job Complete");
+				await DatabaseBackup.BackupDatabase(dbContext, backupContext, cancellationToken);
+
+				_logger.LogInformation($"{nameof(DatabaseBackupCronJob)} Job Complete");
+			});
+			return Task.CompletedTask;
 		}
 	}
 }
