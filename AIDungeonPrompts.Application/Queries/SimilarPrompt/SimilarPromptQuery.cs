@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using AIDungeonPrompts.Application.Abstractions.DbContexts;
 using AIDungeonPrompts.Application.Helpers;
-using AIDungeonPrompts.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,7 +18,7 @@ namespace AIDungeonPrompts.Application.Queries.SimilarPrompt
 		}
 
 		public int? CurrentId { get; set; }
-		public string Title { get; set; } = string.Empty;
+		public string Title { get; set; }
 	}
 
 	public class SimilarPromptQueryHandler : IRequestHandler<SimilarPromptQuery, SimilarPromptViewModel>
@@ -34,7 +33,7 @@ namespace AIDungeonPrompts.Application.Queries.SimilarPrompt
 		public async Task<SimilarPromptViewModel> Handle(SimilarPromptQuery request,
 			CancellationToken cancellationToken = default)
 		{
-			IQueryable<Prompt>? query = _dbContext
+			var query = _dbContext
 				.Prompts
 				.Where(prompt => !prompt.IsDraft)
 				.Where(prompt =>
@@ -47,15 +46,15 @@ namespace AIDungeonPrompts.Application.Queries.SimilarPrompt
 
 			List<SimilarPromptDetailsViewModel>? similarPrompts = await query
 				.AsNoTracking()
-				.Select(prompt => new SimilarPromptDetailsViewModel {Id = prompt.Id, Title = prompt.Title})
-				.ToListAsync();
+				.Select(prompt => new SimilarPromptDetailsViewModel { Id = prompt.Id, Title = prompt.Title })
+				.ToListAsync(cancellationToken);
 
 			if (similarPrompts.Count < 1)
 			{
-				return new SimilarPromptViewModel {Matched = false};
+				return new SimilarPromptViewModel { Matched = false };
 			}
 
-			return new SimilarPromptViewModel {Matched = true, SimilarPrompts = similarPrompts};
+			return new SimilarPromptViewModel { Matched = true, SimilarPrompts = similarPrompts };
 		}
 	}
 }

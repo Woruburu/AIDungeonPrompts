@@ -12,6 +12,12 @@
 		NAI Import Successful!
 	</div>
 }
+@if (!string.IsNullOrWhiteSpace(Model.Command.HoloAiScenario))
+{
+	<div class="alert alert-success">
+		HoloAI Import Successful!
+	</div>
+}
 <h2>Create Prompt</h2>
 <br/>
 @if (Model.CreationDisabled)
@@ -21,17 +27,39 @@
 }
 else
 {
-	<form enctype="multipart/form-data" method="post">
-		@Html.HiddenFor(e => e.Command.ParentId)
-		<div class="d-flex mb-3">
-			<div>
-				<input type="file" name="scenarioFile"/>
-			</div>
-			<div class="ml-auto">
-				<button class="btn btn-outline-light">Upload NAI Scenario</button>
-			</div>
+	<div class="card mb-4 p-2">
+	<details>
+		<summary>Import Options</summary>
+		<div class="mt-2 p-2">
+			<h4>NAI</h4>
+			<form enctype="multipart/form-data" method="post">
+				@Html.HiddenFor(e => e.Command.ParentId)
+				<div class="d-flex mb-3">
+					<div>
+						<input type="file" name="scenarioFile"/>
+					</div>
+					<div class="ml-auto">
+						<button class="btn btn-outline-light">Upload NAI Scenario</button>
+					</div>
+				</div>
+			</form>
 		</div>
-	</form>
+		<div class="mt-2 p-2">
+			<h4>Holo</h4>
+			<form enctype="multipart/form-data" method="post">
+				@Html.HiddenFor(e => e.Command.ParentId)
+				<div class="d-flex mb-3">
+					<div>
+						<input type="file" name="holoFile"/>
+					</div>
+					<div class="ml-auto">
+						<button class="btn btn-outline-light">Upload HoloAI Scenario</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</details>
+	</div>
 	<form asp-controller="Prompts" asp-action="Create" enctype="multipart/form-data" method="post">
 		<input class="honey" name="Honey"/>
 		@Html.HiddenFor(e => e.Command.ParentId)

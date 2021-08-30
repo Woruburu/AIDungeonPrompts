@@ -48,5 +48,6 @@ namespace AIDungeonPrompts.Application.Queries.GetPrompt
 			new List<GetPromptWorldInfoViewModel>();
 
 		public string? NovelAiScenario { get; set; }
+		public string? HoloAiScenario { get; set; }
 	}
 }

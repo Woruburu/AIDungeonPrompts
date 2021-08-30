@@ -34,8 +34,8 @@ namespace AIDungeonPrompts.Test.Application.Commands.UpdatePrompt
 			ValidateAsync_ReturnsIsValidFalse_WhenScriptZipHasValidZipHeaders_AndFiveFiles_ButNotTheExpectedFilenames()
 		{
 			//arrange
-			UpdatePromptCommand? command = CreateValidCommand();
-			using (var memoryStream = new MemoryStream())
+			var command = CreateValidCommand();
+			await using (var memoryStream = new MemoryStream())
 			{
 				using (var zip = new ZipArchive(memoryStream, ZipArchiveMode.Create))
 				{
@@ -59,8 +59,8 @@ namespace AIDungeonPrompts.Test.Application.Commands.UpdatePrompt
 		public async Task ValidateAsync_ReturnsIsValidFalse_WhenScriptZipHasValidZipHeaders_AndNoOtherContents()
 		{
 			//arrange
-			UpdatePromptCommand? command = CreateValidCommand();
-			command.ScriptZip = new byte[] {0x50, 0x4b, 0x03, 0x04};
+			var command = CreateValidCommand();
+			command.ScriptZip = new byte[] { 0x50, 0x4b, 0x03, 0x04 };
 
 			//act
 			ValidationResult? actual = await _validator.ValidateAsync(command);
@@ -73,8 +73,8 @@ namespace AIDungeonPrompts.Test.Application.Commands.UpdatePrompt
 		public async Task ValidateAsync_ReturnsIsValidFalse_WhenScriptZipIsAnEmptyArray()
 		{
 			//arrange
-			UpdatePromptCommand? command = CreateValidCommand();
-			command.ScriptZip = new byte[] { };
+			var command = CreateValidCommand();
+			command.ScriptZip = System.Array.Empty<byte>();
 
 			//act
 			ValidationResult? actual = await _validator.ValidateAsync(command);
@@ -103,9 +103,9 @@ namespace AIDungeonPrompts.Test.Application.Commands.UpdatePrompt
 		public async Task ValidateAsync_ReturnsIsValidTrue_WhenScriptZipHasValidZipHeaders_AndTheExpectedFilenames()
 		{
 			//arrange
-			UpdatePromptCommand? command = CreateValidCommand();
-			var expectedFiles = new[] {"contextModifier.js", "inputModifier.js", "outputModifier.js", "shared.js"};
-			using (var memoryStream = new MemoryStream())
+			var command = CreateValidCommand();
+			var expectedFiles = new[] { "contextModifier.js", "inputModifier.js", "outputModifier.js", "shared.js" };
+			await using (var memoryStream = new MemoryStream())
 			{
 				using (var zip = new ZipArchive(memoryStream, ZipArchiveMode.Create))
 				{
@@ -158,6 +158,6 @@ namespace AIDungeonPrompts.Test.Application.Commands.UpdatePrompt
 		}
 
 		private UpdatePromptCommand CreateValidCommand() =>
-			new() {Id = 1, Title = "NewTitle", PromptContent = "PromptContent", PromptTags = "PromptTags"};
+			new() { Id = 1, Title = "NewTitle", PromptContent = "PromptContent", PromptTags = "PromptTags" };
 	}
 }

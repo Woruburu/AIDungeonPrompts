@@ -50,6 +50,8 @@ namespace AIDungeonPrompts.Application.Commands.CreatePrompt
 		{
 			new CreatePromptCommandWorldInfo()
 		};
+
+		public string? HoloAiScenario { get; set; }
 	}
 
 	public class CreatePromptCommandHandler : IRequestHandler<CreatePromptCommand, int>
@@ -99,9 +101,8 @@ namespace AIDungeonPrompts.Application.Commands.CreatePrompt
 				PublishDate = isDraft ? null : (DateTime?)DateTime.UtcNow,
 				ParentId = request.ParentId,
 				ScriptZip = request.ScriptZip,
-				NovelAiScenario = string.IsNullOrWhiteSpace(request.NovelAiScenario)
-					? null
-					: request.NovelAiScenario
+				NovelAiScenario = string.IsNullOrWhiteSpace(request.NovelAiScenario) ? null : request.NovelAiScenario,
+				HoloAiScenario = string.IsNullOrWhiteSpace(request.HoloAiScenario) ? null :  request.HoloAiScenario
 			};
 
 			foreach (var worldInfo in request.WorldInfos)
@@ -120,7 +121,7 @@ namespace AIDungeonPrompts.Application.Commands.CreatePrompt
 				});
 			}
 
-			IEnumerable<string>? promptTags = request.PromptTags.Split(',').Select(p => p.Trim().ToLower()).Distinct();
+			var promptTags = request.PromptTags.Split(',').Select(p => p.Trim().ToLower()).Distinct();
 			foreach (var promptTag in promptTags)
 			{
 				if (string.IsNullOrWhiteSpace(promptTag))
@@ -135,7 +136,7 @@ namespace AIDungeonPrompts.Application.Commands.CreatePrompt
 				}
 
 				Tag? tag = await _dbContext.Tags.FirstOrDefaultAsync(e =>
-					EF.Functions.ILike(e.Name, NpgsqlHelper.SafeIlike(promptTag), NpgsqlHelper.EscapeChar));
+					EF.Functions.ILike(e.Name, NpgsqlHelper.SafeIlike(promptTag), NpgsqlHelper.EscapeChar), cancellationToken: cancellationToken);
 				if (tag == null)
 				{
 					prompt.PromptTags.Add(new PromptTag {Prompt = prompt, Tag = new Tag {Name = promptTag}});

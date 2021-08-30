@@ -20,7 +20,7 @@ namespace AIDungeonPrompts.Infrastructure.Identity
 
 		public async Task SetCurrentUser(int userId)
 		{
-			GetUserViewModel? user = await _mediator.Send(new GetUserQuery(userId));
+			var user = await _mediator.Send(new GetUserQuery(userId));
 			if (user == null)
 			{
 				_logger.LogWarning($"User with ID {userId} could not be found.");

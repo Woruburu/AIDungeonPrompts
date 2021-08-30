@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using AIDungeonPrompts.Application.Abstractions.DbContexts;
 using AIDungeonPrompts.Application.Helpers;
-using AIDungeonPrompts.Domain.Entities;
 using AIDungeonPrompts.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -30,7 +29,7 @@ namespace AIDungeonPrompts.Application.Queries.GetReports
 			_dbContext = dbContext;
 		}
 
-		public async Task<List<GetReportViewModel>> Handle(GetReportsQuery request,
+		public Task<List<GetReportViewModel>> Handle(GetReportsQuery request,
 			CancellationToken cancellationToken = default)
 		{
 			if (!RoleHelper.CanEdit(request.Role))
@@ -38,7 +37,7 @@ namespace AIDungeonPrompts.Application.Queries.GetReports
 				throw new GetReportUnauthorizedUserException();
 			}
 
-			IQueryable<Report>? query = _dbContext.Reports.Include(e => e.Prompt).AsQueryable();
+			var query = _dbContext.Reports.Include(e => e.Prompt).AsQueryable();
 			if (request.Role == RoleEnum.TagEdit)
 			{
 				query = query.Where(e =>
@@ -46,7 +45,7 @@ namespace AIDungeonPrompts.Application.Queries.GetReports
 					e.ReportReason == ReportReason.UntaggedNsfw);
 			}
 
-			return await query
+			return query
 				.AsNoTracking()
 				.Select(report => new GetReportViewModel
 				{
@@ -56,7 +55,7 @@ namespace AIDungeonPrompts.Application.Queries.GetReports
 					PromptTitle = report.Prompt!.Title,
 					ReportReason = report.ReportReason,
 					Cleared = report.Cleared
-				}).ToListAsync();
+				}).ToListAsync(cancellationToken);
 		}
 	}
 }

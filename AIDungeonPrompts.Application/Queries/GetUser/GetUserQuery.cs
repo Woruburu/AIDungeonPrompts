@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AIDungeonPrompts.Application.Queries.GetUser
 {
-	public class GetUserQuery : IRequest<GetUserViewModel>
+	public class GetUserQuery : IRequest<GetUserViewModel?>
 	{
 		public GetUserQuery(int id)
 		{

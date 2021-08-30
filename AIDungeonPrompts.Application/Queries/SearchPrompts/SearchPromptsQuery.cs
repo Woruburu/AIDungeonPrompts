@@ -170,7 +170,7 @@ namespace AIDungeonPrompts.Application.Queries.SearchPrompts
 					SearchPromptsTagViewModel = prompt.PromptTags
 						.Select(promptTag => new SearchPromptsTagViewModel
 						{
-							Id = promptTag.Tag!.Id, Name = promptTag!.Tag!.Name
+							Id = promptTag.Tag!.Id, Name = promptTag.Tag!.Name
 						})
 				})
 				.ToListAsync(cancellationToken);

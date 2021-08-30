@@ -2,7 +2,7 @@ using AIDungeonPrompts.Backup.Persistence.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace AIDungeonPrompts.Backup.Persistence.Configurations
+namespace AIDungeonPrompts.Backup.Persistence.DbContexts
 {
 	public class WorldInfoConfiguration : IEntityTypeConfiguration<BackupWorldInfo>
 	{

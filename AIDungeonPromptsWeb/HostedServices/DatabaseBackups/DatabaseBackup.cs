@@ -76,7 +76,9 @@ namespace AIDungeonPrompts.Web.HostedServices.DatabaseBackups
 				PublishDate = prompt.PublishDate,
 				Tags = string.Join(", ", prompt.PromptTags.Select(e => e.Tag!.Name)),
 				ScriptZip = prompt.ScriptZip,
-				WorldInfos = prompt.WorldInfos.Select(worldInfo => new BackupWorldInfo
+				NovelAiScenario = prompt.NovelAiScenario,
+				HoloAiScenario = prompt.HoloAiScenario,
+				WorldInfos = prompt.WorldInfos.ConvertAll(worldInfo => new BackupWorldInfo
 				{
 					DateCreated = worldInfo.DateCreated,
 					DateEdited = worldInfo.DateEdited,
@@ -84,7 +86,7 @@ namespace AIDungeonPrompts.Web.HostedServices.DatabaseBackups
 					CorrelationId = worldInfo.Id,
 					Keys = worldInfo.Keys,
 					PromptId = worldInfo.PromptId
-				}).ToList()
+				})
 			};
 	}
 }

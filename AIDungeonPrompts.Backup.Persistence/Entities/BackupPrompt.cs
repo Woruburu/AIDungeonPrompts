@@ -17,6 +17,8 @@ namespace AIDungeonPrompts.Backup.Persistence.Entities
 		public string Tags { get; set; } = string.Empty;
 		public string Title { get; set; } = string.Empty;
 		public byte[]? ScriptZip { get; set; }
+		public string? NovelAiScenario { get; set; }
+		public string? HoloAiScenario { get; set; }
 		public List<BackupWorldInfo> WorldInfos { get; set; } = new List<BackupWorldInfo>();
 	}
 }

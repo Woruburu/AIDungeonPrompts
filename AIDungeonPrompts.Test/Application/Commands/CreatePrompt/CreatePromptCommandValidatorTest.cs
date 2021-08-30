@@ -34,8 +34,8 @@ namespace AIDungeonPrompts.Test.Application.Commands.CreatePrompt
 			ValidateAsync_ReturnsIsValidFalse_WhenScriptZipHasValidZipHeaders_AndFiveFiles_ButNotTheExpectedFilenames()
 		{
 			//arrange
-			CreatePromptCommand? command = CreateValidCommand();
-			using (var memoryStream = new MemoryStream())
+			CreatePromptCommand command = CreateValidCommand();
+			await using (var memoryStream = new MemoryStream())
 			{
 				using (var zip = new ZipArchive(memoryStream, ZipArchiveMode.Create))
 				{
@@ -59,7 +59,7 @@ namespace AIDungeonPrompts.Test.Application.Commands.CreatePrompt
 		public async Task ValidateAsync_ReturnsIsValidFalse_WhenScriptZipHasValidZipHeaders_AndNoOtherContents()
 		{
 			//arrange
-			CreatePromptCommand? command = CreateValidCommand();
+			CreatePromptCommand command = CreateValidCommand();
 			command.ScriptZip = new byte[] {0x50, 0x4b, 0x03, 0x04};
 
 			//act
@@ -73,7 +73,7 @@ namespace AIDungeonPrompts.Test.Application.Commands.CreatePrompt
 		public async Task ValidateAsync_ReturnsIsValidFalse_WhenScriptZipIsAnEmptyArray()
 		{
 			//arrange
-			CreatePromptCommand? command = CreateValidCommand();
+			CreatePromptCommand command = CreateValidCommand();
 			command.ScriptZip = new byte[] { };
 
 			//act
@@ -104,9 +104,9 @@ namespace AIDungeonPrompts.Test.Application.Commands.CreatePrompt
 			ValidateAsync_ReturnsIsValidTrue_WhenScriptZipHasValidZipHeaders_AndFiveFiles_AndTheExpectedFilenames()
 		{
 			//arrange
-			CreatePromptCommand? command = CreateValidCommand();
+			CreatePromptCommand command = CreateValidCommand();
 			var expectedFiles = new[] {"contextModifier.js", "inputModifier.js", "outputModifier.js", "shared.js"};
-			using (var memoryStream = new MemoryStream())
+			await using (var memoryStream = new MemoryStream())
 			{
 				using (var zip = new ZipArchive(memoryStream, ZipArchiveMode.Create))
 				{
@@ -131,9 +131,9 @@ namespace AIDungeonPrompts.Test.Application.Commands.CreatePrompt
 		public async Task ValidateAsync_ReturnsIsValidTrue_WhenScriptZipHasValidZipHeaders_AndTheExpectedFilenames()
 		{
 			//arrange
-			CreatePromptCommand? command = CreateValidCommand();
+			CreatePromptCommand command = CreateValidCommand();
 			var expectedFiles = new[] {"contextModifier.js", "inputModifier.js", "outputModifier.js", "shared.js"};
-			using (var memoryStream = new MemoryStream())
+			await using (var memoryStream = new MemoryStream())
 			{
 				using (var zip = new ZipArchive(memoryStream, ZipArchiveMode.Create))
 				{
