@@ -71,8 +71,9 @@ namespace AIDungeonPrompts.Application.Queries.GetPrompt
 						Id = child.Id, Title = child.Title
 					}),
 					HasScriptFile = prompt.ScriptZip != null,
-					NovelAiScenario = prompt.NovelAiScenario
-				}).FirstOrDefaultAsync(prompt => prompt.Id == request.Id);
+					NovelAiScenario = prompt.NovelAiScenario,
+					HoloAiScenario = prompt.HoloAiScenario
+				}).FirstOrDefaultAsync(prompt => prompt.Id == request.Id, cancellationToken: cancellationToken);
 
 			if (prompt == null || (nonDrafts == null && (!_userService.TryGetCurrentUser(out GetUserViewModel? user) ||
 			                                             prompt.OwnerId != user!.Id)))

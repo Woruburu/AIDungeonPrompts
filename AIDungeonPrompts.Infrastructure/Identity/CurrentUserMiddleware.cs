@@ -33,7 +33,7 @@ namespace AIDungeonPrompts.Infrastructure.Identity
 				return;
 			}
 
-			await currentUserService.SetCurrentUser(int.Parse(userIdClaim.Value));
+			await currentUserService.SetCurrentUser(id);
 			await _next(context);
 		}
 	}

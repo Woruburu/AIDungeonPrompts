@@ -28,5 +28,6 @@ namespace AIDungeonPrompts.Domain.Entities
 		public List<WorldInfo> WorldInfos { get; set; } = new List<WorldInfo>();
 
 		public string? NovelAiScenario { get; set; }
+		public string? HoloAiScenario { get; set; }
 	}
 }

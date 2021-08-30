@@ -20,6 +20,7 @@ using AIDungeonPrompts.Application.Queries.SimilarPrompt;
 using AIDungeonPrompts.Domain.Entities;
 using AIDungeonPrompts.Domain.Enums;
 using AIDungeonPrompts.Web.Extensions;
+using AIDungeonPrompts.Web.Models.HoloAi;
 using AIDungeonPrompts.Web.Models.NovelAi;
 using AIDungeonPrompts.Web.Models.Prompts;
 using FluentValidation.AspNetCore;
@@ -58,7 +59,7 @@ namespace AIDungeonPrompts.Web.Controllers
 				Command = command, CreationDisabled = flag.Enabled, DisabledMessage = flag.Message
 			});
 		}
-		private async Task<string> ReadNovelAiScenario(IFormFile scenarioFile)
+		private async Task<string> ReadFormFile(IFormFile scenarioFile)
 		{
 			try
 			{
@@ -76,7 +77,7 @@ namespace AIDungeonPrompts.Web.Controllers
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> Create(bool addWi, bool confirm, bool saveDraft, bool addChild, bool uploadWi,
-			int? wiDelete, CreatePromptViewModel model, IFormFile? scenarioFile, CancellationToken cancellationToken)
+			int? wiDelete, CreatePromptViewModel model, IFormFile? scenarioFile, IFormFile? holoFile, CancellationToken cancellationToken)
 		{
 			GetServerFlagViewModel? flag = await _mediator.Send(new GetServerFlagQuery(ServerFlagName.CreateDisabled),
 				cancellationToken);
@@ -87,7 +88,7 @@ namespace AIDungeonPrompts.Web.Controllers
 
 			if (scenarioFile != null)
 			{
-				var novelAiScenarioString = await ReadNovelAiScenario(scenarioFile);
+				var novelAiScenarioString = await ReadFormFile(scenarioFile);
 				try
 				{
 					NovelAiScenario? novelAiScenario =
@@ -114,6 +115,39 @@ namespace AIDungeonPrompts.Web.Controllers
 				catch (JsonException e)
 				{
 					_logger.LogError(e, "Could not decode NAI Json data");
+				}
+
+				ModelState.Clear();
+				return View(model);
+			}
+
+			if (holoFile != null)
+			{
+				var holoScenarioString = await ReadFormFile(holoFile);
+				try
+				{
+					HoloAiScenario? holoScenario =
+						JsonSerializer.Deserialize<HoloAiScenario>(holoScenarioString, new JsonSerializerOptions(JsonSerializerDefaults.Web));
+					if (holoScenario != null)
+					{
+						model.Command.Description = null;
+						model.Command.Memory = holoScenario.Memory;
+						model.Command.AuthorsNote = holoScenario.AuthorsNote;
+						model.Command.Title = holoScenario.Title;
+						model.Command.PromptContent = string.Join('\n',
+							holoScenario.Content.Select(content =>
+								string.Join(' ', content.Children.Select(child => child.Text))));
+						model.Command.PromptTags = string.Join(", ", holoScenario.Tags);
+						model.Command.WorldInfos = holoScenario.WorldInfo.ConvertAll(e => new CreatePromptCommandWorldInfo
+						{
+							Entry = e.Value, Keys = string.Join(", ", e.Keys)
+						});
+						model.Command.HoloAiScenario = holoScenarioString;
+					}
+				}
+				catch (JsonException e)
+				{
+					_logger.LogError(e, "Could not decode Holo Json data");
 				}
 
 				ModelState.Clear();
@@ -301,15 +335,41 @@ namespace AIDungeonPrompts.Web.Controllers
 			}
 
 			Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(scenarioString));
-			const string? mimeType = "application/json";
+			const string? mimeType = "application/json;charset=UTF-8";
 			return new FileStreamResult(stream, mimeType) {FileDownloadName = $"{prompt.Title.Trim()}.scenario"};
+		}
+
+		[HttpGet("/{id:int}/holo-scenario")]
+		public async Task<IActionResult> HoloScenario(int? id, CancellationToken cancellationToken)
+		{
+			if (id == null || (int)id == default)
+			{
+				return NotFound();
+			}
+
+			GetPromptViewModel? prompt = await _mediator.Send(new GetPromptQuery(id.Value), cancellationToken);
+			if (prompt == null)
+			{
+				return NotFound();
+			}
+
+			var scenarioString = prompt.HoloAiScenario;
+			if (string.IsNullOrWhiteSpace(scenarioString))
+			{
+				var scenario = new HoloAiScenario(prompt);
+				scenarioString= JsonSerializer.Serialize(scenario, new JsonSerializerOptions(JsonSerializerDefaults.Web));
+			}
+
+			Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(scenarioString));
+			const string? mimeType = "application/json;charset=UTF-8";
+			return new FileStreamResult(stream, mimeType) {FileDownloadName = $"{prompt.Title.Trim()}.holo"};
 		}
 
 		[HttpPost("/{id:int}/edit")]
 		[ValidateAntiForgeryToken]
 		[Authorize]
 		public async Task<IActionResult> Edit(int? id, bool addWi, bool saveDraft, bool confirm, bool addChild,
-			bool uploadWi, int? wiDelete, UpdatePromptViewModel model, IFormFile? scenarioFile, CancellationToken cancellationToken)
+			bool uploadWi, int? wiDelete, UpdatePromptViewModel model, IFormFile? scenarioFile,IFormFile? holoFile, CancellationToken cancellationToken)
 		{
 			model.Command.SaveDraft = saveDraft;
 
@@ -331,7 +391,7 @@ namespace AIDungeonPrompts.Web.Controllers
 
 			if (scenarioFile != null)
 			{
-				var novelAiScenarioString = await ReadNovelAiScenario(scenarioFile);
+				var novelAiScenarioString = await ReadFormFile(scenarioFile);
 				try
 				{
 					NovelAiScenario? novelAiScenario = JsonSerializer.Deserialize<NovelAiScenario>(novelAiScenarioString);
@@ -359,6 +419,39 @@ namespace AIDungeonPrompts.Web.Controllers
 				catch (JsonException e)
 				{
 					_logger.LogError(e, "Could not decode NAI Json data");
+				}
+
+				ModelState.Clear();
+				return View(model);
+			}
+
+			if (holoFile != null)
+			{
+				var holoScenarioString = await ReadFormFile(holoFile);
+				try
+				{
+					HoloAiScenario? holoScenario =
+						JsonSerializer.Deserialize<HoloAiScenario>(holoScenarioString, new JsonSerializerOptions(JsonSerializerDefaults.Web));
+					if (holoScenario != null)
+					{
+						model.Command.Description = null;
+						model.Command.Memory = holoScenario.Memory;
+						model.Command.AuthorsNote = holoScenario.AuthorsNote;
+						model.Command.Title = holoScenario.Title;
+						model.Command.PromptContent = string.Join('\n',
+							holoScenario.Content.Select(content =>
+								string.Join(' ', content.Children.Select(child => child.Text))));
+						model.Command.PromptTags = string.Join(", ", holoScenario.Tags);
+						model.Command.WorldInfos = holoScenario.WorldInfo.ConvertAll(e => new UpdatePromptCommandWorldInfo
+						{
+							Entry = e.Value, Keys = string.Join(", ", e.Keys)
+						});
+						model.Command.HoloAiScenario = holoScenarioString;
+					}
+				}
+				catch (JsonException e)
+				{
+					_logger.LogError(e, "Could not decode Holo Json data");
 				}
 
 				ModelState.Clear();

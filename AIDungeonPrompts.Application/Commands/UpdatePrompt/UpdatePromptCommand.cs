@@ -45,6 +45,8 @@ namespace AIDungeonPrompts.Application.Commands.UpdatePrompt
 		public string Title { get; set; } = string.Empty;
 
 		public string? NovelAiScenario { get; set; }
+		public string? HoloAiScenario { get; set; }
+
 
 		[Display(Name = "World Info")]
 		public List<UpdatePromptCommandWorldInfo> WorldInfos { get; set; } = new List<UpdatePromptCommandWorldInfo>
@@ -101,6 +103,7 @@ namespace AIDungeonPrompts.Application.Commands.UpdatePrompt
 					? request.ScriptZip ?? prompt.ScriptZip
 					: prompt.ScriptZip;
 				prompt.NovelAiScenario = string.IsNullOrWhiteSpace(request.NovelAiScenario) ? null : request.NovelAiScenario;
+				prompt.HoloAiScenario = string.IsNullOrWhiteSpace(request.HoloAiScenario) ? null :  request.HoloAiScenario;
 
 				foreach (var worldInfo in request.WorldInfos)
 				{
@@ -122,7 +125,7 @@ namespace AIDungeonPrompts.Application.Commands.UpdatePrompt
 			if (canEditTags)
 			{
 				prompt.PromptTags = new List<PromptTag>();
-				IEnumerable<string>? promptTags =
+				var promptTags =
 					request.PromptTags.Split(',').Select(p => p.Trim().ToLower()).Distinct();
 				foreach (var promptTag in promptTags)
 				{

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
 using AIDungeonPrompts.Application.Queries.GetPrompt;
@@ -56,10 +57,10 @@ namespace AIDungeonPrompts.Web.Models.NovelAi
 					prompt.WorldInfos.Select(
 						wi =>
 						{
-							var split = wi.Keys.Split(",");
+							var split = wi.KeysList.ToList();
 							return new NovelAiLorebookEntry
 							{
-								Keys = split.Select(key => key.Trim()).ToList(),
+								Keys = split.ConvertAll(key => key.Trim()),
 								Text = wi.Entry,
 								DisplayName = split.FirstOrDefault()?.Trim() ?? string.Empty
 							};

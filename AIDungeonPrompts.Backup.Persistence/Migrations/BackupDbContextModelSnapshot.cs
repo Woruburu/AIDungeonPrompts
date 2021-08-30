@@ -14,7 +14,7 @@ namespace AIDungeonPrompts.Backup.Persistence.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "5.0.2");
+                .HasAnnotation("ProductVersion", "5.0.9");
 
             modelBuilder.Entity("AIDungeonPrompts.Backup.Persistence.Entities.BackupPrompt", b =>
                 {
@@ -37,7 +37,13 @@ namespace AIDungeonPrompts.Backup.Persistence.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("HoloAiScenario")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Memory")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("NovelAiScenario")
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("Nsfw")
