@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:14
+    restart: always
+    #volumes:
+      #- db:/var/lib/postgresql
+    environment:
+      - POSTGRES_PASSWORD=example
+
+  app:
+    image: app
+    build:
+      context: app
+      dockerfile: .
+    restart: always
+    environment:
+      - ConnectionStrings__AIDungeonPrompt=Host=db;Port=5432;Database=prompts;Username=postgres;Password=example;
+      - Serilog__WriteTo__1__Args__connectionString=Host=db;Port=5432;Database=prompts;Username=postgres;Password=example;
+    depends_on:
+      - db
+    ports:
+      - 5001:80
+
+#volumes:
+  #db:
