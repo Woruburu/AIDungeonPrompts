@@ -189,8 +189,8 @@ namespace AIDungeonPrompts.Web
 			});
 
 			services.AddHostedService<DatabaseMigrationHostedService>();
-			services.AddHostedService<DatabaseBackupHostedService>();
-			services.AddHostedService<DatabaseBackupCronJob>();
+			// services.AddHostedService<DatabaseBackupHostedService>();
+			// services.AddHostedService<DatabaseBackupCronJob>();
 			services.AddHostedService<ApplicationLogCleanerCronJob>();
 			services.AddHostedService<ReportCleanerCronJob>();
 		}
