@@ -9,6 +9,7 @@ namespace AIDungeonPrompts.Persistence.Configurations
 		public void Configure(EntityTypeBuilder<WorldInfo> builder)
 		{
 			builder.HasKey(e => e.Id);
+			builder.HasIndex(e => e.PromptId);
 			builder.Property(e => e.Keys).IsRequired();
 			builder.Property(e => e.Entry).IsRequired();
 			builder.HasOne(e => e.Prompt)
